@@ -1,4 +1,4 @@
-# # Self Management Database (SelfMD)
+# # Self Management Database (Self MD)
 
 -- O que é?
 
