@@ -1,0 +1,20 @@
+@import "../../Styles/Variables.scss";
+
+.split-parent {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.split-char,
+.split-word,
+.split-line {
+  display: inline-block;
+}
+
+.split-line {
+  display: block;
+}
+
+.split-word {
+  font-family: $fonte-principal;
+}

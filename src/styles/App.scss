@@ -1,0 +1,108 @@
+@import "../Styles/Variables.scss";
+
+* {
+  margin: 0;
+}
+
+.navbar {
+  display: flex;
+  height: 3.5rem;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ebeaea;
+
+  .nav-left {
+    flex: 0 0 auto;
+
+    img {
+      margin-top: 0.33rem;
+      margin-left: 1rem;
+      width: 130px;
+    }
+  }
+
+  .nav-center {
+    display: flex;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    .nav-itens {
+      .nav-list {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-item {
+        a {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          text-decoration: none;
+          color: black;
+          font-family: $fonte-principal;
+          font-size: 18px;
+          font-weight: 500;
+          transition: 0.4s ease;
+        }
+
+        a:hover {
+          color: $cor-primaria;
+          transition: 0.4s ease;
+        }
+
+        i {
+          font-size: 24px;
+        }
+
+        svg {
+          fill: currentColor;
+          flex-shrink: 0;
+        }
+
+        .label {
+          opacity: 0;
+          max-width: 0;
+          overflow: hidden;
+          transition: ease 0.7s;
+        }
+
+        a:hover .label {
+          opacity: 1;
+          max-width: 70px;
+        }
+      }
+    }
+  }
+
+  .nav-right {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+
+    .LoginButton {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: $cor-fundo;
+
+  h1 {
+    margin-top: 1rem;
+    font-family: $fonte-principal;
+    color: $cor-primaria;
+  }
+
+  p {
+    font-family: $fonte-principal;
+  }
+}
