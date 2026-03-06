@@ -29,7 +29,7 @@ function App() {
           <br />
           <br />
           <SplitText
-            text="Seja bem vindo ao Self Management Database"
+            text="Seja bem vindo ao"
             className="text-2xl font-semibold text-center"
             delay={30}
             duration={1}
@@ -43,14 +43,6 @@ function App() {
             onLetterAnimationComplete={handleAnimationComplete}
             tag="h1"
           />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
           <br />
           <br />
           <br />
