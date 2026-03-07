@@ -1,4 +1,4 @@
-import "./Styles/App.scss";
+import "./styles/App.scss";
 import ScrollFloat from "./ReactBitsCodes/ScrollFloat/ScrollFloat.jsx";
 import SplitText from "./ReactBitsCodes/SplitText/SplitText.jsx";
 import Lenis from "@studio-freight/lenis";

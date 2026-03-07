@@ -1,4 +1,4 @@
-@import "../Styles/Variables.scss";
+@use "../styles/variables" as v;
 
 * {
   margin: 0;
@@ -43,14 +43,14 @@
           gap: 0.6rem;
           text-decoration: none;
           color: black;
-          font-family: $fonte-principal;
+          font-family: v.$jakarta;
           font-size: 18px;
           font-weight: 500;
           transition: 0.4s ease;
         }
 
         a:hover {
-          color: $cor-primaria;
+          color: v.$cor-primaria;
           transition: 0.4s ease;
         }
 
@@ -94,15 +94,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: $cor-fundo;
+  background-color: v.$cor-fundo;
 
   h1 {
     margin-top: 1rem;
-    font-family: $fonte-principal;
-    color: $cor-primaria;
+    font-family: v.$jakarta;
+    color: v.$cor-primaria;
   }
 
   p {
-    font-family: $fonte-principal;
+    font-family: v.$jakarta;
   }
 }
