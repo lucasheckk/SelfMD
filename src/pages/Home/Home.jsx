@@ -1,13 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import "./Home.scss";
+import { Menu } from "../../components/Menu/Menu";
 
 export function Home() {
-  const navigate = useNavigate();
-
   return (
-    <div>
-      <h1>Bem-vindo ao SelfMD</h1>
-      <p>Esta é a página inicial após o login</p>
-      <button onClick={() => navigate('/')}>Voltar</button>
-    </div>
+    <Menu>
+      <div className="body"></div>
+      <div className="container"></div>
+    </Menu>
   );
 }

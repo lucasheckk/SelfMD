@@ -1,0 +1,6 @@
+@use "../../styles/variables" as v;
+
+.body {
+    background-color: v.$cor-fundo;
+  font-family: v.$jakarta;
+}
