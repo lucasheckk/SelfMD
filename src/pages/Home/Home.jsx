@@ -3,9 +3,12 @@ import { Menu } from "../../components/Menu/Menu";
 
 export function Home() {
   return (
-    <Menu>
-      <div className="body"></div>
-      <div className="container"></div>
-    </Menu>
+    <div className="body">
+      <Menu>
+        <div className="container">
+          
+        </div>
+      </Menu>
+    </div>
   );
 }

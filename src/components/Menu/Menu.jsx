@@ -23,12 +23,12 @@ export function Menu() {
             <a href="#database">Database</a>
           </li>
           <li>
-            <i className="fi fi-sr-clock"></i>
-            <a href="#recente">Recente</a>
+            <i className="fi fi-sr-star"></i>
+            <a href="#recente">Favoritos</a>
           </li>
           <li>
             <i className="fi fi-sr-star"></i>
-            <a href="#favoritos">Favoritos</a>
+            <a href="#favoritos">Suporte</a>
           </li>
           <li>
             <i className="fi fi-sr-document"></i>
