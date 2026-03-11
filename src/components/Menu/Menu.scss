@@ -1,9 +1,15 @@
 @use "../../styles/variables" as v;
 
+.icon-animate {
+  display: inline-block;
+  animation: v.$transicao-fadeIn;
+}
+
 .menu-superior {
   display: flex;
+  align-items: center;
   position: fixed;
-  width: calc(100% - 50px);
+  width: calc(100% - 45px);
   height: 60px;
   top: 15px;
   left: 15px;
@@ -14,26 +20,77 @@
   border: v.$glass-border;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  -webkit-font-smoothing: antialiased;
+  animation: v.$transicao-fadeIn;
 
-  button {
+  .menu-toggle {
     display: flex;
-    margin-left: 15px;
-    justify-content: center;
-    align-items: center;
     background: transparent;
+    align-items: center;
     border: none;
     font-size: 24px;
     cursor: pointer;
+    margin-left: 15px; 
 
     i {
-      display: block;
-      background: transparent;
       color: #333;
       line-height: 0;
     }
+  }
 
-    .icon-animate {
-      animation: fadeIn 0.3s ease-in-out;
+  .menu-direita {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 15px;
+
+    .upgrade-button {
+      display: flex;
+      height: 40px;
+      width: 170px;
+      font-size: 20px;
+      background-color: v.$cor-primaria;
+      border-radius: 10px;
+      color: #ffffff;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .user {
+      display: flex;
+      width: 45px;
+      height: 45px;
+      border: solid 3px v.$cor-primaria;
+      border-radius: 50%;
+      cursor: pointer;
+      color: v.$cor-primaria;
+      background: transparent;
+      transition: v.$transicao-rapida;
+      animation: fadeIn 0.4s ease-in-out forwards;
+
+      &:hover {
+        color: #ffffff;
+        background-color: v.$cor-primaria;
+        transition: v.$transicao-rapida;
+      }
+
+    }
+
+    button {
+      display: flex;
+      margin-left: 15px;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+
+      i {
+        display: block;
+        background: transparent;
+        color: #333;
+        line-height: 0;
+      }
     }
   }
 }
@@ -46,12 +103,10 @@
   top: 0px;
   left: 15px;
   width: 290px;
-  height: 240px;
+  height: 290px;
   background: #ffffff;
   border-radius: 15px;
-  transition:
-    top 0.5s ease,
-    opacity 0.3s ease;
+  transition: all 0.3s ease-in-out;
   border: v.$glass-border;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 900;
@@ -59,42 +114,37 @@
   opacity: 0;
 
   ul {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
     list-style: none;
-    background-color: transparent;
     padding: 15px;
 
     li {
+      display: flex;
       background: transparent;
       padding: 9px 0;
-      display: flex;
       align-items: center;
-      gap: 15px;
+      align-content: center;
+      transition: v.$transicao-rapida;
 
-      i {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 28px;
-        font-size: 24px;
-        text-align: center;
-        background: transparent;
-        line-height: 0;
-        color: #333;
-        transition: v.$transicao-rapida;
+      &:hover {
+        transform: translateY(-2px);
       }
 
       a {
-        display: inline-block;
-        line-height: 1;
-        font-size: 23px;
+        display: flex;
+        line-height: 0.9;
+        font-size: 24px;
         text-decoration: none;
         color: #333;
         background: transparent;
         transition: v.$transicao-rapida;
+        gap: 25px;
+
+        i {
+          margin-left: 15px;
+          background: transparent;
+          color: #333;
+          transition: v.$transicao-rapida;
+        }
       }
 
       &:hover {
@@ -105,7 +155,6 @@
         i {
           color: v.$cor-primaria;
           transition: v.$transicao-rapida;
-          transform: translatey(-2px);
         }
       }
     }
@@ -118,13 +167,7 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.conteudo-principal {
+  padding-top: 90px;
+  width: 100%;
 }
