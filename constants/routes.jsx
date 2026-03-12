@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from '../src/App';
 import { Login } from '../src/pages/LoginPage/Login';
-import { Home } from '../src/pages/Home/Home';
+import { Home } from '../src/pages/Home/Database';
 import { Remind } from '../src/pages/Remind/Remind';
 
 export function RoutesConfig() {

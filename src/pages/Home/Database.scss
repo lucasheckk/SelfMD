@@ -1,0 +1,134 @@
+@use "../../styles/variables" as v;
+
+.body {
+  background-color: v.$cor-fundo;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.container-principal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 605px;
+  margin-left: 15px;
+  margin-right: 15px;
+  gap: 60px;
+
+  .criar-database {
+    display: flex;
+    height: 370px;
+    width: 370px;
+    border-radius: 13px;
+    justify-content: center;
+    align-items: center;
+    background-color: v.$cor-fundo;
+    border: solid 2px #c7c7c7;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    transition: v.$transicao-rapida;
+    animation: v.$transicao-fadeIn;
+
+    &:hover {
+      transition: v.$transicao-rapida;
+    }
+
+    i {
+      color: #333;
+      font-size: 40px;
+      transition: v.$transicao-rapida;
+
+      &:hover {
+        cursor: pointer;
+        color: v.$cor-primaria;
+        transition: v.$transicao-rapida;
+      }
+    }
+
+    .card-criacao {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      font-family: v.$jakarta;
+      animation: v.$transicao-fadeIn;
+      gap: 20px;
+
+      .card-ttl {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        padding-bottom: 30px;
+        transition: v.$transicao-rapida;
+      }
+
+      .input-nome {
+        display: flex;
+        margin-bottom: 20px;
+        border: none;
+        border-bottom: 3px solid #333;
+        outline: none;
+        padding: 10px;
+        text-align: center;
+        transition: v.$transicao-rapida;
+        margin-bottom: 30px;
+
+        &::placeholder {
+          opacity: 1;
+          transition: v.$transicao-rapida;
+        }
+
+        &:focus::placeholder {
+          opacity: 0;
+          transition: v.$transicao-rapida;
+        }
+      }
+
+      .mensagem-erro {
+        position: absolute;
+        display: flex;
+        font-size: 15px;
+        bottom: 70px;
+        width: 100%;
+        justify-content: center;
+        animation: v.$transicao-fadeIn;
+        color: red;
+      }
+
+      button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .acoes {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 20px;
+        gap: 30px;
+
+        .cancelar i {
+          display: flex;
+          font-size: 45px;
+          line-height: 0;
+
+          &:hover {
+            color: red;
+          }
+        }
+
+        .confirmar {
+          display: flex;
+          transition: v.$transicao-rapida;
+
+          i {
+            font-size: 45px;
+            line-height: 0;
+          }
+        }
+      }
+    }
+  }
+}

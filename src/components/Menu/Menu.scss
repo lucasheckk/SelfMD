@@ -54,20 +54,30 @@
     gap: 15px;
 
     .notific {
-      
+      height: 40px;
+      width: 40px;
+      border: solid 3px #c7c7c7;
+      border-radius: 50%;
+      transition: v.$transicao-rapida;
+      background-color: v.$cor-fundo;
+
+      &:hover {
+        background-color: v.$cor-primaria;
+        border: solid 3px v.$cor-primaria;
+        transition: v.$transicao-rapida;
+      }
+
+      &:hover i {
+        color: #ffffff;
+      }
+
       i {
-        font-size: 28px;
+        font-size: 20px;
         display: block;
         background: transparent;
         color: #333;
         line-height: 0;
         transition: v.$transicao-rapida;
-
-        &:hover {
-          color: v.$cor-primaria;
-          transition: v.$transicao-rapida;
-        }
-
       }
     }
 
@@ -77,10 +87,11 @@
       height: 40px;
       width: 170px;
       font-size: 20px;
-      border: solid 2px #333;
+      border: solid 3px #c7c7c7;
       border-radius: 10px;
       color: #333;
       transition: v.$transicao-rapida;
+      background-color: v.$cor-fundo;
 
       &:hover {
         background-color: v.$cor-primaria;
@@ -88,18 +99,17 @@
         color: #ffffff;
         transition: v.$transicao-rapida;
       }
-
     }
 
     .user {
       display: flex;
       width: 40px;
       height: 40px;
-      border: solid 3px #333;
+      border: solid 3px #c7c7c7;
       border-radius: 50%;
       cursor: pointer;
       color: v.$cor-primaria;
-      background: transparent;
+      background-color: v.$cor-fundo;
       transition: v.$transicao-rapida;
 
       &:hover {
@@ -218,7 +228,6 @@
     border: none;
     background-color: transparent;
   }
-
 
   &:open {
     top: 90px;
