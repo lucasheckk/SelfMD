@@ -19,17 +19,19 @@ export function Login() {
 
   const handleLoginSubmit = async (e) => {
   e.preventDefault();
-  console.log("Enviando dados:", loginData); // Veja se o JSON está saindo certo
-
   try {
     const response = await API.post(AUTH_ROUTES.LOGIN, loginData);
-    console.log("Resposta da API:", response); // Veja o que o back-end respondeu
+    const token = response.data.token; 
     
-    // Se o login funcionar, o navigate será chamado
-    navigate("/home"); 
+    if (token) {
+      localStorage.setItem("token", token); 
+      navigate("/home");
+    } else {
+      alert("Token não recebido pelo servidor!");
+    }
   } catch (error) {
-    console.error("Erro capturado:", error.response || error);
-    alert("Erro: " + (error.response?.data?.message || "Erro de conexão"));
+    console.error("Erro no login:", error);
+    alert("Falha no login: " + (error.response?.data?.message || "Erro desconhecido"));
   }
 };
 
