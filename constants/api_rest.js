@@ -7,12 +7,20 @@ export const API = axios.create({
   }
 });
 
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token"); 
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const AUTH_ROUTES = {
   LOGIN: "/auth/login",
   REGISTER: "/auth/register"
 };
 
 export const CRUD_ROUTES = {
-  DATABASE: "/databases",
+  CRIAR: "/databases",
   USUARIO: (id) => `/usuario/${id}`
 };

@@ -2,7 +2,7 @@ import "./Database.scss";
 import { useState } from "react";
 import { Menu } from "../../components/Menu/Menu";
 import { API, CRUD_ROUTES } from "../../../constants/api_rest.js";
-import { motion, AnimatePresence } from "framer-motion";
+import {motion, AnimatePresence} from "framer-motion";
 
 export function Home() {
   const [aviso, setAviso] = useState("");
@@ -19,7 +19,7 @@ export function Home() {
 
     setLoading(true);
     try {
-      const response = await API.post(CRUD_ROUTES.DATABASE, {
+      const response = await API.post(CRUD_ROUTES.CRIAR, {
         nome: nomeDatabase,
       });
       if (response.status === 201 || response.status === 200) {
@@ -60,21 +60,20 @@ export function Home() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setIsCriando(true)}
+                  style={{ cursor: "pointer" }}
+                  className="criar-database-icone"
                 >
-                  <div
-                    onClick={() => setIsCriando(true)}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <div>
                     <i className="fi fi-sr-layer-plus"></i>
                   </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key="card-criacao"
-                  initial={{ opacity: 0, scale: 0.9 }} 
-                  animate={{ opacity: 1, scale: 1 }} 
-                  exit={{ opacity: 0, scale: 0.9 }} 
-                  transition={{ duration: 0.4 }} 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
                 >
                   <div className="card-criacao">
                     <h1 className="card-ttl">Nova Database</h1>
@@ -86,9 +85,21 @@ export function Home() {
                       onChange={(e) => setNomeDatabase(e.target.value)}
                       autoFocus
                     />
-                    <p className={`mensagem-erro ${aviso ? "visivel" : ""}`}>
-                      {aviso || "\u00A0"}
-                    </p>
+                    <AnimatePresence mode="wait">
+                      {aviso && (
+                        <motion.p
+                          key="mensagem-erro"
+                          className="mensagem-erro"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {aviso}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+
                     <div className="acoes">
                       <button
                         className="cancelar"

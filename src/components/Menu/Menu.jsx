@@ -94,7 +94,7 @@ export function Menu({ children }) {
       </div>
       )}
       <div className="notificacoes">
-        <button><i class="fi fi-sr-x"></i></button>
+        <button><i className="fi fi-sr-x"></i></button>
 
         <ul>
           <li>
