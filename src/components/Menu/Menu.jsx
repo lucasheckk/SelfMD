@@ -1,11 +1,25 @@
 import "./Menu.scss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 export function Menu({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const nomesAmigaveis = {
+    "/home": "Minhas Databases",
+    "/favoritos": "Favoritos",
+    "/suporte": "Suporte",
+    "/upgrade": "Plano",
+    "/docs": "Documentos",
+    "/configuracoes": "Configurações"
+  };
+
+  const tituloPagina = nomesAmigaveis[location.pathname] || 
+    location.pathname.replace("/", "").charAt(0).toUpperCase() + location.pathname.slice(2);
 
   const toggleMenu = () => {
     if (isMenuOpen) {
@@ -31,8 +45,10 @@ export function Menu({ children }) {
             className={`${isMenuOpen ? "fi fi-sr-cross" : "fi fi-sr-menu-burger"} icon-animate`}
           ></i>
         </button>
+        <div className="where-am-i">
+          <p>{tituloPagina}</p>
+        </div>
         <div className="menu-direita">
-          <button className="aaa">Convidar</button>
           <button className="upgrade-button">Fazer upgrade</button>
           <button className="notific">
             <i className="fi fi-sr-bell"></i>
@@ -77,6 +93,25 @@ export function Menu({ children }) {
         </ul>
       </div>
       )}
+      <div className="notificacoes">
+        <button><i class="fi fi-sr-x"></i></button>
+
+        <ul>
+          <li>
+            <p>Item 1</p>
+          </li>
+          <li>
+            <p>Item 1</p>
+          </li>
+          <li>
+            <p>Item 1</p>
+          </li>
+          <li>
+            <p>Item 1</p>
+          </li>
+        </ul>
+
+      </div>
       <main className="conteudo-principal">
         {children}
       </main>

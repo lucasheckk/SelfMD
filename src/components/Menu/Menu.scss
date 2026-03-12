@@ -17,7 +17,7 @@
   padding-right: 15px;
   border-radius: 15px;
   background: #ffffff;
-  border: v.$glass-border;
+  border: solid 2px #c7c7c7;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   -webkit-font-smoothing: antialiased;
@@ -30,12 +30,21 @@
     border: none;
     font-size: 24px;
     cursor: pointer;
-    margin-left: 15px; 
+    margin-left: 15px;
 
     i {
       color: #333;
       line-height: 0;
     }
+  }
+
+  .where-am-i {
+    display: flex;
+    width: 100%;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    margin-left: 15px;
   }
 
   .menu-direita {
@@ -44,35 +53,61 @@
     margin-left: auto;
     gap: 15px;
 
+    .notific {
+      
+      i {
+        font-size: 28px;
+        display: block;
+        background: transparent;
+        color: #333;
+        line-height: 0;
+        transition: v.$transicao-rapida;
+
+        &:hover {
+          color: v.$cor-primaria;
+          transition: v.$transicao-rapida;
+        }
+
+      }
+    }
+
     .upgrade-button {
       display: flex;
+      align-items: center;
       height: 40px;
       width: 170px;
       font-size: 20px;
-      background-color: v.$cor-primaria;
+      border: solid 2px #333;
       border-radius: 10px;
-      color: #ffffff;
-      animation: fadeIn 0.4s ease-in-out forwards;
+      color: #333;
+      transition: v.$transicao-rapida;
+
+      &:hover {
+        background-color: v.$cor-primaria;
+        border: solid 2px v.$cor-primaria;
+        color: #ffffff;
+        transition: v.$transicao-rapida;
+      }
+
     }
 
     .user {
       display: flex;
-      width: 45px;
-      height: 45px;
-      border: solid 3px v.$cor-primaria;
+      width: 40px;
+      height: 40px;
+      border: solid 3px #333;
       border-radius: 50%;
       cursor: pointer;
       color: v.$cor-primaria;
       background: transparent;
       transition: v.$transicao-rapida;
-      animation: fadeIn 0.4s ease-in-out forwards;
 
       &:hover {
+        border: solid 3px v.$cor-primaria;
         color: #ffffff;
         background-color: v.$cor-primaria;
         transition: v.$transicao-rapida;
       }
-
     }
 
     button {
@@ -84,13 +119,6 @@
       border: none;
       font-size: 24px;
       cursor: pointer;
-
-      i {
-        display: block;
-        background: transparent;
-        color: #333;
-        line-height: 0;
-      }
     }
   }
 }
@@ -107,7 +135,7 @@
   background: #ffffff;
   border-radius: 15px;
   transition: all 0.3s ease-in-out;
-  border: v.$glass-border;
+  border: solid 2px #c7c7c7;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 900;
   pointer-events: none;
@@ -161,6 +189,38 @@
   }
 
   &.open {
+    top: 90px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.notificacoes {
+  display: flex;
+  position: fixed;
+  align-items: center;
+  height: 200px;
+  width: 250px;
+  background-color: #ffffff;
+  top: 15px;
+  right: 12px;
+  border-radius: 15px;
+  z-index: 1;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  border: solid 2px #c7c7c7;
+  animation: v.$transicao-fadeIn;
+  opacity: 0;
+
+  button {
+    position: fixed;
+    top: 15px;
+    left: 210px;
+    border: none;
+    background-color: transparent;
+  }
+
+
+  &:open {
     top: 90px;
     opacity: 1;
     pointer-events: auto;
