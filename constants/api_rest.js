@@ -26,6 +26,9 @@ export const AUTH_ROUTES = {
 };
 
 export const CRUD_ROUTES = {
+  BASE: "/databases",
   CRIAR: "/databases",
-  USUARIO: (id) => `/usuario/${id}`,
+  LISTAR: (id) => `/usuario/${id}`,
+  ATUALIZAR: (id) => `/databases/${id}`,
+  EXCLUIR: (id) => `/databases/${id}`
 };

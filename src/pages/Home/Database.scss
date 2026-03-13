@@ -9,12 +9,24 @@
 .container-principal {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  height: 605px;
-  margin-left: 15px;
-  margin-right: 15px;
+  min-height: 605px;
+  width: 100%;
   gap: 60px;
+  position: relative;
+  animation: v.$transicao-fadeIn;
+
+  .lista-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+  }
 
   .criar-database {
     display: flex;
@@ -23,34 +35,15 @@
     border-radius: 13px;
     justify-content: center;
     align-items: center;
-    background-color: v.$cor-fundo;
+    background-color: #ffffff;
     border: solid 2px #c7c7c7;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
     transition: v.$transicao-rapida;
-    animation: v.$transicao-fadeIn;
-
-    &:hover {
-      transition: v.$transicao-rapida;
-    }
-
-    i {
-      color: #333;
-      font-size: 40px;
-      transition: v.$transicao-rapida;
-
-      &:hover {
-        cursor: pointer;
-        color: v.$cor-primaria;
-        transition: v.$transicao-rapida;
-      }
-    }
 
     .card-criacao {
       position: relative;
       display: flex;
       flex-direction: column;
-      font-family: v.$jakarta;
       animation: v.$transicao-fadeIn;
       gap: 20px;
 
@@ -59,46 +52,30 @@
         align-items: center;
         justify-content: center;
         font-size: 35px;
-        padding-bottom: 30px;
-        transition: v.$transicao-rapida;
+        padding-bottom: 10px;
+        font-family: v.$jakarta;
+        font-weight: 600;
+        color: #333;
       }
 
       .input-nome {
         display: flex;
-        margin-bottom: 20px;
         border: none;
         border-bottom: 3px solid #333;
         outline: none;
         padding: 10px;
         text-align: center;
-        transition: v.$transicao-rapida;
-        margin-bottom: 30px;
+        font-family: v.$jakarta;
+        font-weight: 400;
 
         &::placeholder {
           opacity: 1;
           transition: v.$transicao-rapida;
         }
-
         &:focus::placeholder {
           opacity: 0;
           transition: v.$transicao-rapida;
         }
-      }
-
-      .mensagem-erro {
-        position: absolute;
-        display: flex;
-        font-size: 15px;
-        bottom: 70px;
-        width: 100%;
-        justify-content: center;
-        color: red;
-      }
-
-      button {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
       }
 
       .acoes {
@@ -108,84 +85,156 @@
         padding-top: 20px;
         gap: 30px;
 
-        .cancelar i {
+        button {
           display: flex;
-          font-size: 45px;
-          line-height: 0;
-
-          &:hover {
-            color: red;
-          }
-        }
-
-        .confirmar {
-          display: flex;
-          transition: v.$transicao-rapida;
+          width: 60px;
+          height: 60px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          align-items: center;
+          justify-content: center;
 
           i {
             font-size: 45px;
             line-height: 0;
+            transition: v.$transicao-rapida;
+          }
+          &:hover i {
+            transform: scale(0.9);
+          }
+        }
+        .cancelar:hover i {
+          color: rgb(206, 2, 2);
+        }
+        .confirmar:hover i {
+          color: v.$cor-primaria;
+        }
+      }
+    }
+  }
+
+  // Estilo dos cards de sucesso (Lista)
+  .card-sucesso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    width: 370px;
+    height: 300px;
+    border-radius: 13px;
+    border: solid 2px #c7c7c7;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    animation: v.$transicao-fadeIn;
+    font-family: v.$jakarta;
+
+    .card-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 3rem;
+
+      .titulo-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+
+        h2 {
+          font-size: 35px;
+          font-weight: 600;
+          color: #333;
+          margin: 0;
+          line-height: 1;
+        }
+        .atualizar {
+          margin-top: 6px;
+          font-size: 24px;
+          cursor: pointer;
+          color: #333;
+          line-height: 0;
+          transition: v.$transicao-rapida;
+
+          &:hover {
+            transform: scale(0.9);
+            will-change: transform;
+            transition: v.$transicao-rapida;
           }
         }
       }
     }
 
-    .card-sucesso {
+    .botoes-container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-direction: row;
+      gap: 1.5rem;
       justify-content: center;
-      animation: v.$transicao-fadeIn;
 
-      h2 {
-        font-size: 40px;
-        display: flex;
+      button {
+        border: none;
+        background-color: transparent;
         color: #333;
-        margin-bottom: 3rem;
-      }
-
-      .botoes-container {
+        cursor: pointer;
         display: flex;
-        flex-direction: row;
-        gap: 1.5rem; 
+        align-items: center;
         justify-content: center;
-
-        button {
-          border: none;
-          background-color: transparent;
-          color: #333;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          
-          i {
-            font-size: 35px;
-          }
-
+        i {
+          font-size: 35px;
+          transition: v.$transicao-rapida;
         }
+      }
+      .excluir:hover i {
+        color: #dc2e2e;
+        transform: scale(0.9);
+      }
+      .favoritar:hover i {
+        color: #bec502;
+        transform: scale(0.9);
+      }
+      .acessar:hover i {
+        color: v.$cor-primaria;
+        transform: scale(0.9);
+      }
+      .link-convite:hover i {
+        color: #0091c1;
+        transform: scale(0.9);
+      }
+    }
+  }
 
-        .excluir:hover i{
-          color: #dc2e2e;
-          transform: scale(0.9);
-        }
+  // Ícone de "+" (Fica dentro do lista-container)
+  .criar-database-icone {
+    width: 370px;
+    height: 370px;
+    border-radius: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 2px #c7c7c7;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: v.$transicao-rapida;
 
-        .acessar:hover i {
-          color: v.$cor-primaria;
-          transform: scale(0.9);
-        }
+    i {
+      color: #333;
+      font-size: 40px;
+      transition: v.$transicao-rapida;
 
-        .link-convite:hover i {
-          color: #0091c1;
-          transform: scale(0.9);
-        }
+      &:hover {
+        color: v.$cor-primaria;
+        transition: v.$transicao-rapida;
+        transform: scale(0.9);
+        will-change: transform;
       }
     }
   }
 }
 
+// Modal (sobrepõe tudo dentro do container-principal)
 .modal-exclusao-container {
-  position: absolute; // Relativo ao .criar-database
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -194,29 +243,26 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: white; // Garante que você veja o fundo branco
-  z-index: 1000;           // Garante que fique por cima de tudo
+  background-color: white;
+  z-index: 1000;
   padding: 20px;
   border-radius: 13px;
-  border: 1px solid #ccc;  // Para você ver o contorno dele na tela
-  
+  border: 1px solid #ccc;
+
   h2 {
     color: #333;
     font-size: 20px;
     margin-bottom: 20px;
   }
-  
   input {
     width: 80%;
     padding: 10px;
     border: 1px solid #333;
     margin-bottom: 20px;
   }
-  
   .acoes-exclusao {
     display: flex;
     gap: 15px;
-    
     button {
       padding: 10px 20px;
       cursor: pointer;

@@ -27,7 +27,7 @@ export function Login() {
     
     if (token) {
       localStorage.setItem("token", token); 
-      navigate("/home");
+      navigate("/database");
     } else {
       alert("Token não recebido pelo servidor!");
     }
@@ -42,7 +42,7 @@ export function Login() {
     try {
       const response = await API.post(AUTH_ROUTES.REGISTER, signUpData);
       console.log("Cadastro com sucesso:", response.data);
-      navigate("/home");
+      navigate("/database");
     } catch (error) {
       console.error("Erro no cadastro:", error.response?.data);
     }

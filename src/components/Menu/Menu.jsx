@@ -1,31 +1,43 @@
+
 import "./Menu.scss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 export function Menu({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
+  const [isNotificacaoOpen, setIsNotificacaoOpen] = useState(false);
+  const [isNotificacaoRendered, setIsNotificacaoRendered] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const nomesAmigaveis = {
-    "/home": "Minhas Databases",
+    "/database": "Minhas Databases",
     "/favoritos": "Favoritos",
     "/suporte": "Suporte",
     "/upgrade": "Plano",
     "/docs": "Documentos",
-    "/configuracoes": "Configurações"
+    "/configuracoes": "Configurações",
   };
 
-  const tituloPagina = nomesAmigaveis[location.pathname] || 
-    location.pathname.replace("/", "").charAt(0).toUpperCase() + location.pathname.slice(2);
+  const notific = [
+  { id: 100, tipo: 'limite', mensagem: 'Seu consumo atingiu 90% do limite.' },
+  { id: 200, tipo: 'upgrade', mensagem: 'Novo plano Pro disponível!' },
+  { id: 300, tipo: 'convite', mensagem: 'Você recebeu um convite para a database X.' },
+  { id: 400, tipo: 'acesso', mensagem: 'Você perdeu acesso à database Y.' }
+];
+
+  const tituloPagina =
+    nomesAmigaveis[location.pathname] ||
+    location.pathname.replace("/", "").charAt(0).toUpperCase() +
+      location.pathname.slice(2);
 
   const toggleMenu = () => {
     if (isMenuOpen) {
       // Se está fechando, espera a animação de 0.3s (do CSS)
       setIsMenuOpen(false);
-      setTimeout(() => setIsRendered(false), 300); 
+      setTimeout(() => setIsRendered(false), 300);
     } else {
       // Se está abrindo, mostra o elemento e depois aplica a classe .open
       setIsRendered(true);
@@ -33,13 +45,21 @@ export function Menu({ children }) {
     }
   };
 
+  const toggleNotificacoes = () => {
+    if (isNotificacaoOpen) {
+      setIsNotificacaoOpen(false);
+      setTimeout(() => setIsNotificacaoRendered(false), 300);
+    } else {
+      setIsNotificacaoRendered(true);
+      setTimeout(() => setIsNotificacaoOpen(true), 50);
+    }
+  };
+
   return (
+    
     <nav>
       <div className="menu-superior">
-        <button
-          className="menu-toggle"
-          onClick={toggleMenu}
-        >
+        <button className="menu-toggle" onClick={toggleMenu}>
           <i
             key={isMenuOpen ? "close" : "open"}
             className={`${isMenuOpen ? "fi fi-sr-cross" : "fi fi-sr-menu-burger"} icon-animate`}
@@ -50,7 +70,7 @@ export function Menu({ children }) {
         </div>
         <div className="menu-direita">
           <button className="upgrade-button">Fazer upgrade</button>
-          <button className="notific">
+          <button className="notific" onClick={toggleNotificacoes}>
             <i className="fi fi-sr-bell"></i>
           </button>
           <button className="user"></button>
@@ -58,63 +78,70 @@ export function Menu({ children }) {
       </div>
 
       {isRendered && (
-      <div className={`menu ${isMenuOpen ? "open" : ""}`}>
-        <ul>
-          <li>
-            <a onClick={() => navigate('/home')}>
-              <i className="fi fi-sr-coins"></i>Database
-            </a>
-          </li>
-          <li>
-            <a href="#recente">
-              <i className="fi fi-sr-star"></i>Favoritos
-            </a>
-          </li>
-          <li>
-            <a href="#favoritos">
-              <i class="fi fi-sr-user-headset"></i>Suporte
-            </a>
-          </li>
-          <li>
-            <a href="#favoritos">
-              <i class="fi fi-sr-usd-circle"></i>Planos
-            </a>
-          </li>
-          <li>
-            <a href="#documentos">
-              <i className="fi fi-sr-document"></i>Documentos
-            </a>
-          </li>
-          <li>
-            <a href="#configuracoes">
-              <i className="fi fi-sr-settings"></i>Configurações
-            </a>
-          </li>
-        </ul>
-      </div>
+        <div className={`menu ${isMenuOpen ? "open" : ""}`}>
+          <ul>
+            <li>
+              <a onClick={() => navigate("/home")}>
+                <i className="fi fi-sr-coins"></i>Database
+              </a>
+            </li>
+            <li>
+              <a href="#recente">
+                <i className="fi fi-sr-star"></i>Favoritos
+              </a>
+            </li>
+            <li>
+              <a href="#favoritos">
+                <i class="fi fi-sr-user-headset"></i>Suporte
+              </a>
+            </li>
+            <li>
+              <a href="#favoritos">
+                <i class="fi fi-sr-usd-circle"></i>Planos
+              </a>
+            </li>
+            <li>
+              <a href="#documentos">
+                <i className="fi fi-sr-document"></i>Documentos
+              </a>
+            </li>
+            <li>
+              <a href="#configuracoes">
+                <i className="fi fi-sr-settings"></i>Configurações
+              </a>
+            </li>
+          </ul>
+        </div>
       )}
-      <div className="notificacoes">
-        <button><i className="fi fi-sr-x"></i></button>
+      {isNotificacaoRendered && (
+        <div className={`notificacoes ${isNotificacaoOpen ? "open" : ""}`}>
+          <button
+            className="fechar-aba"
+            onClick={() => {
+              setIsNotificacaoOpen(false);
+              setTimeout(() => setIsNotificacaoRendered(false), 300);
+            }}
+          >
+            <i className="fi fi-sr-x"></i>
+          </button>
 
-        <ul>
-          <li>
-            <p>Item 1</p>
-          </li>
-          <li>
-            <p>Item 1</p>
-          </li>
-          <li>
-            <p>Item 1</p>
-          </li>
-          <li>
-            <p>Item 1</p>
-          </li>
-        </ul>
+          <p className="notific-ttl">Notificações</p>
 
-      </div>
-      <main className="conteudo-principal">
-        {children}
-      </main>
+          <ul className="notific-lista">
+            <li key={notific.id} className={`notific-item ${notific.tipo}`}>
+              <p>{notific.mensagem}</p>
+            </li>
+            <li>
+              <p>Item 1</p>
+            </li>
+            <li>
+              <p>Item 1</p>
+            </li>
+          </ul>
+          <a href="">Marcar como lido</a>
+        </div>
+      )}
+      <main className="conteudo-principal">{children}</main>
     </nav>
   );
 }

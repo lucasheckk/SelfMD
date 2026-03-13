@@ -12,6 +12,7 @@
   "dependencies": {
     "@flaticon/flaticon-uicons": "^3.3.1",
     "@gsap/react": "^2.1.2",
+    "@lottiefiles/dotlottie-web": "^0.66.2",
     "@studio-freight/lenis": "^1.0.42",
     "axios": "^1.13.3",
     "framer-motion": "^12.36.0",
