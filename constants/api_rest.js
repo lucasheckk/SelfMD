@@ -1,26 +1,31 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const API = axios.create({
   baseURL: "http://localhost:8080",
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token"); 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token.trim()}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 export const AUTH_ROUTES = {
   LOGIN: "/auth/login",
-  REGISTER: "/auth/register"
+  REGISTER: "/auth/register",
 };
 
 export const CRUD_ROUTES = {
   CRIAR: "/databases",
-  USUARIO: (id) => `/usuario/${id}`
+  USUARIO: (id) => `/usuario/${id}`,
 };

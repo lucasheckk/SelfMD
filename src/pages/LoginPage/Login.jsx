@@ -21,6 +21,8 @@ export function Login() {
   e.preventDefault();
   try {
     const response = await API.post(AUTH_ROUTES.LOGIN, loginData);
+    console.log("Resposta do Login:", response.data);
+    
     const token = response.data.token; 
     
     if (token) {
