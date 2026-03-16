@@ -4,6 +4,7 @@ import SplitText from "./ReactBitsCodes/SplitText/SplitText.jsx";
 import Lenis from "@studio-freight/lenis";
 import { useEffect } from "react";
 import { Link } from 'react-router-dom';
+import { LoadingAnimation } from './components/Animation/LoadingAnimation.jsx'
 
 function App() {
   useEffect(() => {

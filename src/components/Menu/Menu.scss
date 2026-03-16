@@ -38,8 +38,9 @@
     margin-left: 15px;
 
     i {
-      color: #333;
+      color: #c7c7c7;
       line-height: 0;
+      animation: v.$transicao;
     }
   }
 
@@ -48,8 +49,8 @@
     width: 100%;
     height: auto;
     align-items: center;
-    justify-content: center;
-    margin-left: 15px;
+    margin-left: 30px;
+    font-weight: 400;
   }
 
   .menu-direita {
@@ -61,15 +62,16 @@
     .notific {
       height: 40px;
       width: 40px;
-      border: solid 3px #c7c7c7;
+      border: solid 2px #c7c7c7;
       border-radius: 50%;
       transition: v.$transicao-rapida;
       background-color: v.$cor-fundo;
 
       &:hover {
         background-color: v.$cor-primaria;
-        border: solid 3px v.$cor-primaria;
+        border: solid 2px v.$cor-primaria;
         transition: v.$transicao-rapida;
+        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
 
       &:hover i {
@@ -93,7 +95,7 @@
       width: 170px;
       font-size: 20px;
       font-weight: 500;
-      border: solid 3px #c7c7c7;
+      border: solid 2px #c7c7c7;
       border-radius: 10px;
       color: #333;
       transition: v.$transicao-rapida;
@@ -104,17 +106,19 @@
         border: solid 2px v.$cor-primaria;
         color: #ffffff;
         transition: v.$transicao-rapida;
+        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
     }
 
     .user {
       display: flex;
+      color: #333;
       width: 40px;
       height: 40px;
-      border: solid 3px #c7c7c7;
+      border: solid 2px #c7c7c7;
       border-radius: 50%;
       cursor: pointer;
-      color: v.$cor-primaria;
+      color: #333;
       background-color: v.$cor-fundo;
       transition: v.$transicao-rapida;
 
@@ -123,7 +127,13 @@
         color: #ffffff;
         background-color: v.$cor-primaria;
         transition: v.$transicao-rapida;
+        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
+
+      i {
+        font-size: 20px;
+      }
+
     }
 
     button {

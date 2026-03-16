@@ -1,17 +1,29 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from '../src/App';
-import { Login } from '../src/pages/LoginPage/Login';
-import { Database } from '../src/pages/Home/Database';
-import { Remind } from '../src/pages/Remind/Remind';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import App from "../src/App";
+import { Login } from "../src/pages/LoginPage/Login";
+import { Database } from "../src/pages/Home/Database";
+import { Remind } from "../src/pages/Remind/Remind";
+import { PrivateRoute } from "../constants/private_routes";
 
 export function RoutesConfig() {
   return (
     <BrowserRouter>
       <Routes>
+
+        // Rotas comuns
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/database" element={<Database />} />
         <Route path="/remind" element={<Remind />} />
+
+        // Rotas protegidas
+        <Route
+          path="/database"
+          element={
+            <PrivateRoute>
+              <Database />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

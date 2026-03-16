@@ -1,0 +1,26 @@
+@use "../../styles/variables" as v;
+
+.body-animation {
+     position: fixed; /* Fixa na tela */
+    top: 0;
+    left: 0;
+    width: 100vw;   /* Largura total da tela */
+    height: 100vh;  /* Altura total da tela */
+    background-color: rgba(0, 0, 0, 0.452); 
+    backdrop-filter: blur(10px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+    transition: v.$transicao-rapida;
+
+    .animation-container {
+        background-color: transparent;
+        height: 300px;
+        width: 300px;
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+
+
+}

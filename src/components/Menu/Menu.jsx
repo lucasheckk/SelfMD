@@ -1,4 +1,3 @@
-
 import "./Menu.scss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,15 +17,19 @@ export function Menu({ children }) {
     "/suporte": "Suporte",
     "/upgrade": "Plano",
     "/docs": "Documentos",
-    "/configuracoes": "Configurações",
+    "/config": "Configurações",
   };
 
   const notific = [
-  { id: 100, tipo: 'limite', mensagem: 'Seu consumo atingiu 90% do limite.' },
-  { id: 200, tipo: 'upgrade', mensagem: 'Novo plano Pro disponível!' },
-  { id: 300, tipo: 'convite', mensagem: 'Você recebeu um convite para a database X.' },
-  { id: 400, tipo: 'acesso', mensagem: 'Você perdeu acesso à database Y.' }
-];
+    { id: 100, tipo: "limite", mensagem: "Seu consumo atingiu 90% do limite." },
+    { id: 200, tipo: "upgrade", mensagem: "Novo plano Pro disponível!" },
+    {
+      id: 300,
+      tipo: "convite",
+      mensagem: "Você recebeu um convite para a database X.",
+    },
+    { id: 400, tipo: "acesso", mensagem: "Você perdeu acesso à database Y." },
+  ];
 
   const tituloPagina =
     nomesAmigaveis[location.pathname] ||
@@ -56,13 +59,12 @@ export function Menu({ children }) {
   };
 
   return (
-    
     <nav>
       <div className="menu-superior">
         <button className="menu-toggle" onClick={toggleMenu}>
           <i
             key={isMenuOpen ? "close" : "open"}
-            className={`${isMenuOpen ? "fi fi-sr-cross" : "fi fi-sr-menu-burger"} icon-animate`}
+            className={`${isMenuOpen ? "fi fi-sr-layers" : "fi fi-rr-layers"}`}
           ></i>
         </button>
         <div className="where-am-i">
@@ -73,7 +75,9 @@ export function Menu({ children }) {
           <button className="notific" onClick={toggleNotificacoes}>
             <i className="fi fi-sr-bell"></i>
           </button>
-          <button className="user"></button>
+          <button className="user">
+            <i className="fi fi-sr-user"></i>
+          </button>
         </div>
       </div>
 
