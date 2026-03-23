@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "http://localhost:8080/selfmd/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -25,10 +25,9 @@ export const AUTH_ROUTES = {
   REGISTER: "/auth/register",
 };
 
-export const CRUD_ROUTES = {
-  BASE: "/databases",
-  CRIAR: "/databases",
-  LISTAR: "/databases/minhas-databases",
-  ATUALIZAR: (id) => `/databases/${id}`,
-  EXCLUIR: (id) => `/databases/${id}`
+export const DATABASE_CRUD_ROUTES = {
+  CRIAR: "/databases/criar",
+  LISTAR: "/databases/listar",
+  ATUALIZAR: (id) => `/databases/atualizar/${id}`,
+  EXCLUIR: (id) => `/databases/excluir/${id}`
 };

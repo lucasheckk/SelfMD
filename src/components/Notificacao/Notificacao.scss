@@ -1,0 +1,172 @@
+@use "../../styles/variables" as v;
+
+// --- VARIABLES ---
+$toast-width: min(400px, 90vw);
+$toast-bg: #ffffff;
+$toast-text: #333;
+$shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+// Map para gerenciar os tipos e cores
+$notification-types: (
+  "success": #30b368,
+  "error": #e74c3c,
+  "warning": #f1c40f,
+  "info": #3498db,
+);
+
+// --- MIXINS ---
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin gpu-accelerated {
+  transform: translateZ(0);
+  shape-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
+
+#toast-container {
+  position: fixed;
+  top: 90px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 99999;
+  pointer-events: none;
+  background: transparent !important;
+}
+
+.toast {
+  @include gpu-accelerated;
+  width: 300px;
+  min-height: 70px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ) !important; // Transparência no card do toast
+  backdrop-filter: blur(10px) saturate(180%); // Efeito de vidro (glassmorphism)
+  border-radius: 16px;
+  box-shadow: $shadow;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  pointer-events: auto;
+  
+  overflow: hidden;
+  border: solid 2px;
+
+  &:hover .progress-bar {
+    animation-play-state: paused;
+  }
+
+  // Loop para cores dos estados (sucesso, erro, etc)
+  @each $name, $color in $notification-types {
+    &.#{$name} {
+      border-color: $color;
+
+      .toast-icon {
+        color: $color;
+      }
+      .progress-bar {
+        background-color: $color;
+      }
+    }
+  }
+
+  .toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 24px;
+    margin-bottom: 21px;
+    flex-shrink: 0;
+    line-height: 0;
+  }
+
+  .toast-content {
+    flex: 1;
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #111;
+      font-size: 16px;
+    }
+
+    .toast-message {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  .toast-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: #aaa;
+    padding: 0;
+    margin-bottom: 21px;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #333;
+    }
+  }
+
+  .progress-track {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .progress-bar {
+    @include gpu-accelerated;
+    height: 100%;
+    width: 100%;
+    animation: timer 5s linear forwards;
+  }
+}
+
+// --- ANIMATIONS ---
+@keyframes slideInRight {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes timer {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

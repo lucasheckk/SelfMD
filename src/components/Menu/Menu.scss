@@ -6,7 +6,6 @@
 }
 
 .menu-superior {
-
   * {
     font-family: v.$jakarta;
   }
@@ -35,12 +34,20 @@
     border: none;
     font-size: 24px;
     cursor: pointer;
-    margin-left: 15px;
+    margin-left: 30px;
+    padding: 0;
 
-    i {
-      color: #c7c7c7;
+    .menu-icon {
+      color: #333;
+      margin-top: 2px;
       line-height: 0;
-      animation: v.$transicao;
+      position: absolute;
+      transition: v.$transicao-rapida;
+
+      &:hover {
+        transition: v.$transicao-rapida;
+        transform: scale(0.9);
+      }
     }
   }
 
@@ -49,7 +56,7 @@
     width: 100%;
     height: auto;
     align-items: center;
-    margin-left: 30px;
+    margin-left: 45px;
     font-weight: 400;
   }
 
@@ -133,7 +140,6 @@
       i {
         font-size: 20px;
       }
-
     }
 
     button {
@@ -225,7 +231,7 @@
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 30px; 
+  top: 30px;
   right: 12px;
   height: 200px;
   width: 300px;
@@ -233,7 +239,7 @@
   border-radius: 15px;
   border: solid 2px #c7c7c7;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 1; 
+  z-index: 1;
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s ease-in-out;
@@ -269,7 +275,6 @@
       display: flex;
       font-family: v.$jakarta;
     }
-
   }
 
   &.open {

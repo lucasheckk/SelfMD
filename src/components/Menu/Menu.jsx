@@ -13,7 +13,7 @@ export function Menu({ children }) {
 
   const nomesAmigaveis = {
     "/database": "Minhas Databases",
-    "/favoritos": "Favoritos",
+    "/favoritos": "Meus Favoritos",
     "/suporte": "Suporte",
     "/upgrade": "Plano",
     "/docs": "Documentos",
@@ -63,8 +63,7 @@ export function Menu({ children }) {
       <div className="menu-superior">
         <button className="menu-toggle" onClick={toggleMenu}>
           <i
-            key={isMenuOpen ? "close" : "open"}
-            className={`${isMenuOpen ? "fi fi-sr-layers" : "fi fi-rr-layers"}`}
+            className={`${isMenuOpen ? "fi fi-sr-apps menu-icon" : "fi fi-sr-apps menu-icon"}`}
           ></i>
         </button>
         <div className="where-am-i">

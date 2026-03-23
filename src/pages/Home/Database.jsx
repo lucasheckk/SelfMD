@@ -1,10 +1,11 @@
 import "./Database.scss";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Menu } from "../../components/Menu/Menu";
-import { API, CRUD_ROUTES } from "../../../constants/api_rest.js";
+import { useNavigate } from "react-router-dom";
+import { API, DATABASE_CRUD_ROUTES } from "../../../constants/api_rest.js";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingAnimation } from "../../components/Animation/LoadingAnimation.jsx";
+import { Notificacao } from "../../components/Notificacao/Notificacao.jsx";
 
 const fadeOutVariants = {
   hidden: {
@@ -24,16 +25,34 @@ const fadeOutVariants = {
 };
 
 export function Database() {
-  const [aviso, setAviso] = useState("");
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Estados de Controle de Interface
   const [isCriando, setIsCriando] = useState(false);
+  const [databaseParaExcluir, setDatabaseParaExcluir] = useState(null);
+  const [databaseParaConvidar, setDatabaseParaConvidar] = useState(null);
+
+  // Estados de Dados
   const [nomeDatabase, setNomeDatabase] = useState("");
   const [databases, setDatabases] = useState([]);
-  const [databaseParaExcluir, setDatabaseParaExcluir] = useState(null);
   const [confirmacaoExclusao, setConfirmacaoExclusao] = useState("");
+  const [emailConvite, setEmailConvite] = useState("");
 
-  // Carrega a lista de databases ao iniciar o componente
+  // Estado para o seu novo componente de avisos
+  const [notifications, setNotifications] = useState([]);
+
+  // Função auxiliar para chamar sua futura Notificação
+  const mostrarAviso = (type, title, message) => {
+    const id = Date.now();
+    setNotifications((prev) => [
+      ...prev,
+      { id, type, title, message, duration: 5000 },
+    ]);
+  };
+
+  // Carrega a lista de databases ao iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -45,15 +64,22 @@ export function Database() {
     const carregarDatabase = async () => {
       setIsLoading(true);
       try {
-        const { data } = await API.get(CRUD_ROUTES.LISTAR);
-        setDatabases(data);
+        const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
+
+        const dados = response.data?.data || [];
+
+        setDatabases(Array.isArray(dados) ? dados : []);
       } catch (err) {
         console.error("Falha ao listar:", err);
+
+        setDatabases([]);
+
         if (err.response?.status === 401 || err.response?.status === 403) {
-            window.location.href = "/login";
+          localStorage.removeItem("token");
+          window.location.href = "/login";
         }
-      }finally {
-        setIsLoading(false); 
+      } finally {
+        setIsLoading(false);
       }
     };
     carregarDatabase();
@@ -62,21 +88,31 @@ export function Database() {
   // Envia os dados para criar uma nova database no servidor
   const handleSalvar = async () => {
     if (nomeDatabase.trim() === "") {
-      setAviso("Preencha o nome da database!");
+      mostrarAviso(
+        "warning",
+        "Atenção",
+        "O nome não pode estar vazio!",
+      );
       return;
     }
     setLoading(true);
     try {
-      const response = await API.post(CRUD_ROUTES.CRIAR, {
+      const response = await API.post(DATABASE_CRUD_ROUTES.CRIAR, {
         nomeDatabase: nomeDatabase,
       });
-      setDatabases((prev) => [...prev, response.data]);
-      setIsCriando(false);
-      setNomeDatabase("");
-      setAviso("");
-    } catch (err) {
-      console.log(err);
-      setAviso("Erro ao criar database.");
+
+      const novaDb = response.data.data;
+
+      setDatabases((prev) => [...(Array.isArray(prev) ? prev : []), novaDb]);
+
+      mostrarAviso("success", "Criada!", "Database criada com sucesso.");
+      fecharModais();
+    } catch {
+      mostrarAviso(
+        "error",
+        "Erro ao Criar",
+        "Não foi possível salvar.",
+      );
     } finally {
       setLoading(false);
     }
@@ -85,168 +121,259 @@ export function Database() {
   // Deleta a database
   const handleDelete = async (id) => {
     try {
-      await API.delete(CRUD_ROUTES.EXCLUIR(id));
+      await API.delete(DATABASE_CRUD_ROUTES.EXCLUIR(id));
       setDatabases((prev) => prev.filter((db) => db.id !== id));
-      setDatabaseParaExcluir(null);
-      setConfirmacaoExclusao("");
-      setAviso("");
-    } catch (err) {
-      console.error(err);
-      setAviso("Erro ao excluir a database.");
+      mostrarAviso(
+        "info",
+        "Excluída",
+        "A database foi excluída!",
+      );
+      fecharModais();
+    } catch {
+      mostrarAviso("error", "Erro", "Houve um problema ao excluir.");
     }
   };
 
   // Atualiza o nome da database
   const handleUpdate = async (id, novoNome) => {
+    if (!novoNome) return;
     try {
-      await API.put(CRUD_ROUTES.ATUALIZAR(id), { nomeDatabase: novoNome });
-
+      await API.put(DATABASE_CRUD_ROUTES.ATUALIZAR(id), {
+        nomeDatabase: novoNome,
+      });
       setDatabases((prev) =>
         prev.map((db) =>
           db.id === id ? { ...db, nomeDatabase: novoNome } : db,
         ),
       );
-      setAviso("");
-    } catch (err) {
-      console.error(err);
-      setAviso("Erro ao atualizar a database.");
+      mostrarAviso("success", "Atualizado", "O nome foi alterado.");
+    } catch {
+      mostrarAviso("error", "Falha", "Erro ao tentar atualizar!");
     }
   };
 
-  const handleCancelarCriacao = () => {
+  // Convida o usuario para a database
+  const handleEnviarConvite = () => {
+    if (!emailConvite || !emailConvite.includes("@")) {
+      mostrarAviso("warning", "Aviso", "Insira um e-mail válido!");
+      return;
+    }
+    setLoading(true);
+    try {
+      // Lógica de API aqui...
+      mostrarAviso("success", "Sucesso", "Convite enviado!");
+      fecharModais();
+    } catch {
+      mostrarAviso("error", "Falha", "Não foi possível enviar o convite.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copiarLink = () => {
+    const link = `${window.location.origin}/convite/${databaseParaConvidar.id}`;
+    navigator.clipboard.writeText(link);
+    mostrarAviso("info", "Info", "Link copiado!");
+  };
+
+  const fecharModais = () => {
+    setDatabaseParaExcluir(null);
+    setDatabaseParaConvidar(null);
     setIsCriando(false);
     setNomeDatabase("");
-    setAviso("");
+    setConfirmacaoExclusao("");
+    setEmailConvite("");
   };
 
   return (
     <div className="body">
+      <AnimatePresence mode="wait">
+      <Notificacao
+        notifications={notifications}
+        setNotifications={setNotifications}
+      />
+      </AnimatePresence>
       <Menu>
         <div className="container-principal">
           {isLoading ? (
-             <LoadingAnimation /> 
+            <LoadingAnimation />
           ) : (
             <>
-          {/* 1. Modal de Exclusão (Sempre o primeiro a ser verificado) */}
-          <AnimatePresence mode="wait">
-            {isCriando ? (
-            {databaseParaExcluir && (
-              <motion.div
-                key="modal-exclusao"
-                className="modal-exclusao-container"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-              >
-                <h2>Excluir {databaseParaExcluir.nomeDatabase}?</h2>
-                <input
-                  type="text"
-                  value={confirmacaoExclusao}
-                  onChange={(e) => setConfirmacaoExclusao(e.target.value)}
-                  placeholder="Digite o nome para confirmar"
-                />
-                <div className="acoes-exclusao">
-                  <button onClick={() => setDatabaseParaExcluir(null)}>
-                    <i class="fi fi-sr-trash-undo"></i>
-                  </button>
-                  <button
-                    disabled={
-                      confirmacaoExclusao !== databaseParaExcluir.nomeDatabase
-                    }
-                    onClick={() => handleDelete(databaseParaExcluir.id)}
-                  >
-                    <i className="fi fi-sr-trash-can-check confirmar-exclusao"></i>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* 2. Conteúdo Principal (Lista ou Criação) */}
-          {!databaseParaExcluir && (
-            <AnimatePresence mode="wait">
-              {isCriando ? (
-                <motion.div key="form" className="criar-database">
+              <AnimatePresence mode="wait">
+                {/* MODAL DE EXCLUSÃO */}
+                {databaseParaExcluir && (
                   <motion.div
-                    className="card-criacao"
+                    key="modal-exclusao"
+                    className="modal-exclusao-container"
                     variants={fadeOutVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
                   >
-                    <h1 className="card-ttl">Nova Database</h1>
+                    <h2>Excluir {databaseParaExcluir.nomeDatabase}?</h2>
+                    <p>Confirme digitando o nome exato da database:</p>
                     <input
-                      className="input-nome"
                       type="text"
-                      placeholder="Nome"
-                      value={nomeDatabase}
-                      onChange={(e) => setNomeDatabase(e.target.value)}
+                      value={confirmacaoExclusao}
+                      onChange={(e) => setConfirmacaoExclusao(e.target.value)}
+                      placeholder="Digite o nome para confirmar"
                     />
-                    <div className="acoes">
-                      <button
-                        className="cancelar"
-                        onClick={handleCancelarCriacao}
-                      >
-                        <i className="fi fi-sr-cross-circle"></i>
+                    <div className="acoes-exclusao">
+                      <button onClick={fecharModais}>
+                        <i className="fi fi-sr-trash-undo"></i>
                       </button>
-                      <button className="confirmar" onClick={handleSalvar}>
-                        <i className="fi fi-sr-arrow-circle-right"></i>
+                      <button
+                        disabled={
+                          confirmacaoExclusao !==
+                          databaseParaExcluir.nomeDatabase
+                        }
+                        onClick={() => handleDelete(databaseParaExcluir.id)}
+                      >
+                        <i className="fi fi-sr-trash-can-check confirmar-exclusao"></i>
                       </button>
                     </div>
                   </motion.div>
-                </motion.div>
-              ) : (
-                // LISTA DE DATABASES
-                <motion.div key="lista" className="lista-container">
-                  {databases.length > 0 ? (
-                  {databases?.map((db) => (
-                    <div key={db.id} className="card-sucesso">
-                      <div className="card-header">
-                        <div className="titulo-wrapper">
-                          <h2>{db.nomeDatabase}</h2>
-                          <i
-                            className="fi fi-sr-pencil atualizar"
-                            onClick={() =>
-                              handleUpdate(
-                                db.id,
-                                prompt("Novo nome:", db.nomeDatabase),
-                              )
-                            }
-                          ></i>
-                        </div>
-                      </div>
+                )}
 
-                      <div className="botoes-container">
+                {/* MODAL DE CONVITE */}
+                {databaseParaConvidar && (
+                  <motion.div
+                    key="modal-convite"
+                    className="modal-exclusao-container" // Usando mesma classe para manter layout
+                    variants={fadeOutVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <h2>Convidar para {databaseParaConvidar.nomeDatabase}</h2>
+
+                    <div
+                      className="link-copy-section"
+                      onClick={copiarLink}
+                      style={{ cursor: "pointer", marginBottom: "10px" }}
+                    >
+                      <small>
+                        Clique para copiar o link de convite{" "}
+                        <i className="fi fi-sr-copy"></i>
+                      </small>
+                    </div>
+                    <input
+                      type="email"
+                      value={emailConvite}
+                      onChange={(e) => setEmailConvite(e.target.value)}
+                      placeholder="E-mail do usuário"
+                    />
+                    <div className="acoes-exclusao">
+                      <button onClick={fecharModais}>
+                        <i className="fi fi-sr-cross-circle"></i>
+                      </button>
+                      <button onClick={handleEnviarConvite}>
+                        <i className="fi fi-sr-paper-plane"></i>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* TELA DE CRIAÇÃO */}
+                {isCriando && !databaseParaExcluir && !databaseParaConvidar && (
+                  <motion.div
+                    key="form-criacao"
+                    className="criar-database"
+                    variants={fadeOutVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <div className="card-criacao">
+                      <h1 className="card-ttl">Nova Database</h1>
+                      <input
+                        className="input-nome"
+                        type="text"
+                        placeholder="Nome da Database"
+                        value={nomeDatabase}
+                        onChange={(e) => setNomeDatabase(e.target.value)}
+                      />
+                      <div className="acoes">
+                        <button className="cancelar" onClick={fecharModais}>
+                          <i className="fi fi-sr-cross-circle"></i>
+                        </button>
                         <button
-                          className="excluir"
-                          onClick={() => setDatabaseParaExcluir(db)}
+                          className="confirmar"
+                          onClick={handleSalvar}
+                          disabled={loading}
                         >
-                          <i className="fi fi-sr-trash-xmark"></i>
-                        </button>
-                        <button className="favoritar">
-                          <i className="fi fi-sr-star"></i>
-                        </button>
-                        <button className="acessar">
-                          <i className="fi fi-sr-server-key"></i>
-                        </button>
-                        <button className="link-convite">
-                          <i className="fi fi-sr-user-link"></i>
+                          <i className="fi fi-sr-arrow-circle-right"></i>
                         </button>
                       </div>
                     </div>
-                  
-                  ) : ( 
-                  <p>Nenhuma database encontrada.</p>)}
-                  <div
-                    className="criar-database-icone"
-                    onClick={() => setIsCriando(true)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <i className="fi fi-sr-layer-plus"></i>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                )}
+
+                {/* LISTA DE DATABASES */}
+                {!isCriando &&
+                  !databaseParaExcluir &&
+                  !databaseParaConvidar && (
+                    <motion.div
+                      key="lista"
+                      className="lista-container"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {databases.map((db) => (
+                        <div key={db.id} className="card-sucesso">
+                          <div className="card-header">
+                            <div className="titulo-wrapper">
+                              <h2>{db.nomeDatabase}</h2>
+                              <i
+                                className="fi fi-sr-pencil atualizar"
+                                onClick={() =>
+                                  handleUpdate(
+                                    db.id,
+                                    prompt("Novo nome:", db.nomeDatabase),
+                                  )
+                                }
+                              ></i>
+                            </div>
+                          </div>
+
+                          <div className="botoes-container">
+                            <button
+                              className="excluir"
+                              onClick={() => setDatabaseParaExcluir(db)}
+                            >
+                              <i className="fi fi-sr-trash-xmark"></i>
+                            </button>
+                            <button className="favoritar">
+                              <i className="fi fi-sr-star"></i>
+                            </button>
+                            <button
+                              className="acessar"
+                              onClick={() => navigate("/minha-database")}
+                            >
+                              <i className="fi fi-sr-server-key"></i>
+                            </button>
+                            <button
+                              className="link-convite"
+                              onClick={() => setDatabaseParaConvidar(db)}
+                            >
+                              <i className="fi fi-sr-user-link"></i>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div
+                        className="criar-database-icone"
+                        onClick={() => setIsCriando(true)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <i className="fi fi-sr-layer-plus"></i>
+                      </div>
+                    </motion.div>
+                  )}
+              </AnimatePresence>
+            </>
           )}
         </div>
       </Menu>
