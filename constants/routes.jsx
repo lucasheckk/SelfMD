@@ -4,6 +4,7 @@ import { Login } from "../src/pages/LoginPage/Login";
 import { Database } from "../src/pages/Home/Database";
 import { Remind } from "../src/pages/Remind/Remind";
 import { PrivateRoute } from "../constants/private_routes";
+import { System } from "../src/pages/System/System";
 
 export function RoutesConfig() {
   return (
@@ -21,6 +22,14 @@ export function RoutesConfig() {
           element={
             <PrivateRoute>
               <Database />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/system"
+          element={
+            <PrivateRoute>
+              <System />
             </PrivateRoute>
           }
         />

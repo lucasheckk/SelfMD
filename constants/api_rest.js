@@ -31,3 +31,10 @@ export const DATABASE_CRUD_ROUTES = {
   ATUALIZAR: (id) => `/databases/atualizar/${id}`,
   EXCLUIR: (id) => `/databases/excluir/${id}`
 };
+
+export const TABELA_CRUD_ROUTES = {
+  CRIAR: "/tabelas/criar",
+  LISTAR: "/tabelas/listar",
+  ATUALIZAR: (id) => `/tabelas/atualizar/${id}`,
+  EXCLUIR: (id) => `/tabelas/excluir/${id}`
+};

@@ -27,7 +27,7 @@
   }
 
   .container {
-    background: v.$glass-bkg;
+    background: #ffffff;
     box-shadow: v.$glass-shadow;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -71,8 +71,6 @@
     &:active {
             transform: scale(0.95);
         }
-
-
     }
 
     &.right-panel-active {

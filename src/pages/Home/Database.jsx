@@ -10,7 +10,7 @@ import { Notificacao } from "../../components/Notificacao/Notificacao.jsx";
 const fadeOutVariants = {
   hidden: {
     opacity: 0,
-    scale: 0.8,
+    scale: 1,
   },
   visible: {
     opacity: 1,
@@ -19,7 +19,7 @@ const fadeOutVariants = {
   },
   exit: {
     opacity: 0,
-    scale: 0.8,
+    scale: 1,
     transition: { duration: 0.3, ease: "easeInOut" },
   },
 };
@@ -66,18 +66,15 @@ export function Database() {
       try {
         const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
 
-        const dados = response.data?.data || [];
+        const listaVindaDoServidor = response.data?.dados || [];
 
-        setDatabases(Array.isArray(dados) ? dados : []);
+        setDatabases(
+          Array.isArray(listaVindaDoServidor) ? listaVindaDoServidor : [],
+        );
       } catch (err) {
-        console.error("Falha ao listar:", err);
+        console.error("Erro ao carregar databases:", err);
 
         setDatabases([]);
-
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-        }
       } finally {
         setIsLoading(false);
       }
@@ -88,31 +85,35 @@ export function Database() {
   // Envia os dados para criar uma nova database no servidor
   const handleSalvar = async () => {
     if (nomeDatabase.trim() === "") {
-      mostrarAviso(
-        "warning",
-        "Atenção",
-        "O nome não pode estar vazio!",
-      );
+      mostrarAviso("warning", "Atenção", "O nome não pode estar vazio!");
       return;
     }
     setLoading(true);
     try {
-      const response = await API.post(DATABASE_CRUD_ROUTES.CRIAR, {
+      await API.post(DATABASE_CRUD_ROUTES.CRIAR, {
         nomeDatabase: nomeDatabase,
       });
 
-      const novaDb = response.data.data;
+      const carregarDatabase = async () => {
+      const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
+      const listaVindaDoServidor = response.data?.dados || [];
+      setDatabases(Array.isArray(listaVindaDoServidor) ? listaVindaDoServidor : []);
+    };
 
-      setDatabases((prev) => [...(Array.isArray(prev) ? prev : []), novaDb]);
+    await carregarDatabase();
 
       mostrarAviso("success", "Criada!", "Database criada com sucesso.");
       fecharModais();
-    } catch {
-      mostrarAviso(
-        "error",
-        "Erro ao Criar",
-        "Não foi possível salvar.",
-      );
+    } catch (err) {
+      if (err.response?.status === 402) {
+        mostrarAviso(
+          "warning",
+          "Limite Atingido",
+          "Atualize para obter mais espaço.",
+        );
+      } else {
+        mostrarAviso("error", "Erro", "Não foi possível salvar.");
+      }
     } finally {
       setLoading(false);
     }
@@ -123,11 +124,7 @@ export function Database() {
     try {
       await API.delete(DATABASE_CRUD_ROUTES.EXCLUIR(id));
       setDatabases((prev) => prev.filter((db) => db.id !== id));
-      mostrarAviso(
-        "info",
-        "Excluída",
-        "A database foi excluída!",
-      );
+      mostrarAviso("info", "Excluída", "A database foi excluída!");
       fecharModais();
     } catch {
       mostrarAviso("error", "Erro", "Houve um problema ao excluir.");
@@ -170,12 +167,6 @@ export function Database() {
     }
   };
 
-  const copiarLink = () => {
-    const link = `${window.location.origin}/convite/${databaseParaConvidar.id}`;
-    navigator.clipboard.writeText(link);
-    mostrarAviso("info", "Info", "Link copiado!");
-  };
-
   const fecharModais = () => {
     setDatabaseParaExcluir(null);
     setDatabaseParaConvidar(null);
@@ -188,10 +179,10 @@ export function Database() {
   return (
     <div className="body">
       <AnimatePresence mode="wait">
-      <Notificacao
-        notifications={notifications}
-        setNotifications={setNotifications}
-      />
+        <Notificacao
+          notifications={notifications}
+          setNotifications={setNotifications}
+        />
       </AnimatePresence>
       <Menu>
         <div className="container-principal">
@@ -211,7 +202,6 @@ export function Database() {
                     exit="exit"
                   >
                     <h2>Excluir {databaseParaExcluir.nomeDatabase}?</h2>
-                    <p>Confirme digitando o nome exato da database:</p>
                     <input
                       type="text"
                       value={confirmacaoExclusao}
@@ -239,7 +229,7 @@ export function Database() {
                 {databaseParaConvidar && (
                   <motion.div
                     key="modal-convite"
-                    className="modal-exclusao-container" // Usando mesma classe para manter layout
+                    className="modal-exclusao-container" 
                     variants={fadeOutVariants}
                     initial="hidden"
                     animate="visible"
@@ -247,16 +237,7 @@ export function Database() {
                   >
                     <h2>Convidar para {databaseParaConvidar.nomeDatabase}</h2>
 
-                    <div
-                      className="link-copy-section"
-                      onClick={copiarLink}
-                      style={{ cursor: "pointer", marginBottom: "10px" }}
-                    >
-                      <small>
-                        Clique para copiar o link de convite{" "}
-                        <i className="fi fi-sr-copy"></i>
-                      </small>
-                    </div>
+                    
                     <input
                       type="email"
                       value={emailConvite}
@@ -266,6 +247,9 @@ export function Database() {
                     <div className="acoes-exclusao">
                       <button onClick={fecharModais}>
                         <i className="fi fi-sr-cross-circle"></i>
+                      </button>
+                      <button>
+                        <i class="fi fi-sr-user-gear"></i>
                       </button>
                       <button onClick={handleEnviarConvite}>
                         <i className="fi fi-sr-paper-plane"></i>
@@ -349,7 +333,7 @@ export function Database() {
                             </button>
                             <button
                               className="acessar"
-                              onClick={() => navigate("/minha-database")}
+                              onClick={() => navigate("/system")}
                             >
                               <i className="fi fi-sr-server-key"></i>
                             </button>
@@ -362,11 +346,24 @@ export function Database() {
                           </div>
                         </div>
                       ))}
-
                       <div
-                        className="criar-database-icone"
-                        onClick={() => setIsCriando(true)}
-                        style={{ cursor: "pointer" }}
+                        className={`criar-database-icone ${databases.length >= 1 ? "desabilitado" : ""}`}
+                        onClick={() => {
+                          if (databases.length < 1) {
+                            setIsCriando(true);
+                          } else {
+                            mostrarAviso(
+                              "warning",
+                              "Limite Atingido",
+                              "Seu plano permite apenas 1 database.",
+                            );
+                          }
+                        }}
+                        style={{
+                          cursor:
+                            databases.length >= 1 ? "not-allowed" : "pointer",
+                          opacity: databases.length >= 1 ? 0.5 : 1,
+                        }}
                       >
                         <i className="fi fi-sr-layer-plus"></i>
                       </div>

@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-$cor-primaria: #08af50;
-$cor-secundaria: #30b368;
+$cor-primaria: #0bcd5f;
+$cor-secundaria: #08af50;
 $cor-fundo: #f4d9d9;
 $jakarta: 'Plus Jakarta Sans', sans-serif;
-$gradiente-login: linear-gradient(to right, #08af50 0%, #30b368 100%);
+$gradiente-login: linear-gradient(to right, #0bcd5f 0%, #08af50 100%);
 $glass-bkg: rgba(255, 255, 255, 0.2);
 $glass-border: 1px solid rgba(255, 255, 255, 0.18);
 $glass-shadow: 0 8px 32px 0 rgba(14, 41, 12, 0.37);
@@ -16,7 +16,7 @@ $transicao-fadeOut: fadeOut 0.4s ease-in-out forwards;
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;

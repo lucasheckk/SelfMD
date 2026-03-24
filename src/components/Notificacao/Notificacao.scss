@@ -30,7 +30,7 @@ $notification-types: (
 #toast-container {
   position: fixed;
   top: 90px;
-  right: 18px;
+  right: 15px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -43,13 +43,8 @@ $notification-types: (
   @include gpu-accelerated;
   width: 300px;
   min-height: 70px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.8
-  ) !important; // Transparência no card do toast
-  backdrop-filter: blur(10px) saturate(180%); // Efeito de vidro (glassmorphism)
+  background: #ffffff; 
+  backdrop-filter: blur(10px) saturate(180%); 
   border-radius: 16px;
   box-shadow: $shadow;
   display: flex;
