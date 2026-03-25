@@ -1,0 +1,127 @@
+@use "../../styles/variables" as v;
+
+.segundo-menu-layout {
+  display: flex;
+  flex-direction: row;
+  position: fixed;
+  width: calc(100% - 50px);
+  height: 60px;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  padding-right: 15px;
+  border-radius: 15px;
+  background: #ffffff;
+  border: solid 2px #c7c7c7;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  -webkit-font-smoothing: antialiased;
+  animation: v.$transicao-fadeIn;
+
+  .smenu-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .smenu-left {
+      margin-left: 10px;
+      display: flex;
+      padding-left: 15px;
+      gap: 20px;
+
+      .back:hover {
+        transform: translateX(-2px);
+      }
+    }
+
+    .smenu-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      .smenu-search {
+        display: flex;
+        align-items: center;
+        background: v.$cor-fundo;
+        border: solid 2px #c7c7c7;
+        border-radius: 20px;
+        width: 295px;
+        height: 35px;
+
+        .search-bar {
+          display: flex;
+          border: none;
+          background-color: transparent;
+          padding: 0 20px;
+          color: #333;
+
+          &:focus {
+            outline: none;
+          }
+
+          &:focus::placeholder {
+            opacity: 0;
+            transition: v.$transicao-rapida;
+          }
+
+          &::placeholder {
+            color: #333;
+            transition: v.$transicao-rapida;
+          }
+        }
+
+        .search-icon i {
+          display: flex;
+          padding: 0;
+          font-size: 18px;
+          color: #333;
+          transition: v.$transicao-rapida;
+
+          &:hover {
+            transform: scale(0.9);
+            will-change: transform;
+            transition: v.$transicao-rapida;
+          }
+        }
+      }
+    }
+
+    .smenu-right {
+      display: flex;
+      gap: 20px;
+      margin-right: 10px;
+    }
+
+    button {
+      border: none;
+      background-color: transparent;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    i {
+      height: 30px;
+      width: 30px;
+      color: #333;
+      display: flex;
+      font-size: 24px;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      margin: 0;
+      padding: 0;
+      transition: v.$transicao-rapida;
+
+      &:hover {
+        transform: translateY(-2px);
+        transition: v.$transicao-rapida;
+      }
+    }
+  }
+}

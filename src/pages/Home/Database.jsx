@@ -1,5 +1,5 @@
 import "./Database.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Menu } from "../../components/Menu/Menu";
 import { useNavigate } from "react-router-dom";
 import { API, DATABASE_CRUD_ROUTES } from "../../../constants/api_rest.js";
@@ -43,7 +43,6 @@ export function Database() {
   // Estado para o seu novo componente de avisos
   const [notifications, setNotifications] = useState([]);
 
-  // Função auxiliar para chamar sua futura Notificação
   const mostrarAviso = (type, title, message) => {
     const id = Date.now();
     setNotifications((prev) => [
@@ -52,35 +51,39 @@ export function Database() {
     ]);
   };
 
+  const fecharModais = () => {
+    setDatabaseParaExcluir(null);
+    setDatabaseParaConvidar(null);
+    setIsCriando(false);
+    setNomeDatabase("");
+    setConfirmacaoExclusao("");
+    setEmailConvite("");
+  };
+
+  const carregarDadosDaAPI = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
+      const lista = response.data?.dados || [];
+      setDatabases(Array.isArray(lista) ? lista : []);
+    } catch (err) {
+      console.error("Erro ao carregar:", err);
+      mostrarAviso("error", "Erro", "Não foi possível carregar as databases.");
+      setDatabases([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // Carrega a lista de databases ao iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
-      window.location.href = "/login";
+      navigate("/login");
       return;
     }
-
-    const carregarDatabase = async () => {
-      setIsLoading(true);
-      try {
-        const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
-
-        const listaVindaDoServidor = response.data?.dados || [];
-
-        setDatabases(
-          Array.isArray(listaVindaDoServidor) ? listaVindaDoServidor : [],
-        );
-      } catch (err) {
-        console.error("Erro ao carregar databases:", err);
-
-        setDatabases([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    carregarDatabase();
-  }, []);
+    carregarDadosDaAPI();
+  }, [navigate, carregarDadosDaAPI]);
 
   // Envia os dados para criar uma nova database no servidor
   const handleSalvar = async () => {
@@ -90,18 +93,8 @@ export function Database() {
     }
     setLoading(true);
     try {
-      await API.post(DATABASE_CRUD_ROUTES.CRIAR, {
-        nomeDatabase: nomeDatabase,
-      });
-
-      const carregarDatabase = async () => {
-      const response = await API.get(DATABASE_CRUD_ROUTES.LISTAR);
-      const listaVindaDoServidor = response.data?.dados || [];
-      setDatabases(Array.isArray(listaVindaDoServidor) ? listaVindaDoServidor : []);
-    };
-
-    await carregarDatabase();
-
+      await API.post(DATABASE_CRUD_ROUTES.CRIAR, { nomeDatabase });
+      await carregarDadosDaAPI(); 
       mostrarAviso("success", "Criada!", "Database criada com sucesso.");
       fecharModais();
     } catch (err) {
@@ -133,47 +126,34 @@ export function Database() {
 
   // Atualiza o nome da database
   const handleUpdate = async (id, novoNome) => {
-    if (!novoNome) return;
+    if (!novoNome || novoNome.trim() === "") return;
     try {
-      await API.put(DATABASE_CRUD_ROUTES.ATUALIZAR(id), {
-        nomeDatabase: novoNome,
-      });
+      await API.put(DATABASE_CRUD_ROUTES.ATUALIZAR(id), { nomeDatabase: novoNome });
       setDatabases((prev) =>
-        prev.map((db) =>
-          db.id === id ? { ...db, nomeDatabase: novoNome } : db,
-        ),
+        prev.map((db) => (db.id === id ? { ...db, nomeDatabase: novoNome } : db))
       );
-      mostrarAviso("success", "Atualizado", "O nome foi alterado.");
+      mostrarAviso("success", "Atualizado", "Nome alterado com sucesso.");
     } catch {
-      mostrarAviso("error", "Falha", "Erro ao tentar atualizar!");
+      mostrarAviso("error", "Falha", "Erro ao tentar atualizar.");
     }
   };
 
   // Convida o usuario para a database
-  const handleEnviarConvite = () => {
+  const handleEnviarConvite = async () => {
     if (!emailConvite || !emailConvite.includes("@")) {
       mostrarAviso("warning", "Aviso", "Insira um e-mail válido!");
       return;
     }
     setLoading(true);
     try {
-      // Lógica de API aqui...
-      mostrarAviso("success", "Sucesso", "Convite enviado!");
+      // Simulação de chamada de API para convite
+      mostrarAviso("success", "Sucesso", "Convite enviado para " + emailConvite);
       fecharModais();
     } catch {
-      mostrarAviso("error", "Falha", "Não foi possível enviar o convite.");
+      mostrarAviso("error", "Falha", "Erro ao enviar convite.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const fecharModais = () => {
-    setDatabaseParaExcluir(null);
-    setDatabaseParaConvidar(null);
-    setIsCriando(false);
-    setNomeDatabase("");
-    setConfirmacaoExclusao("");
-    setEmailConvite("");
   };
 
   return (
