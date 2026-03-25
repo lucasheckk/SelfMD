@@ -32,8 +32,9 @@ export function SegundoMenu() {
         </div>
         <div className="smenu-right">
           <button>
-            <i class="fi fi-rr-exclamation"></i>
+            <i class="fi fi-rr-bell"></i>
           </button>
+          <i class="fi fi-sr-bell-notification-social-media"></i>
           <button>
             <i className="fi fi-sr-folder-link"></i>
           </button>
