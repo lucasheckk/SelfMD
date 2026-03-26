@@ -85,12 +85,14 @@
       }
     }
   }
+
   .content-area {
     padding-left: 20px;
     padding-top: 15px;
+    height: 100%;
 
     .table-header {
-      font-size: 23px; 
+      font-size: 23px;
       font-weight: 300;
       display: flex;
       align-items: center;
@@ -98,36 +100,48 @@
       color: #333;
 
       .row-counter {
-        color: #c7c7c7; 
-        font-size: 23px;
+        color: #c7c7c7;
+        font-size: 20px;
         font-weight: 300;
         line-height: 0;
         padding-left: 10px;
         padding-top: 1px;
       }
+
+      .qtd-reg {
+        color: #333;
+        font-size: 22px;
+      }
     }
 
     .selection-bar {
-      width: calc(100% - 25px);
+      width: calc(100% - 45px);
       height: 40px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       border: solid 2px v.$cor-primaria;
       margin-top: 10px;
       border-radius: 8px;
+      margin-left: 1px;
+      padding: 0 10px;
       transition: v.$transicao-rapida;
 
-      &:active {
-        background-color: v.$cor-primaria;
-        
-        i {
-          color: white;
-          transition: v.$transicao-rapida;
+      &.active-selection {
+        background-color: v.$cor-secundaria;
+        border: solid 2px v.$cor-secundaria;
+        transition: v.$transicao-rapida;
+
+        span {
+          color: #ffffff;
         }
 
         button {
-          color: white;
-          transition: v.$transicao-rapida;
+          color: #ffffff;
+
+          i {
+            color: #ffffff;
+          }
         }
       }
 
@@ -148,7 +162,188 @@
           font-size: 20px;
         }
       }
+
+      span {
+        font-size: 18px;
+        font-weight: 300;
+        color: #333;
+      }
     }
 
+    .table-wrapper {
+      margin-top: 15px;
+      width: calc(100% - 23px);
+      height: calc(100vh - 290px);
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #eee;
+        border-radius: 10px;
+        &:hover {
+          background: v.$cor-primaria;
+        }
+      }
+
+      .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+
+        thead tr:hover {
+          background-color: transparent;
+        }
+
+        .checkbox-col, .id-col-header, .id-cell {
+          position: sticky;
+          left: 0;
+          z-index: 10;
+          background-color: inherit; 
+        }
+
+        .id-col-header, .id-cell {
+          left: 50px; 
+          z-index: 9;
+        }
+
+        .checkbox-col {
+          width: 50px;
+          text-align: left;
+          vertical-align: middle;
+
+          input,
+          .select-all-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+          }
+        }
+
+        th {
+          text-align: left;
+          padding: 12px 8px;
+          color: #333;
+          font-weight: 500;
+          top: 0;
+          font-size: 14px;
+          border-bottom: 2px solid #eee;
+          background-color: #ffffff;
+          position: sticky;
+
+          &.actions-header {
+            width: 80px;
+            position: relative;
+
+            .actions-cell-content {
+              display: flex;
+              gap: 5px;
+              justify-content: flex-end;
+
+              button {
+                border: none;
+                background: none;
+                cursor: pointer;
+                font-size: 20px;
+                color: #333;
+                transition: v.$transicao-rapida;
+
+                &:hover {
+                  transform: scale(1.1);
+                  color: black;
+                  transition: v.$transicao-rapida;
+                  will-change: transform;
+                }
+              }
+            }
+          }
+
+          .cell-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .resizer {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            border-radius: 10px;
+            width: 3px;
+            background: #eee;
+            cursor: col-resize;
+            transition: v.$transicao-rapida;
+            z-index: 11;
+
+            &:hover {
+              background: v.$cor-primaria;
+              transition: v.$transicao-rapida;
+            }
+          }
+        }
+
+        tr {
+          background-color: #ffffff;
+          transition: v.$transicao-rapida;
+          border-bottom: 2px solid #eee;
+
+          &.row-selected {
+            background-color: rgba(v.$cor-primaria, 0.2);
+            transition: v.$transicao-rapida;
+          }
+
+          &:hover {
+            background-color: rgba(v.$cor-primaria, 0.2);
+            transition: v.$transicao-rapida;
+          }
+
+          td {
+            padding: 10px 8px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .actions-cell {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+
+            button {
+              border: none;
+              background: none;
+              cursor: pointer;
+              font-size: 18px;
+              color: #333;
+              transition: v.$transicao-rapida;
+
+              &:hover {
+                  transform: scale(1.1);
+                  transition: v.$transicao-rapida;
+                  will-change: transform;
+                  color: black;
+                }
+            }
+          }
+        }
+      }
+    }
   }
 }
