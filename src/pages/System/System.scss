@@ -1,5 +1,27 @@
 @use "../../styles/variables" as v;
 
+// ─── Medidas fixas ───────────────────────────────────────────────────────────
+$checkbox-width: 50px;
+$id-width: 70px;
+$actions-width: 60px;
+
+$sticky-checkbox-left: 0px;
+$sticky-id-left: $checkbox-width; // 50px
+
+$col-min-width: 60px;
+
+$content-padding-h: 20px;
+$content-padding-top: 10px;
+$content-padding-bottom: 15px;
+
+// ─── Cores de fundo para estados da linha ────────────────────────────────────
+// Usamos variáveis CSS (custom properties) para que sticky cells consigam
+// herdar a cor correta via var() em vez de ter background fixo em #fff.
+// Isso resolve o hover e o selected nas colunas fixas.
+$bg-normal: #ffffff;
+$bg-hover: rgba(v.$cor-primaria, 0.08);
+$bg-selected: rgba(v.$cor-primaria, 0.2);
+
 .system-container {
   min-height: 100vh;
   background-color: v.$cor-fundo;
@@ -8,6 +30,7 @@
     font-family: v.$jakarta;
   }
 
+  // ── Card principal ─────────────────────────────────────────────────────────
   .main-layout {
     position: fixed;
     display: flex;
@@ -22,6 +45,7 @@
     overflow: hidden;
     animation: v.$transicao-fadeIn;
 
+    // ── Tabs ──────────────────────────────────────────────────────────────
     .tab-layout {
       display: flex;
       align-items: center;
@@ -29,6 +53,7 @@
       padding-left: 15px;
       gap: 10px;
       position: relative;
+      flex-shrink: 0;
 
       .tab-item {
         background: transparent;
@@ -44,8 +69,6 @@
         &.active {
           color: v.$cor-secundaria;
           font-weight: 400;
-          font-size: 18px;
-          transition: v.$transicao-rapida;
           transform: translateY(-1px);
           will-change: transform;
         }
@@ -75,70 +98,68 @@
           font-size: 16px;
           color: #333;
           transition: v.$transicao-rapida;
-
           &:hover {
             transform: translateY(-1px);
             will-change: transform;
-            transition: v.$transicao-rapida;
           }
         }
       }
     }
   }
 
+  // ── Área de conteúdo ───────────────────────────────────────────────────────
   .content-area {
-    padding-left: 20px;
-    padding-top: 15px;
-    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: $content-padding-top $content-padding-h $content-padding-bottom
+      $content-padding-h;
+    overflow: hidden;
+    min-height: 0;
 
     .table-header {
-      font-size: 23px;
-      font-weight: 300;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #333;
-
-      .row-counter {
-        color: #c7c7c7;
-        font-size: 20px;
-        font-weight: 300;
-        line-height: 0;
-        padding-left: 10px;
-        padding-top: 1px;
-      }
 
       .qtd-reg {
-        color: #333;
         font-size: 22px;
+        font-weight: 300;
+        color: #333;
+      }
+      .row-counter {
+        font-size: 18px;
+        font-weight: 300;
+        color: #c7c7c7;
+        padding-left: 10px;
+        padding-top: 4px;
+        line-height: 0;
       }
     }
 
     .selection-bar {
-      width: calc(100% - 45px);
+      flex-shrink: 0;
+      width: 100%;
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border: solid 2px v.$cor-primaria;
-      margin-top: 10px;
       border-radius: 8px;
-      margin-left: 1px;
+      margin-top: 10px;
       padding: 0 10px;
+      box-sizing: border-box;
       transition: v.$transicao-rapida;
 
       &.active-selection {
         background-color: v.$cor-secundaria;
-        border: solid 2px v.$cor-secundaria;
-        transition: v.$transicao-rapida;
-
+        border-color: v.$cor-secundaria;
         span {
           color: #ffffff;
         }
-
         button {
           color: #ffffff;
-
           i {
             color: #ffffff;
           }
@@ -147,16 +168,14 @@
 
       button {
         display: flex;
+        align-items: center;
         border: none;
-        background-color: transparent;
+        background: transparent;
         color: v.$cor-secundaria;
-        font-size: 20px;
-        line-height: 1;
         gap: 10px;
         font-size: 18px;
         font-weight: 300;
         cursor: pointer;
-
         i {
           color: v.$cor-secundaria;
           font-size: 20px;
@@ -170,176 +189,322 @@
       }
     }
 
-    .table-wrapper {
+    // ── Scroll area ───────────────────────────────────────────────────────
+    .table-scroll-area {
+      flex: 1;
+      min-height: 0;
       margin-top: 15px;
-      width: calc(100% - 23px);
-      height: calc(100vh - 290px);
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden;
 
-      &::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: #eee;
-        border-radius: 10px;
-        &:hover {
-          background: v.$cor-primaria;
+      .table-wrapper {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: auto;
+
+        &::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
         }
-      }
-
-      .custom-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        table-layout: fixed;
-
-        thead tr:hover {
-          background-color: transparent;
+        &::-webkit-scrollbar-track {
+          background: transparent;
+          margin-block: 8px;
         }
-
-        .checkbox-col, .id-col-header, .id-cell {
-          position: sticky;
-          left: 0;
-          z-index: 10;
-          background-color: inherit; 
-        }
-
-        .id-col-header, .id-cell {
-          left: 50px; 
-          z-index: 9;
-        }
-
-        .checkbox-col {
-          width: 50px;
-          text-align: left;
-          vertical-align: middle;
-
-          input,
-          .select-all-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: #333;
+        &::-webkit-scrollbar-thumb {
+          background: #ddd;
+          border-radius: 10px;
+          &:hover {
+            background: v.$cor-primaria;
           }
         }
 
-        th {
-          text-align: left;
-          padding: 12px 8px;
-          color: #333;
-          font-weight: 500;
-          top: 0;
-          font-size: 14px;
-          border-bottom: 2px solid #eee;
-          background-color: #ffffff;
-          position: sticky;
+        // ── Tabela ────────────────────────────────────────────────────────
+        // table-layout: fixed é fundamental: respeita as larguras do <colgroup>
+        // e garante que o ícone resizer de NOME nunca seja "engolido" pelo browser
+        .custom-table {
+          table-layout: fixed;
+          border-collapse: separate;
+          border-spacing: 0;
 
-          &.actions-header {
-            width: 80px;
-            position: relative;
+          // ── Sticky helpers ───────────────────────────────────────────
+          .sticky-col {
+            position: sticky;
+            z-index: 20;
+            // IMPORTANTE: background-color NÃO é definido aqui.
+            // Cada estado (normal, hover, selected) define o background
+            // diretamente na célula, para que as sticky cells participem
+            // do hover/selected igual às células normais.
+          }
 
-            .actions-cell-content {
+          .sticky-checkbox {
+            left: $sticky-checkbox-left;
+          }
+
+          .sticky-id {
+            left: $sticky-id-left;
+            &::after {
+              content: "";
+              position: absolute;
+              top: 0;
+              right: -6px;
+              width: 6px;
+              height: 100%;
+              background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.06),
+                transparent
+              );
+              pointer-events: none;
+            }
+          }
+
+          .sticky-actions {
+            right: 0;
+            &::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: -6px;
+              width: 6px;
+              height: 100%;
+              background: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0.06),
+                transparent
+              );
+              pointer-events: none;
+            }
+          }
+
+          // ── Thead ────────────────────────────────────────────────────
+          thead th {
+            position: sticky;
+            top: 0;
+            background-color: #eee;
+            z-index: 10;
+            border-bottom: 2px solid #c7c7c7;
+            color: #333;
+            padding: 12px 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+
+            &.sticky-col {
+              z-index: 30;
+              background-color: #eee; // thead sempre cinza, sem hover
+            }
+          }
+
+          // ── Checkbox col ─────────────────────────────────────────────
+          .checkbox-col {
+            width: $checkbox-width;
+            min-width: $checkbox-width;
+            max-width: $checkbox-width;
+            text-align: center;
+            padding: 0;
+
+            .select-all-btn {
               display: flex;
-              gap: 5px;
-              justify-content: flex-end;
-
-              button {
-                border: none;
-                background: none;
-                cursor: pointer;
-                font-size: 20px;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto;
+              background: none;
+              border: none;
+              cursor: pointer;
+              font-size: 18px;
+              color: #c7c7c7;
+              padding: 10px;
+              transition: v.$transicao-rapida;
+              &:hover {
                 color: #333;
-                transition: v.$transicao-rapida;
+              }
+            }
 
-                &:hover {
-                  transform: scale(1.1);
-                  color: black;
-                  transition: v.$transicao-rapida;
-                  will-change: transform;
+            .custom-checkbox {
+              background: none;
+              border: none;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto;
+              padding: 10px;
+              line-height: 0;
+              transition: v.$transicao-rapida;
+
+              i {
+                font-size: 16px;
+                transition: v.$transicao-rapida;
+                &.fi-sr-angle-square-right {
+                  color: v.$cor-secundaria;
+                }
+                &.fi-rr-square {
+                  color: #c7c7c7;
+                  &:hover {
+                    color: #333;
+                  }
                 }
               }
             }
           }
 
-          .cell-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .resizer {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 20px;
-            border-radius: 10px;
-            width: 3px;
-            background: #eee;
-            cursor: col-resize;
-            transition: v.$transicao-rapida;
-            z-index: 11;
-
-            &:hover {
-              background: v.$cor-primaria;
-              transition: v.$transicao-rapida;
+          // ── ID col ───────────────────────────────────────────────────
+          .id-col {
+            width: $id-width;
+            min-width: $id-width;
+            max-width: $id-width;
+            .cell-content {
+              display: flex;
+              align-items: center;
             }
           }
-        }
 
-        tr {
-          background-color: #ffffff;
-          transition: v.$transicao-rapida;
-          border-bottom: 2px solid #eee;
-
-          &.row-selected {
-            background-color: rgba(v.$cor-primaria, 0.2);
-            transition: v.$transicao-rapida;
-          }
-
-          &:hover {
-            background-color: rgba(v.$cor-primaria, 0.2);
-            transition: v.$transicao-rapida;
-          }
-
-          td {
-            padding: 10px 8px;
+          .id-cell {
             font-size: 14px;
             color: #333;
-            border-bottom: 2px solid #eee;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            width: $id-width;
+            min-width: $id-width;
+            max-width: $id-width;
           }
 
-          .actions-cell {
-            display: flex;
-            gap: 5px;
-            justify-content: flex-end;
+          // ── Colunas redimensionáveis ──────────────────────────────────
+          // Largura vem do <col> no colgroup — o th não precisa de width inline
+          .resizable-col {
+            overflow: hidden;
 
-            button {
-              border: none;
-              background: none;
-              cursor: pointer;
-              font-size: 18px;
-              color: #333;
-              transition: v.$transicao-rapida;
+            .cell-content {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              overflow: hidden;
+              gap: 4px;
 
-              &:hover {
-                  transform: scale(1.1);
-                  transition: v.$transicao-rapida;
-                  will-change: transform;
+              .col-label {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+              }
+
+              // Resizer — flex-shrink:0 garante que nunca desaparece
+              .resizer-btn {
+                flex-shrink: 0;
+                background: none;
+                border: none;
+                cursor: col-resize;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 2px;
+                line-height: 0;
+                color: #aaa;
+                transition: v.$transicao-rapida;
+
+                i {
+                  font-size: 14px;
+                  pointer-events: none;
+                }
+                &:hover {
+                  color: v.$cor-primaria;
+                }
+              }
+            }
+          }
+
+          // ── Ações col — 60px fixo, sem resizer ───────────────────────
+          .actions-header {
+            width: $actions-width;
+            min-width: $actions-width;
+            max-width: $actions-width;
+
+            .actions-cell-content {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 8px;
+
+              button {
+                border: none;
+                background: none;
+                cursor: pointer;
+                font-size: 18px;
+                color: #333;
+                line-height: 0;
+                padding: 0;
+                transition: v.$transicao-rapida;
+                &:hover {
                   color: black;
                 }
+              }
+            }
+          }
+
+          // ── Tbody ────────────────────────────────────────────────────
+          tbody tr {
+            // ── Estado padrão: todas as células (incluindo sticky) recebem fundo branco
+            td {
+              background-color: $bg-normal;
+              padding: 10px 8px;
+              font-size: 14px;
+              color: #333;
+              border-bottom: 2px solid #c7c7c7;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              transition: background-color 0.15s ease;
+
+              // sticky-col no tbody: z-index acima das células normais
+              // background NÃO é redefinido aqui — herda o td acima
+              &.sticky-col {
+                z-index: 20;
+              }
+            }
+
+            // ── Hover: aplica fundo em TODAS as tds, inclusive sticky
+            &:hover td {
+              background-color: $bg-hover;
+            }
+
+            // ── Selecionado: aplica fundo em TODAS as tds, inclusive sticky
+            // !important necessário para sobrepor o hover quando ambos coexistem
+            &.row-selected td {
+              background-color: $bg-selected !important;
+            }
+
+            // Célula de ações
+            .actions-cell {
+              width: $actions-width;
+              min-width: $actions-width;
+              max-width: $actions-width;
+              padding: 0 4px;
+
+              .actions-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 4px;
+                height: 100%;
+
+                button {
+                  border: none;
+                  background: none;
+                  cursor: pointer;
+                  font-size: 16px;
+                  color: #333;
+                  line-height: 0;
+                  padding: 0;
+                  display: flex;
+                  align-items: center;
+                  transition: v.$transicao-rapida;
+                  &:hover {
+                    transform: scale(1.1);
+                    color: black;
+                    will-change: transform;
+                  }
+                }
+              }
             }
           }
         }

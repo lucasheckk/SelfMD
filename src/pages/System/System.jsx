@@ -4,180 +4,130 @@ import { SegundoMenu } from "../../components/SegundoMenu/SegundoMenu";
 
 export function System() {
   const initialRows = [
-    {
-      id: 1,
-      nome: "Kathryn Murphy",
-      email: "tkub@green.com",
-      cargo: "Manager",
-      cep: "01001-000",
-      idade: 28,
-    },
-    {
-      id: 2,
-      nome: "Albert Flores",
-      email: "littel.jo@block.com",
-      cargo: "F&B Team",
-      cep: "02002-000",
-      idade: 32,
-    },
-    {
-      id: 3,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 4,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 5,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 6,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 7,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 8,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 9,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
-    {
-      id: 10,
-      nome: "Guy Hawkins",
-      email: "lavina.m@marvin.com",
-      cargo: "Housekeeping",
-      cep: "03003-000",
-      idade: 45,
-    },
+    { id: 1,  nome: "Kathryn Murphy", email: "tkub@green.com",     cargo: "Manager",      cep: "01001-000", idade: 28 },
+    { id: 2,  nome: "Albert Flores",  email: "littel.jo@block.com", cargo: "F&B Team",     cep: "02002-000", idade: 32 },
+    { id: 3,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 4,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 5,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 6,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 7,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 8,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 9,  nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 10, nome: "Guy Hawkins",    email: "lavina.m@marvin.com", cargo: "Housekeeping", cep: "03003-000", idade: 45 },
+    { id: 11, nome: "Albert Flores",  email: "littel.jo@block.com", cargo: "F&B Team",     cep: "02002-000", idade: 32 },
+    { id: 12, nome: "Albert Flores",  email: "littel.jo@block.com", cargo: "F&B Team",     cep: "02002-000", idade: 32 },
+    { id: 13, nome: "Albert Flores",  email: "littel.jo@block.com", cargo: "F&B Team",     cep: "02002-000", idade: 32 },
+    { id: 14, nome: "Albert Flores",  email: "littel.jo@block.com", cargo: "F&B Team",     cep: "02002-000", idade: 32 },
   ];
 
-  const [tabs, setTabs] = useState([
-    { id: 1, name: "Sua tabela", rows: initialRows },
-  ]);
-  const [activeTab, setActiveTab] = useState(1);
+  const MIN_COL_WIDTH = 60;
+
+  // Larguras fixas das colunas imutáveis — espelham as variáveis SCSS
+  const CHECKBOX_WIDTH = 50;
+  const ID_WIDTH       = 70;
+  const ACTIONS_WIDTH  = 60;
+
+  const [tabs, setTabs] = useState([{ id: 1, name: "Sua tabela", rows: initialRows }]);
+  const [activeTab, setActiveTab]     = useState(1);
   const [selectedRows, setSelectedRows] = useState([]);
 
   const [colWidths, setColWidths] = useState({
-    id: 60,
-    nome: 70,
+    nome:  150,
     email: 150,
     cargo: 150,
-    cep: 120,
-    idade: 80,
+    cep:   120,
+    idade: 100,
   });
+
   const activeTabData = tabs.find((t) => t.id === activeTab);
-  const rows = activeTabData?.rows || [];
+  const rows          = activeTabData?.rows || [];
+
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const tabsRef = useRef({});
 
+  /* ─── Seleção ─────────────────────────────────────────────────────────── */
   const toggleSelectAll = () => {
-    if (selectedRows.length === rows.length && rows.length > 0) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows(rows.map((row) => row.id));
-    }
+    if (selectedRows.length === rows.length && rows.length > 0) setSelectedRows([]);
+    else setSelectedRows(rows.map((r) => r.id));
   };
 
-  const toggleSelectRow = (id) => {
+  const toggleSelectRow = (id) =>
     setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-  };
 
+  /* ─── Tabs ────────────────────────────────────────────────────────────── */
   const addNewTab = () => {
     const tabName = prompt("Digite o nome da nova tabela:");
     if (tabName) {
       const newId = Date.now();
-      const newTab = { id: newId, name: tabName, rows: [] };
-      setTabs([...tabs, newTab]);
+      setTabs((prev) => [...prev, { id: newId, name: tabName, rows: [] }]);
       setActiveTab(newId);
     }
   };
 
   useEffect(() => {
-    const currentTab = tabsRef.current[activeTab];
-    if (currentTab) {
-      const { offsetLeft, offsetWidth } = currentTab;
-
-      setIndicatorStyle({
-        left: `${offsetLeft}px`,
-        width: `${offsetWidth}px`,
-      });
-    }
+    const el = tabsRef.current[activeTab];
+    if (el) setIndicatorStyle({ left: `${el.offsetLeft}px`, width: `${el.offsetWidth}px` });
   }, [activeTab, tabs]);
 
+  /* ─── Deletar selecionados ───────────────────────────────────────────── */
   const deleteSelected = () => {
-    const updatedRows = rows.filter((row) => !selectedRows.includes(row.id));
-    const updatedTabs = tabs.map((tab) =>
-      tab.id === activeTab ? { ...tab, rows: updatedRows } : tab,
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === activeTab
+          ? { ...tab, rows: tab.rows.filter((r) => !selectedRows.includes(r.id)) }
+          : tab
+      )
     );
-    setTabs(updatedTabs);
     setSelectedRows([]);
   };
 
+  /* ─── Redimensionar coluna ───────────────────────────────────────────── */
   const handleMouseDown = (e, colName) => {
-    const startX = e.pageX;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const startX     = e.pageX;
     const startWidth = colWidths[colName];
 
-    const handleMouseMove = (moveEvent) => {
-      // Limite mínimo de 40px para manter 15% de visibilidade mínima
-      const newWidth = Math.max(40, startWidth + (moveEvent.pageX - startX));
+    const onMove = (ev) => {
+      const newWidth = Math.max(MIN_COL_WIDTH, startWidth + (ev.pageX - startX));
       setColWidths((prev) => ({ ...prev, [colName]: newWidth }));
     };
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup",   onUp);
+      document.body.style.cursor     = "default";
+      document.body.style.userSelect = "";
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup",   onUp);
   };
+
+  const resizableCols = Object.keys(colWidths); // ["nome","email","cargo","cep","idade"]
+
+  // Largura total da tabela calculada em JS para forçar table-layout:fixed
+  // sem que o browser redistribua o espaço e "engula" o ícone de NOME
+  const totalTableWidth =
+    CHECKBOX_WIDTH +
+    ID_WIDTH +
+    resizableCols.reduce((acc, col) => acc + colWidths[col], 0) +
+    ACTIONS_WIDTH;
 
   return (
     <div className="system-container">
       <SegundoMenu />
       <main className="main-layout">
+
+        {/* ── Tabs ──────────────────────────────────────────────────────── */}
         <div className="tab-layout">
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              ref={(el) => (tabsRef.current[tab.id] = el)} // Guarda a ref
+              ref={(el) => (tabsRef.current[tab.id] = el)}
               className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -189,29 +139,20 @@ export function System() {
             <i className="fi fi-rr-plus"></i>
           </button>
         </div>
-        <div className="content-area">
-          <div className="table-header">
-            {(() => {
-              const rowCount = activeTabData?.rows?.length || 0;
 
-              return (
-                <>
-                  <span className="qtd-reg">Registros</span>
-                  <span className="row-counter">{rowCount}</span>
-                </>
-              );
-            })()}
+        {/* ── Conteúdo ──────────────────────────────────────────────────── */}
+        <div className="content-area">
+
+          <div className="table-header">
+            <span className="qtd-reg">Registros</span>
+            <span className="row-counter">{activeTabData?.rows?.length || 0}</span>
           </div>
-          <div
-            className={`selection-bar ${selectedRows.length > 0 ? "active-selection" : ""}`}
-          >
+
+          <div className={`selection-bar ${selectedRows.length > 0 ? "active-selection" : ""}`}>
             {selectedRows.length > 0 ? (
               <>
                 <span>{selectedRows.length} item(s) selecionado(s)</span>
-                <button
-                  className="delete-selection-btn"
-                  onClick={deleteSelected}
-                >
+                <button className="delete-selection-btn" onClick={deleteSelected}>
                   <i className="fi fi-sr-trash"></i>
                   Apagar
                 </button>
@@ -220,80 +161,113 @@ export function System() {
               <span className="empty-selection">Nenhum item selecionado</span>
             )}
           </div>
-          <div className="table-wrapper">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th className="checkbox-col">
-                    <button
-                      className="select-all-btn"
-                      onClick={toggleSelectAll}
-                    >
-                      <i
-                        className={`fi ${selectedRows.length === rows.length && rows.length > 0 ? "fi-fi-rr-square-minus" : "fi fi-rr-square-plus"}`}
-                      ></i>
-                    </button>
-                  </th>
-                  {Object.keys(colWidths).map((col, index, array) => (
-                    <th key={col} style={{ width: `${colWidths[col]}px` }}>
-                      <div className="cell-content">
-                        {col.toUpperCase()}
-                        {index < array.length - 1 && (
-                          <div
-                            className="resizer"
+
+          <div className="table-scroll-area">
+            <div className="table-wrapper">
+              {/*
+                style={{ width }} força a tabela a ter exatamente o tamanho somado
+                das colunas. Com table-layout:fixed no CSS, o browser respeita as
+                larguras definidas em cada th e nunca "engole" o ícone de NOME.
+              */}
+              <table className="custom-table" style={{ width: `${totalTableWidth}px` }}>
+
+                <colgroup>
+                  <col style={{ width: `${CHECKBOX_WIDTH}px` }} />
+                  <col style={{ width: `${ID_WIDTH}px` }} />
+                  {resizableCols.map((col) => (
+                    <col key={col} style={{ width: `${colWidths[col]}px` }} />
+                  ))}
+                  <col style={{ width: `${ACTIONS_WIDTH}px` }} />
+                </colgroup>
+
+                <thead>
+                  <tr>
+
+                    {/* Checkbox — fixo esquerda, sem resizer */}
+                    <th className="checkbox-col sticky-col sticky-checkbox">
+                      <button className="select-all-btn" onClick={toggleSelectAll}>
+                        <i className={`fi ${
+                          selectedRows.length === rows.length && rows.length > 0
+                            ? "fi-rr-square-minus"
+                            : "fi-rr-square-plus"
+                        }`}></i>
+                      </button>
+                    </th>
+
+                    {/* ID — fixo, sem resizer */}
+                    <th className="id-col sticky-col sticky-id">
+                      <div className="cell-content">ID</div>
+                    </th>
+
+                    {/* Colunas do usuário — TODAS com resizer */}
+                    {resizableCols.map((col) => (
+                      <th key={col} className="resizable-col">
+                        <div className="cell-content">
+                          <span className="col-label">{col.toUpperCase()}</span>
+                          <button
+                            className="resizer-btn"
                             onMouseDown={(e) => handleMouseDown(e, col)}
-                          />
-                        )}
+                            title="Redimensionar coluna"
+                          >
+                            <i className="fi fi-sr-arrows-alt-h"></i>
+                          </button>
+                        </div>
+                      </th>
+                    ))}
+
+                    {/* Ações — fixo direita, sem resizer */}
+                    <th className="actions-header sticky-col sticky-actions">
+                      <div className="actions-cell-content">
+                        <button title="Configurar Colunas">
+                          <i className="fi fi-rr-settings"></i>
+                        </button>
+                        <button title="Excluir Colunas">
+                          <i className="fi fi-rr-cross-circle"></i>
+                        </button>
                       </div>
                     </th>
-                  ))}
-                  <th className="actions-header">
-                    <div className="actions-cell-content">
-                      <button title="Configurar Colunas">
-                        <i className="fi fi-rr-settings"></i>
-                      </button>
-                      <button title="Excluir Colunas">
-                        <i className="fi fi-rr-cross-circle"></i>
-                      </button>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="scrollable-body">
-                {rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className={
-                      selectedRows.includes(row.id) ? "row-selected" : ""
-                    }
-                  >
-                    <td className="checkbox-col">
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(row.id)}
-                        onChange={() => toggleSelectRow(row.id)}
-                      />
-                    </td>
-                    <td>{row.id}</td>
-                    <td>{row.nome}</td>
-                    <td>{row.email}</td>
-                    <td>{row.cargo}</td>
-                    <td>{row.cep}</td>
-                    <td>{row.idade}</td>
-                    <td className="actions-cell">
-                      <button>
-                        <i class="fi fi-rr-file-edit editar"></i>
-                      </button>
-                      <button>
-                        <i class="fi fi-rr-delete-document remover"></i>
-                      </button>
-                    </td>
+
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className={selectedRows.includes(row.id) ? "row-selected" : ""}
+                    >
+                      <td className="checkbox-col sticky-col sticky-checkbox">
+                        <button className="custom-checkbox" onClick={() => toggleSelectRow(row.id)}>
+                          <i className={`fi ${
+                            selectedRows.includes(row.id)
+                              ? "fi-sr-angle-square-right"
+                              : "fi-rr-square"
+                          }`}></i>
+                        </button>
+                      </td>
+
+                      <td className="id-cell sticky-col sticky-id">{row.id}</td>
+
+                      {resizableCols.map((col) => (
+                        <td key={col} className="data-cell">{row[col]}</td>
+                      ))}
+
+                      <td className="actions-cell sticky-col sticky-actions">
+                        <div className="actions-container">
+                          <button><i className="fi fi-rr-file-edit editar"></i></button>
+                          <button><i className="fi fi-rr-delete-document remover"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+            </div>
           </div>
+
         </div>
+
       </main>
     </div>
   );
