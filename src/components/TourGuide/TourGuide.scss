@@ -1,0 +1,509 @@
+@use "../../styles/variables" as v;
+
+// ─── Backdrop ────────────────────────────────────────────────────────────────
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: all;
+}
+
+.tour-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { stroke-opacity: 0.28; }
+  50%       { stroke-opacity: 0.65; }
+}
+
+.tour-ring {
+  animation: ring-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+// ─── Tooltip container ───────────────────────────────────────────────────────
+.tour-tooltip {
+  position: fixed;
+  z-index: 9100;
+  width: 360px;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #e8e8e8;
+  padding: 20px 22px 18px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: v.$jakarta;
+
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition:
+    opacity   0.22s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    top  0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.tour-tooltip--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  // Modo demo: mais largo para comportar as colunas
+  &.tour-tooltip--wide {
+    width: 740px;
+    max-width: calc(100vw - 32px);
+  }
+
+  // Sombra diferente no modo demo
+  &.tour-tooltip--demo {
+    border-color: rgba(v.$cor-primaria, 0.18);
+    box-shadow:
+      0 0 0 1px rgba(v.$cor-primaria, 0.08),
+      0 20px 60px rgba(0,0,0,0.28);
+  }
+}
+
+// ─── Setas direcionais ───────────────────────────────────────────────────────
+.tooltip-arrow::before {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #fff;
+  border: 2px solid #e8e8e8;
+  border-radius: 2px;
+}
+
+.tooltip-arrow--bottom::before {
+  top: -7px; left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-bottom: none; border-right: none;
+}
+.tooltip-arrow--top::before {
+  bottom: -7px; left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-top: none; border-left: none;
+}
+.tooltip-arrow--right::before {
+  left: -7px; top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-right: none; border-top: none;
+}
+.tooltip-arrow--left::before {
+  right: -7px; top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-left: none; border-bottom: none;
+}
+
+// ─── Progresso ───────────────────────────────────────────────────────────────
+.tour-progress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tour-progress-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  transition: all 0.25s;
+  flex-shrink: 0;
+
+  &.done   { background: rgba(v.$cor-primaria, 0.35); width: 12px; border-radius: 3px; }
+  &.active { background: v.$cor-primaria; width: 20px; border-radius: 3px; }
+}
+
+// ─── Texto ───────────────────────────────────────────────────────────────────
+.tour-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tour-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.tour-desc {
+  font-size: 13.5px;
+  color: #666;
+  margin: 0;
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+// ─── Rodapé do tour ──────────────────────────────────────────────────────────
+.tour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1.5px solid #f2f2f2;
+  gap: 8px;
+}
+
+.tour-btn-cancel {
+  background: none; border: none;
+  font-family: v.$jakarta;
+  font-size: 12px; color: #bbb;
+  cursor: pointer; padding: 0;
+  transition: color 0.15s;
+  &:hover { color: #888; }
+}
+
+.tour-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tour-btn-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: v.$jakarta;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  i { font-size: 12px; }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.tour-btn-prev {
+  background: #f2f2f2; color: #555;
+  &:hover:not(:disabled) { background: #e8e8e8; }
+}
+
+.tour-btn-next {
+  background: v.$cor-primaria; color: #fff;
+  &:hover { opacity: 0.88; transform: translateY(-1px); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── DEMO WIZARD ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.demo-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid #ececec;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fafafa;
+
+  // Versão larga (step 2)
+  &.demo-wizard--wide {
+    background: #fff;
+  }
+}
+
+// ── Cabeçalho fake do wizard ──────────────────────────────────────────────────
+.demo-wizard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 10px;
+  border-bottom: 1.5px solid #ececec;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.demo-steps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.demo-step-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ccc;
+  font-family: v.$jakarta;
+  transition: all 0.3s;
+
+  &.demo-step-done {
+    background: v.$cor-primaria;
+    border-color: v.$cor-primaria;
+    color: #fff;
+  }
+}
+
+.demo-step-line {
+  width: 28px; height: 2px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  transition: background 0.3s;
+
+  &.demo-step-line--done {
+    background: v.$cor-primaria;
+  }
+}
+
+.demo-badge {
+  font-size: 11px;
+  color: #aaa;
+  background: #f0f0f0;
+  border-radius: 5px;
+  padding: 2px 8px;
+  font-family: v.$jakarta;
+
+  strong { color: v.$cor-primaria; font-weight: 600; }
+}
+
+// ── Body do step 1 ────────────────────────────────────────────────────────────
+.demo-wizard-body {
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.demo-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #777;
+  margin: 0;
+  font-family: v.$jakarta;
+}
+
+.demo-input-field {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 9px 14px;
+  background: #fff;
+  transition: border-color 0.25s;
+  min-height: 40px;
+
+  &.demo-input-done {
+    border-color: v.$cor-primaria;
+  }
+}
+
+.demo-typed {
+  font-size: 15px;
+  color: #222;
+  font-family: v.$jakarta;
+  letter-spacing: 0.01em;
+}
+
+.demo-cursor {
+  font-size: 17px;
+  color: v.$cor-primaria;
+  font-weight: 300;
+  opacity: 0;
+  transition: opacity 0.1s;
+  line-height: 1;
+  margin-left: 1px;
+
+  &.demo-cursor-on { opacity: 1; }
+}
+
+.demo-char-track {
+  height: 3px;
+  background: #efefef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.demo-char-fill {
+  height: 100%;
+  background: v.$cor-primaria;
+  border-radius: 3px;
+  transition: width 0.12s ease;
+}
+
+.demo-char-hint {
+  font-size: 11px;
+  color: #ccc;
+  font-family: v.$jakarta;
+  text-align: right;
+}
+
+// ── Footer fake ───────────────────────────────────────────────────────────────
+.demo-wizard-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1.5px solid #ececec;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.demo-btn-fake {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: v.$jakarta;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+
+  i { font-size: 11px; }
+
+  &.demo-btn-fake--ghost {
+    background: #f2f2f2;
+    color: #999;
+  }
+
+  &.demo-btn-fake--primary {
+    background: v.$cor-primaria;
+    color: #fff;
+    opacity: 0.5;
+    transition: opacity 0.3s, box-shadow 0.3s;
+  }
+}
+
+// Efeito pulse quando o botão "ativa"
+@keyframes btn-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(v.$cor-primaria, 0.45); opacity: 0.9; }
+  50%  { box-shadow: 0 0 0 6px rgba(v.$cor-primaria, 0);    opacity: 1;   }
+  100% { box-shadow: 0 0 0 0   rgba(v.$cor-primaria, 0);    opacity: 0.9; }
+}
+
+.demo-btn-pulse {
+  opacity: 1 !important;
+  animation: btn-pulse 1.6s ease-in-out infinite;
+}
+
+// ── Área das colunas (step 2) ─────────────────────────────────────────────────
+.demo-cols-scroll {
+  overflow-y: auto;
+  max-height: 260px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+}
+
+// Grid: nome | pk | tipo | config
+.demo-cols-grid {
+  display: grid;
+  grid-template-columns: 130px 40px 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-cols-head {
+  span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #bbb;
+    padding: 0 3px;
+    font-family: v.$jakarta;
+  }
+  .txt-center { text-align: center; }
+}
+
+.demo-cols-row {
+  background: #fafafa;
+  border: 1.5px solid #efefef;
+  border-radius: 9px;
+  padding: 7px 10px;
+
+  // Animação de revelação em cascata
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.28s ease, transform 0.28s ease, border-color 0.2s;
+
+  &.demo-cols-row--in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &:hover { border-color: #d8d8d8; }
+}
+
+.txt-center { text-align: center; }
+
+.demo-col-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  font-family: v.$jakarta;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Ícone PK
+.demo-pk-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  border: 1.5px solid #e0e0e0;
+  color: #ccc;
+  font-size: 12px;
+  transition: all 0.2s;
+
+  &.demo-pk-icon--on {
+    background: rgba(v.$cor-primaria, 0.1);
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
+  }
+}
+
+// Pills: tipo de dado e config
+.demo-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.demo-pill {
+  font-size: 10px;
+  font-family: v.$jakarta;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1.5px solid #e8e8e8;
+  color: #bbb;
+  background: #fff;
+  white-space: nowrap;
+  transition: all 0.18s;
+
+  &.demo-pill--on {
+    background: v.$cor-primaria;
+    border-color: v.$cor-primaria;
+    color: #fff;
+    font-weight: 600;
+  }
+}

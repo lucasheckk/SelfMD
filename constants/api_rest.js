@@ -33,8 +33,16 @@ export const DATABASE_CRUD_ROUTES = {
 };
 
 export const TABELA_CRUD_ROUTES = {
-  CRIAR: "/tabelas/criar",
-  LISTAR: "/tabelas/listar",
-  ATUALIZAR: (id) => `/tabelas/atualizar/${id}`,
-  EXCLUIR: (id) => `/tabelas/excluir/${id}`
+  CRIAR: "/tabelas/criar/{databaseId}",
+  LISTAR: "/tabelas/listar/{databaseId}",
+  ATUALIZAR: (tabelaId) => `/tabelas/atualizar/${tabelaId}`,
+  EXCLUIR: (tabelaId) => `/tabelas/excluir/${tabelaId}`
 };
+
+export const COLUNA_CRUD_ROUTES = {}
+
+export const DADOS_CRUD_ROUTES = {}
+
+export const REL_CRUD_ROUTES = {}
+
+export const AUT_CRUD_ROUTES = {}

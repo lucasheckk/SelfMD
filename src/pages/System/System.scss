@@ -1,36 +1,31 @@
 @use "../../styles/variables" as v;
 
 // ─── Medidas fixas ───────────────────────────────────────────────────────────
-$checkbox-width: 50px;
-$id-width: 70px;
-$actions-width: 60px;
+$checkbox-width:     50px;
+$id-width:           70px;
+$actions-width:      60px;
 
 $sticky-checkbox-left: 0px;
-$sticky-id-left: $checkbox-width; // 50px
+$sticky-id-left:       $checkbox-width;
 
-$col-min-width: 60px;
+$col-min-width:        60px;
 
-$content-padding-h: 20px;
-$content-padding-top: 10px;
+$content-padding-h:      20px;
+$content-padding-top:    10px;
 $content-padding-bottom: 15px;
 
-// ─── Cores de fundo para estados da linha ────────────────────────────────────
-// Usamos variáveis CSS (custom properties) para que sticky cells consigam
-// herdar a cor correta via var() em vez de ter background fixo em #fff.
-// Isso resolve o hover e o selected nas colunas fixas.
-$bg-normal: #ffffff;
-$bg-hover: rgba(v.$cor-primaria, 0.08);
+$bg-normal:   #ffffff;
+$bg-hover:    rgba(v.$cor-primaria, 0.08);
 $bg-selected: rgba(v.$cor-primaria, 0.2);
 
+// ─── Container ───────────────────────────────────────────────────────────────
 .system-container {
   min-height: 100vh;
   background-color: v.$cor-fundo;
 
-  * {
-    font-family: v.$jakarta;
-  }
+  * { font-family: v.$jakarta; }
 
-  // ── Card principal ─────────────────────────────────────────────────────────
+  // ── Card principal ──────────────────────────────────────────────────────
   .main-layout {
     position: fixed;
     display: flex;
@@ -98,46 +93,87 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           font-size: 16px;
           color: #333;
           transition: v.$transicao-rapida;
-          &:hover {
-            transform: translateY(-1px);
-            will-change: transform;
-          }
+          &:hover { transform: translateY(-1px); will-change: transform; }
         }
       }
     }
   }
 
-  // ── Área de conteúdo ───────────────────────────────────────────────────────
+  // ── Área de conteúdo ─────────────────────────────────────────────────────
   .content-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: $content-padding-top $content-padding-h $content-padding-bottom
-      $content-padding-h;
+    padding: $content-padding-top $content-padding-h $content-padding-bottom $content-padding-h;
     overflow: hidden;
     min-height: 0;
 
+    // ── Empty state ──────────────────────────────────────────────────────
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding-bottom: 40px;
+
+      .empty-title {
+        font-size: 22px;
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+      }
+
+      .empty-desc {
+        font-size: 15px;
+        color: #aaa;
+        margin: 0;
+        text-align: center;
+        max-width: 340px;
+        line-height: 1.6;
+      }
+    }
+
+    // ── Table header ─────────────────────────────────────────────────────
     .table-header {
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 8px;
 
-      .qtd-reg {
-        font-size: 22px;
-        font-weight: 300;
-        color: #333;
-      }
+      .qtd-reg   { font-size: 22px; font-weight: 300; color: #333; }
       .row-counter {
-        font-size: 18px;
-        font-weight: 300;
-        color: #c7c7c7;
-        padding-left: 10px;
-        padding-top: 4px;
-        line-height: 0;
+        font-size: 18px; font-weight: 300;
+        color: #c7c7c7; padding-left: 10px; padding-top: 4px; line-height: 0;
+      }
+
+      // ── Botão Tour ──────────────────────────────────────────────────
+      .tour-trigger-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-left: auto;        // empurra para a direita
+        background: transparent;
+        border: 1.5px dashed #c7c7c7;
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-family: v.$jakarta;
+        color: #aaa;
+        cursor: pointer;
+        transition: v.$transicao-rapida;
+
+        i { font-size: 14px; padding-top: 2px; }
+
+        &:hover {
+          border-color: v.$cor-primaria;
+          color: v.$cor-primaria;
+        }
       }
     }
 
+    // ── Selection bar ────────────────────────────────────────────────────
     .selection-bar {
       flex-shrink: 0;
       width: 100%;
@@ -155,354 +191,181 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       &.active-selection {
         background-color: v.$cor-secundaria;
         border-color: v.$cor-secundaria;
-        span {
-          color: #ffffff;
-        }
-        button {
-          color: #ffffff;
-          i {
-            color: #ffffff;
-          }
-        }
+        span { color: #ffffff; }
+        button { color: #ffffff; i { color: #ffffff; } }
       }
 
       button {
-        display: flex;
-        align-items: center;
-        border: none;
-        background: transparent;
-        color: v.$cor-secundaria;
-        gap: 10px;
-        font-size: 18px;
-        font-weight: 300;
-        cursor: pointer;
-        i {
-          color: v.$cor-secundaria;
-          font-size: 20px;
-        }
+        display: flex; align-items: center;
+        border: none; background: transparent;
+        color: v.$cor-secundaria; gap: 10px;
+        font-size: 18px; font-weight: 300; cursor: pointer;
+        i { color: v.$cor-secundaria; font-size: 20px; }
       }
 
-      span {
-        font-size: 18px;
-        font-weight: 300;
-        color: #333;
-      }
+      span { font-size: 18px; font-weight: 300; color: #333; }
     }
 
-    // ── Scroll area ───────────────────────────────────────────────────────
+    // ── Scroll area ──────────────────────────────────────────────────────
     .table-scroll-area {
       flex: 1;
-      min-height: 0;
       margin-top: 15px;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
 
       .table-wrapper {
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: auto;
+        height: auto;
+        max-height: 100%;
+        overflow-x: hidden;
 
-        &::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-        }
-        &::-webkit-scrollbar-track {
-          background: transparent;
-          margin-block: 8px;
-        }
+        &::-webkit-scrollbar { width: 5px; height: 5px; }
+        &::-webkit-scrollbar-track { background: transparent; margin-block: 8px; }
         &::-webkit-scrollbar-thumb {
-          background: #ddd;
-          border-radius: 10px;
-          &:hover {
-            background: v.$cor-primaria;
-          }
+          background: #ddd; border-radius: 10px;
+          &:hover { background: v.$cor-primaria; }
         }
 
-        // ── Tabela ────────────────────────────────────────────────────────
-        // table-layout: fixed é fundamental: respeita as larguras do <colgroup>
-        // e garante que o ícone resizer de NOME nunca seja "engolido" pelo browser
         .custom-table {
           table-layout: fixed;
           border-collapse: separate;
           border-spacing: 0;
+          width: 100%;
+          min-width: 0;
 
-          // ── Sticky helpers ───────────────────────────────────────────
-          .sticky-col {
-            position: sticky;
-            z-index: 20;
-            // IMPORTANTE: background-color NÃO é definido aqui.
-            // Cada estado (normal, hover, selected) define o background
-            // diretamente na célula, para que as sticky cells participem
-            // do hover/selected igual às células normais.
-          }
-
-          .sticky-checkbox {
-            left: $sticky-checkbox-left;
-          }
-
+          .sticky-col      { position: sticky; z-index: 20; }
+          .sticky-checkbox { left: $sticky-checkbox-left; }
           .sticky-id {
             left: $sticky-id-left;
             &::after {
-              content: "";
-              position: absolute;
-              top: 0;
-              right: -6px;
-              width: 6px;
-              height: 100%;
-              background: linear-gradient(
-                to right,
-                rgba(0, 0, 0, 0.06),
-                transparent
-              );
+              content: ""; position: absolute;
+              top: 0; right: -6px; width: 6px; height: 100%;
+              background: linear-gradient(to right, rgba(0,0,0,0.06), transparent);
               pointer-events: none;
             }
           }
-
           .sticky-actions {
-            right: 0;
+            right: 0; z-index: 25;
             &::before {
-              content: "";
-              position: absolute;
-              top: 0;
-              left: -6px;
-              width: 6px;
-              height: 100%;
-              background: linear-gradient(
-                to left,
-                rgba(0, 0, 0, 0.06),
-                transparent
-              );
+              content: ""; position: absolute;
+              top: 0; left: -6px; width: 6px; height: 100%;
+              background: linear-gradient(to left, rgba(0,0,0,0.06), transparent);
               pointer-events: none;
             }
           }
 
-          // ── Thead ────────────────────────────────────────────────────
           thead th {
-            position: sticky;
-            top: 0;
-            background-color: #eee;
-            z-index: 10;
+            position: sticky; top: 0;
+            background-color: #eee; z-index: 10;
             border-bottom: 2px solid #c7c7c7;
-            color: #333;
-            padding: 12px 8px;
-            font-size: 14px;
-            font-weight: 500;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-
-            &.sticky-col {
-              z-index: 30;
-              background-color: #eee; // thead sempre cinza, sem hover
-            }
+            color: #333; padding: 12px 8px;
+            font-size: 14px; font-weight: 500;
+            text-align: left; white-space: nowrap; overflow: hidden;
+            &.sticky-col { z-index: 30; background-color: #eee; }
           }
 
-          // ── Checkbox col ─────────────────────────────────────────────
           .checkbox-col {
-            width: $checkbox-width;
-            min-width: $checkbox-width;
-            max-width: $checkbox-width;
-            text-align: center;
-            padding: 0;
+            width: $checkbox-width; min-width: $checkbox-width; max-width: $checkbox-width;
+            text-align: center; padding: 0;
 
             .select-all-btn {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin: 0 auto;
-              background: none;
-              border: none;
-              cursor: pointer;
-              font-size: 18px;
-              color: #c7c7c7;
-              padding: 10px;
+              display: flex; align-items: center; justify-content: center;
+              margin: 0 auto; background: none; border: none; cursor: pointer;
+              font-size: 18px; color: #c7c7c7; padding: 10px;
               transition: v.$transicao-rapida;
-              &:hover {
-                color: #333;
-              }
+              &:hover { color: #333; }
             }
 
             .custom-checkbox {
-              background: none;
-              border: none;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin: 0 auto;
-              padding: 10px;
-              line-height: 0;
+              background: none; border: none; cursor: pointer;
+              display: flex; align-items: center; justify-content: center;
+              margin: 0 auto; padding: 10px; line-height: 0;
               transition: v.$transicao-rapida;
-
               i {
-                font-size: 16px;
-                transition: v.$transicao-rapida;
-                &.fi-sr-angle-square-right {
-                  color: v.$cor-secundaria;
-                }
-                &.fi-rr-square {
-                  color: #c7c7c7;
-                  &:hover {
-                    color: #333;
-                  }
-                }
+                font-size: 16px; transition: v.$transicao-rapida;
+                &.fi-sr-angle-square-right { color: v.$cor-secundaria; }
+                &.fi-rr-square { color: #c7c7c7; &:hover { color: #333; } }
               }
             }
           }
 
-          // ── ID col ───────────────────────────────────────────────────
           .id-col {
-            width: $id-width;
-            min-width: $id-width;
-            max-width: $id-width;
-            .cell-content {
-              display: flex;
-              align-items: center;
-            }
+            width: $id-width; min-width: $id-width; max-width: $id-width;
+            .cell-content { display: flex; align-items: center; }
           }
-
           .id-cell {
-            font-size: 14px;
-            color: #333;
-            width: $id-width;
-            min-width: $id-width;
-            max-width: $id-width;
+            font-size: 14px; color: #333;
+            width: $id-width; min-width: $id-width; max-width: $id-width;
           }
 
-          // ── Colunas redimensionáveis ──────────────────────────────────
-          // Largura vem do <col> no colgroup — o th não precisa de width inline
           .resizable-col {
-            overflow: hidden;
-
+            overflow: visible !important;
             .cell-content {
-              display: flex;
-              align-items: center;
+              display: flex; align-items: center;
               justify-content: space-between;
-              overflow: hidden;
-              gap: 4px;
+              overflow: hidden; gap: 4px; position: relative;
 
               .col-label {
-                flex: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
+                flex: 1; overflow: hidden;
+                text-overflow: ellipsis; white-space: nowrap; min-width: 0;
               }
-
-              // Resizer — flex-shrink:0 garante que nunca desaparece
               .resizer-btn {
-                flex-shrink: 0;
-                background: none;
-                border: none;
-                cursor: col-resize;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0 2px;
-                line-height: 0;
-                color: #aaa;
+                flex-shrink: 0; background: none; border: none;
+                cursor: col-resize; display: flex;
+                align-items: center; justify-content: center;
+                padding: 0 4px; line-height: 0; color: #aaa; z-index: 5;
                 transition: v.$transicao-rapida;
-
-                i {
-                  font-size: 14px;
-                  pointer-events: none;
-                }
-                &:hover {
-                  color: v.$cor-primaria;
-                }
+                i { font-size: 14px; pointer-events: none; }
+                &:hover { color: v.$cor-primaria; }
               }
             }
           }
 
-          // ── Ações col — 60px fixo, sem resizer ───────────────────────
           .actions-header {
-            width: $actions-width;
-            min-width: $actions-width;
-            max-width: $actions-width;
-
+            width: $actions-width; min-width: $actions-width; max-width: $actions-width;
             .actions-cell-content {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              gap: 8px;
-
+              display: flex; justify-content: center; align-items: center; gap: 8px;
               button {
-                border: none;
-                background: none;
-                cursor: pointer;
-                font-size: 18px;
-                color: #333;
-                line-height: 0;
-                padding: 0;
+                border: none; background: none; cursor: pointer;
+                font-size: 18px; color: #333; line-height: 0; padding: 0;
                 transition: v.$transicao-rapida;
-                &:hover {
-                  color: black;
-                }
+                &:hover { color: black; }
               }
             }
           }
 
-          // ── Tbody ────────────────────────────────────────────────────
           tbody tr {
-            // ── Estado padrão: todas as células (incluindo sticky) recebem fundo branco
+            &:not(.row-selected):hover td { background-color: $bg-hover; }
+
             td {
               background-color: $bg-normal;
-              padding: 10px 8px;
-              font-size: 14px;
-              color: #333;
+              padding: 10px 8px; font-size: 14px; color: #333;
               border-bottom: 2px solid #c7c7c7;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
               transition: background-color 0.15s ease;
-
-              // sticky-col no tbody: z-index acima das células normais
-              // background NÃO é redefinido aqui — herda o td acima
-              &.sticky-col {
-                z-index: 20;
-              }
+              &.sticky-col { z-index: 20; }
             }
 
-            // ── Hover: aplica fundo em TODAS as tds, inclusive sticky
-            &:hover td {
-              background-color: $bg-hover;
+            &.row-selected td { background-color: $bg-selected !important; }
+
+            .empty-rows-cell {
+              text-align: center;
+              color: #bbb;
+              font-size: 14px;
+              padding: 30px 8px;
             }
 
-            // ── Selecionado: aplica fundo em TODAS as tds, inclusive sticky
-            // !important necessário para sobrepor o hover quando ambos coexistem
-            &.row-selected td {
-              background-color: $bg-selected !important;
-            }
-
-            // Célula de ações
             .actions-cell {
-              width: $actions-width;
-              min-width: $actions-width;
-              max-width: $actions-width;
-              padding: 0 4px;
-
+              width: $actions-width; min-width: $actions-width; max-width: $actions-width;
+              padding: 0 4px; background-color: #fff;
               .actions-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 4px;
-                height: 100%;
-
+                display: flex; justify-content: center; align-items: center;
+                gap: 4px; height: 100%;
                 button {
-                  border: none;
-                  background: none;
-                  cursor: pointer;
-                  font-size: 16px;
-                  color: #333;
-                  line-height: 0;
-                  padding: 0;
-                  display: flex;
-                  align-items: center;
+                  border: none; background: none; cursor: pointer;
+                  font-size: 16px; color: #333; line-height: 0; padding: 0;
+                  display: flex; align-items: center;
                   transition: v.$transicao-rapida;
-                  &:hover {
-                    transform: scale(1.1);
-                    color: black;
-                    will-change: transform;
-                  }
+                  &:hover { transform: scale(1.1); color: black; will-change: transform; }
                 }
               }
             }
@@ -511,4 +374,340 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       }
     }
   }
+}
+
+// ─── Wizard Overlay ───────────────────────────────────────────────────────────
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeOverlay 0.2s ease;
+
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+.wizard-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #e0e0e0;
+  width: 560px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 60px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    border-bottom: 2px solid #f0f0f0;
+    flex-shrink: 0;
+
+    .wizard-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .step-dot {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 600; color: #bbb;
+        transition: all 0.3s;
+
+        &.done {
+          background-color: v.$cor-primaria;
+          border-color: v.$cor-primaria;
+          color: #fff;
+        }
+      }
+
+      .step-line {
+        width: 32px; height: 2px;
+        background: #e0e0e0; border-radius: 2px;
+      }
+    }
+
+    .wizard-close {
+      background: none; border: none; cursor: pointer;
+      color: #aaa; font-size: 14px; padding: 4px;
+      display: flex; align-items: center;
+      transition: color 0.15s;
+      &:hover { color: #333; }
+    }
+  }
+
+  .wizard-body {
+    padding: 24px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    overflow: hidden;
+
+    &.wizard-body--cols {
+      padding: 20px 24px 20px;
+      overflow: hidden;
+    }
+
+    .wizard-title   { font-size: 20px; font-weight: 600; color: #222; margin: 0; }
+    .wizard-subtitle { font-size: 14px; color: #888; margin: 0; }
+
+    .wizard-step2-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .wizard-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+
+      label { font-size: 13px; font-weight: 500; color: #555; }
+
+      input {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 15px;
+        font-family: v.$jakarta;
+        color: #222;
+        outline: none;
+        transition: border-color 0.2s;
+        background: #fafafa;
+
+        &::placeholder { color: #ccc; }
+        &:focus { border-color: v.$cor-primaria; background: #fff; }
+        &.input-error { border-color: #e74c3c; }
+      }
+
+      .char-counter {
+        position: absolute;
+        right: 12px; bottom: 10px;
+        font-size: 12px; color: #ccc;
+        pointer-events: none;
+        &.over { color: #e74c3c; }
+      }
+    }
+
+    .wizard-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+      padding-top: 4px;
+    }
+  }
+}
+
+// ─── Botões do Wizard ─────────────────────────────────────────────────────────
+.btn-primary,
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-family: v.$jakarta;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.18s;
+  i { font-size: 13px; }
+}
+
+.btn-primary {
+  background-color: v.$cor-primaria;
+  color: #fff;
+  &:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+.btn-secondary {
+  background-color: #f2f2f2;
+  color: #555;
+  &:hover { background-color: #e8e8e8; }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  @keyframes spin { to { transform: rotate(360deg); } }
+}
+
+.btn-add-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 2px dashed #c7c7c7;
+  color: #888;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: v.$jakarta;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  i { font-size: 12px; }
+  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
+}
+
+// ─── Lista de colunas — Step 2 ────────────────────────────────────────────────
+.cols-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+}
+
+.cols-grid {
+  display: grid;
+  grid-template-columns: 160px 44px 1fr 1fr 36px;
+  align-items: center;
+  gap: 8px;
+
+  &.cols-grid-header {
+    span {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #aaa; padding: 0 4px;
+    }
+    .center { text-align: center; }
+  }
+
+  &.cols-grid-row {
+    background: #fafafa;
+    border: 2px solid #efefef;
+    border-radius: 10px;
+    padding: 8px 10px;
+    transition: border-color 0.15s;
+    &:hover { border-color: #d8d8d8; }
+  }
+}
+
+.col-input {
+  width: 100%;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: v.$jakarta;
+  color: #222;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  &::placeholder { color: #ccc; }
+  &:focus { border-color: v.$cor-primaria; }
+}
+
+.pk-btn {
+  background: none;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #ccc;
+  transition: all 0.15s;
+  margin: 0 auto;
+  i { font-size: 14px; }
+  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
+  &.pk-active {
+    background: rgba(v.$cor-primaria, 0.12);
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
+  }
+}
+
+.tipo-options {
+  display: flex; flex-wrap: wrap; gap: 4px;
+
+  .tipo-btn {
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: v.$jakarta;
+    color: #777;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
+    &.tipo-active {
+      background: v.$cor-primaria;
+      border-color: v.$cor-primaria;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}
+
+.config-options {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+
+.config-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: v.$jakarta;
+  color: #777;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  input[type="checkbox"] { display: none; }
+  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
+  &.config-active {
+    background: rgba(v.$cor-primaria, 0.1);
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
+    font-weight: 600;
+  }
+}
+
+.col-remove-btn {
+  background: none; border: none; cursor: pointer;
+  color: #ccc; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; transition: color 0.15s;
+  &:hover:not(:disabled) { color: #e74c3c; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
 }
