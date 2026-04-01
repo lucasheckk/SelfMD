@@ -75,17 +75,22 @@
           }
         }
 
-        .search-icon i {
+        .search-icon {
           display: flex;
           padding: 0;
-          font-size: 18px;
-          color: #333;
-          transition: v.$transicao-rapida;
 
-          &:hover {
-            transform: scale(0.9);
+          .lupa {
+            color: #333;
+            height: 28px;
+            width: 26px;
+            font-size: 18px;
+            transition: v.$transicao-rapida;
+
+            &:hover {
+            transform: scale(0.9) translateY(0);
             will-change: transform;
             transition: v.$transicao-rapida;
+          }
           }
         }
       }

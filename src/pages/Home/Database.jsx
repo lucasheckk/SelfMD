@@ -40,6 +40,19 @@ export function Database() {
   const [confirmacaoExclusao, setConfirmacaoExclusao] = useState("");
   const [emailConvite, setEmailConvite] = useState("");
 
+  // Lógica para definir o limite de acordo com o plano
+  const planoBruto = localStorage.getItem("planoAtual") || "FREE";
+  const planoUsuario = planoBruto.toUpperCase();
+
+  const limites = {
+    FREE: 1,
+    PLUS: 2,
+    ULTRA: 3,
+  };
+
+  const limiteDatabases = limites[planoUsuario] || 1;
+  const isLimiteAtingido = databases.length >= limiteDatabases;
+
   // Estado para o seu novo componente de avisos
   const [notifications, setNotifications] = useState([]);
 
@@ -94,7 +107,7 @@ export function Database() {
     setLoading(true);
     try {
       await API.post(DATABASE_CRUD_ROUTES.CRIAR, { nomeDatabase });
-      await carregarDadosDaAPI(); 
+      await carregarDadosDaAPI();
       mostrarAviso("success", "Criada!", "Database criada com sucesso.");
       fecharModais();
     } catch (err) {
@@ -128,9 +141,13 @@ export function Database() {
   const handleUpdate = async (id, novoNome) => {
     if (!novoNome || novoNome.trim() === "") return;
     try {
-      await API.put(DATABASE_CRUD_ROUTES.ATUALIZAR(id), { nomeDatabase: novoNome });
+      await API.put(DATABASE_CRUD_ROUTES.ATUALIZAR(id), {
+        nomeDatabase: novoNome,
+      });
       setDatabases((prev) =>
-        prev.map((db) => (db.id === id ? { ...db, nomeDatabase: novoNome } : db))
+        prev.map((db) =>
+          db.id === id ? { ...db, nomeDatabase: novoNome } : db,
+        ),
       );
       mostrarAviso("success", "Atualizado", "Nome alterado com sucesso.");
     } catch {
@@ -147,7 +164,11 @@ export function Database() {
     setLoading(true);
     try {
       // Simulação de chamada de API para convite
-      mostrarAviso("success", "Sucesso", "Convite enviado para " + emailConvite);
+      mostrarAviso(
+        "success",
+        "Sucesso",
+        "Convite enviado para " + emailConvite,
+      );
       fecharModais();
     } catch {
       mostrarAviso("error", "Falha", "Erro ao enviar convite.");
@@ -209,15 +230,13 @@ export function Database() {
                 {databaseParaConvidar && (
                   <motion.div
                     key="modal-convite"
-                    className="modal-exclusao-container" 
+                    className="modal-exclusao-container"
                     variants={fadeOutVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
                   >
                     <h2>Convidar para {databaseParaConvidar.nomeDatabase}</h2>
-
-                    
                     <input
                       type="email"
                       value={emailConvite}
@@ -326,23 +345,24 @@ export function Database() {
                           </div>
                         </div>
                       ))}
+
+                      {/* BOTÃO DE ADICIONAR DATABASE */}
                       <div
-                        className={`criar-database-icone ${databases.length >= 1 ? "desabilitado" : ""}`}
+                        className={`criar-database-icone ${isLimiteAtingido ? "desabilitado" : ""}`}
                         onClick={() => {
-                          if (databases.length < 1) {
+                          if (!isLimiteAtingido) {
                             setIsCriando(true);
                           } else {
                             mostrarAviso(
                               "warning",
                               "Limite Atingido",
-                              "Seu plano permite apenas 1 database.",
+                              "Seu plano (${planoUsuario}) permite apenas ${limiteDatabases} database(s).",
                             );
                           }
                         }}
                         style={{
-                          cursor:
-                            databases.length >= 1 ? "not-allowed" : "pointer",
-                          opacity: databases.length >= 1 ? 0.5 : 1,
+                          cursor: isLimiteAtingido ? "not-allowed" : "pointer",
+                          opacity: isLimiteAtingido ? 0.5 : 1,
                         }}
                       >
                         <i className="fi fi-sr-layer-plus"></i>

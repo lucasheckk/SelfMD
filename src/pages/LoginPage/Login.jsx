@@ -24,12 +24,14 @@ export function Login() {
     setIsLoading(true);
     try {
       const response = await API.post(AUTH_ROUTES.LOGIN, loginData);
-      const { mensagem, token, usuarioId } = response.data;
+      const { mensagem, token, usuarioId, plano } = response.data;
 
       if (token && token.length > 50) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("usuarioId", usuarioId);
+        localStorage.setItem("planoAtual", plano || "FREE");
+
         setTimeout(() => {
-          localStorage.setItem("token", token);
-          localStorage.setItem("usuarioId", usuarioId);
           navigate("/database");
         }, 5000);
       } else {
@@ -48,7 +50,13 @@ export function Login() {
     setIsLoading(true);
     try {
       const response = await API.post(AUTH_ROUTES.REGISTER, signUpData);
-      console.log("Cadastro com sucesso:", response.data);
+      const { token, usuarioId, plano } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("usuarioId", usuarioId);
+        localStorage.setItem("planoAtual", plano || "FREE");
+      }
 
       setTimeout(() => {
         navigate("/database");

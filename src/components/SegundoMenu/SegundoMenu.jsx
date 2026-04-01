@@ -36,9 +36,6 @@ export function SegundoMenu() {
           </button>
           <i className="fi fi-sr-bell-notification-social-media"></i>
           <button>
-            <i className="fi fi-rr-folder-link"></i>
-          </button>
-          <button>
             <i className="fi fi-rr-it-alt"></i>
           </button>
           <button>

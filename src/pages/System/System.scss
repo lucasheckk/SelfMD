@@ -1,38 +1,36 @@
 @use "../../styles/variables" as v;
 
 // ─── Medidas fixas ───────────────────────────────────────────────────────────
-$checkbox-width:     50px;
-$id-width:           70px;
-$actions-width:      60px;
+$checkbox-width: 50px;
+$id-width: 70px;
+$actions-width: 60px;
 
 $sticky-checkbox-left: 0px;
-$sticky-id-left:       $checkbox-width;
+$sticky-id-left: $checkbox-width;
 
-$col-min-width:        60px;
-
-$content-padding-h:      20px;
-$content-padding-top:    10px;
+$content-padding-h: 20px;
+$content-padding-top: 10px;
 $content-padding-bottom: 15px;
 
-$bg-normal:   #ffffff;
-$bg-hover:    rgba(v.$cor-primaria, 0.08);
+$bg-normal: #ffffff;
+$bg-hover: rgba(v.$cor-primaria, 0.08);
 $bg-selected: rgba(v.$cor-primaria, 0.2);
 
 // ─── Container ───────────────────────────────────────────────────────────────
 .system-container {
   min-height: 100vh;
   background-color: v.$cor-fundo;
+  * {
+    font-family: v.$jakarta;
+  }
 
-  * { font-family: v.$jakarta; }
-
-  // ── Card principal ──────────────────────────────────────────────────────
   .main-layout {
     position: fixed;
     display: flex;
     flex-direction: column;
     height: calc(100% - 115px);
     width: calc(100% - 35px);
-    background-color: #ffffff;
+    background-color: #fff;
     border: solid 2px #c7c7c7;
     border-radius: 15px;
     bottom: 15px;
@@ -60,7 +58,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         transition: v.$transicao-rapida;
         font-size: 18px;
         white-space: nowrap;
-
         &.active {
           color: v.$cor-secundaria;
           font-weight: 400;
@@ -68,7 +65,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           will-change: transform;
         }
       }
-
       .tab-indicator {
         position: absolute;
         bottom: -2px;
@@ -78,7 +74,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         will-change: left, width;
       }
-
       .new-tab-btn {
         background: transparent;
         border: none;
@@ -87,13 +82,15 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         display: flex;
         align-items: center;
         color: #333;
-
         i {
           padding-top: 5px;
           font-size: 16px;
           color: #333;
           transition: v.$transicao-rapida;
-          &:hover { transform: translateY(-1px); will-change: transform; }
+          &:hover {
+            transform: translateY(-1px);
+            will-change: transform;
+          }
         }
       }
     }
@@ -104,11 +101,11 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: $content-padding-top $content-padding-h $content-padding-bottom $content-padding-h;
+    padding: $content-padding-top $content-padding-h $content-padding-bottom
+      $content-padding-h;
     overflow: hidden;
     min-height: 0;
 
-    // ── Empty state ──────────────────────────────────────────────────────
     .empty-state {
       flex: 1;
       display: flex;
@@ -117,14 +114,12 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       justify-content: center;
       gap: 12px;
       padding-bottom: 40px;
-
       .empty-title {
         font-size: 22px;
         font-weight: 500;
         color: #333;
         margin: 0;
       }
-
       .empty-desc {
         font-size: 15px;
         color: #aaa;
@@ -135,25 +130,29 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       }
     }
 
-    // ── Table header ─────────────────────────────────────────────────────
     .table-header {
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 8px;
-
-      .qtd-reg   { font-size: 22px; font-weight: 300; color: #333; }
-      .row-counter {
-        font-size: 18px; font-weight: 300;
-        color: #c7c7c7; padding-left: 10px; padding-top: 4px; line-height: 0;
+      .qtd-reg {
+        font-size: 22px;
+        font-weight: 300;
+        color: #333;
       }
-
-      // ── Botão Tour ──────────────────────────────────────────────────
+      .row-counter {
+        font-size: 18px;
+        font-weight: 300;
+        color: #c7c7c7;
+        padding-left: 10px;
+        padding-top: 4px;
+        line-height: 0;
+      }
       .tour-trigger-btn {
         display: flex;
         align-items: center;
         gap: 5px;
-        margin-left: auto;        // empurra para a direita
+        margin-left: auto;
         background: transparent;
         border: 1.5px dashed #c7c7c7;
         border-radius: 8px;
@@ -163,9 +162,10 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         color: #aaa;
         cursor: pointer;
         transition: v.$transicao-rapida;
-
-        i { font-size: 14px; padding-top: 2px; }
-
+        i {
+          font-size: 14px;
+          padding-top: 2px;
+        }
         &:hover {
           border-color: v.$cor-primaria;
           color: v.$cor-primaria;
@@ -173,7 +173,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       }
     }
 
-    // ── Selection bar ────────────────────────────────────────────────────
     .selection-bar {
       flex-shrink: 0;
       width: 100%;
@@ -187,42 +186,64 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       padding: 0 10px;
       box-sizing: border-box;
       transition: v.$transicao-rapida;
-
       &.active-selection {
         background-color: v.$cor-secundaria;
         border-color: v.$cor-secundaria;
-        span { color: #ffffff; }
-        button { color: #ffffff; i { color: #ffffff; } }
+        span {
+          color: #fff;
+        }
+        button {
+          color: #fff;
+          i {
+            color: #fff;
+          }
+        }
       }
-
       button {
-        display: flex; align-items: center;
-        border: none; background: transparent;
-        color: v.$cor-secundaria; gap: 10px;
-        font-size: 18px; font-weight: 300; cursor: pointer;
-        i { color: v.$cor-secundaria; font-size: 20px; }
+        display: flex;
+        align-items: center;
+        border: none;
+        background: transparent;
+        color: v.$cor-secundaria;
+        gap: 10px;
+        font-size: 18px;
+        font-weight: 300;
+        cursor: pointer;
+        i {
+          color: v.$cor-secundaria;
+          font-size: 20px;
+        }
       }
-
-      span { font-size: 18px; font-weight: 300; color: #333; }
+      span {
+        font-size: 18px;
+        font-weight: 300;
+        color: #333;
+      }
     }
 
-    // ── Scroll area ──────────────────────────────────────────────────────
     .table-scroll-area {
       flex: 1;
       margin-top: 15px;
       overflow-y: auto;
       overflow-x: hidden;
-
       .table-wrapper {
         height: auto;
         max-height: 100%;
         overflow-x: hidden;
-
-        &::-webkit-scrollbar { width: 5px; height: 5px; }
-        &::-webkit-scrollbar-track { background: transparent; margin-block: 8px; }
+        &::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent;
+          margin-block: 8px;
+        }
         &::-webkit-scrollbar-thumb {
-          background: #ddd; border-radius: 10px;
-          &:hover { background: v.$cor-primaria; }
+          background: #ddd;
+          border-radius: 10px;
+          &:hover {
+            background: v.$cor-primaria;
+          }
         }
 
         .custom-table {
@@ -232,120 +253,224 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           width: 100%;
           min-width: 0;
 
-          .sticky-col      { position: sticky; z-index: 20; }
-          .sticky-checkbox { left: $sticky-checkbox-left; }
+          .sticky-col {
+            position: sticky;
+            z-index: 20;
+          }
+          .sticky-checkbox {
+            left: $sticky-checkbox-left;
+          }
           .sticky-id {
             left: $sticky-id-left;
             &::after {
-              content: ""; position: absolute;
-              top: 0; right: -6px; width: 6px; height: 100%;
-              background: linear-gradient(to right, rgba(0,0,0,0.06), transparent);
+              content: "";
+              position: absolute;
+              top: 0;
+              right: -6px;
+              width: 6px;
+              height: 100%;
+              background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.06),
+                transparent
+              );
               pointer-events: none;
             }
           }
           .sticky-actions {
-            right: 0; z-index: 25;
+            right: 0;
+            z-index: 25;
             &::before {
-              content: ""; position: absolute;
-              top: 0; left: -6px; width: 6px; height: 100%;
-              background: linear-gradient(to left, rgba(0,0,0,0.06), transparent);
+              content: "";
+              position: absolute;
+              top: 0;
+              left: -6px;
+              width: 6px;
+              height: 100%;
+              background: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0.06),
+                transparent
+              );
               pointer-events: none;
             }
           }
 
           thead th {
-            position: sticky; top: 0;
-            background-color: #eee; z-index: 10;
+            position: sticky;
+            top: 0;
+            background-color: #eee;
+            z-index: 10;
             border-bottom: 2px solid #c7c7c7;
-            color: #333; padding: 12px 8px;
-            font-size: 14px; font-weight: 500;
-            text-align: left; white-space: nowrap; overflow: hidden;
-            &.sticky-col { z-index: 30; background-color: #eee; }
+            color: #333;
+            padding: 12px 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            &.sticky-col {
+              z-index: 30;
+              background-color: #eee;
+            }
           }
 
           .checkbox-col {
-            width: $checkbox-width; min-width: $checkbox-width; max-width: $checkbox-width;
-            text-align: center; padding: 0;
-
+            width: $checkbox-width;
+            min-width: $checkbox-width;
+            max-width: $checkbox-width;
+            text-align: center;
+            padding: 0;
             .select-all-btn {
-              display: flex; align-items: center; justify-content: center;
-              margin: 0 auto; background: none; border: none; cursor: pointer;
-              font-size: 18px; color: #c7c7c7; padding: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto;
+              background: none;
+              border: none;
+              cursor: pointer;
+              font-size: 18px;
+              color: #c7c7c7;
+              padding: 10px;
               transition: v.$transicao-rapida;
-              &:hover { color: #333; }
+              &:hover {
+                color: #333;
+              }
             }
-
             .custom-checkbox {
-              background: none; border: none; cursor: pointer;
-              display: flex; align-items: center; justify-content: center;
-              margin: 0 auto; padding: 10px; line-height: 0;
+              background: none;
+              border: none;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto;
+              padding: 10px;
+              line-height: 0;
               transition: v.$transicao-rapida;
               i {
-                font-size: 16px; transition: v.$transicao-rapida;
-                &.fi-sr-angle-square-right { color: v.$cor-secundaria; }
-                &.fi-rr-square { color: #c7c7c7; &:hover { color: #333; } }
+                font-size: 16px;
+                transition: v.$transicao-rapida;
+                &.fi-sr-angle-square-right {
+                  color: v.$cor-secundaria;
+                }
+                &.fi-rr-square {
+                  color: #c7c7c7;
+                  &:hover {
+                    color: #333;
+                  }
+                }
               }
             }
           }
-
           .id-col {
-            width: $id-width; min-width: $id-width; max-width: $id-width;
-            .cell-content { display: flex; align-items: center; }
+            width: $id-width;
+            min-width: $id-width;
+            max-width: $id-width;
+            .cell-content {
+              display: flex;
+              align-items: center;
+            }
           }
           .id-cell {
-            font-size: 14px; color: #333;
-            width: $id-width; min-width: $id-width; max-width: $id-width;
+            font-size: 14px;
+            color: #333;
+            width: $id-width;
+            min-width: $id-width;
+            max-width: $id-width;
           }
 
           .resizable-col {
             overflow: visible !important;
             .cell-content {
-              display: flex; align-items: center;
+              display: flex;
+              align-items: center;
               justify-content: space-between;
-              overflow: hidden; gap: 4px; position: relative;
-
+              overflow: hidden;
+              gap: 4px;
+              position: relative;
               .col-label {
-                flex: 1; overflow: hidden;
-                text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
               }
               .resizer-btn {
-                flex-shrink: 0; background: none; border: none;
-                cursor: col-resize; display: flex;
-                align-items: center; justify-content: center;
-                padding: 0 4px; line-height: 0; color: #aaa; z-index: 5;
+                flex-shrink: 0;
+                background: none;
+                border: none;
+                cursor: col-resize;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 4px;
+                line-height: 0;
+                color: #aaa;
+                z-index: 5;
                 transition: v.$transicao-rapida;
-                i { font-size: 14px; pointer-events: none; }
-                &:hover { color: v.$cor-primaria; }
+                i {
+                  font-size: 14px;
+                  pointer-events: none;
+                }
+                &:hover {
+                  color: v.$cor-primaria;
+                }
               }
             }
           }
-
           .actions-header {
-            width: $actions-width; min-width: $actions-width; max-width: $actions-width;
+            width: $actions-width;
+            min-width: $actions-width;
+            max-width: $actions-width;
+
             .actions-cell-content {
-              display: flex; justify-content: center; align-items: center; gap: 8px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 8px;
+
               button {
-                border: none; background: none; cursor: pointer;
-                font-size: 18px; color: #333; line-height: 0; padding: 0;
+                border: none;
+                background: none;
+                cursor: pointer;
+                font-size: 18px;
+                color: #333;
+                line-height: 0;
+                padding: 0;
                 transition: v.$transicao-rapida;
-                &:hover { color: black; }
+
+                &:hover {
+                  color: black;
+                }
               }
             }
           }
 
           tbody tr {
-            &:not(.row-selected):hover td { background-color: $bg-hover; }
+            &:not(.row-selected):hover td {
+              background-color: $bg-hover;
+            }
 
             td {
               background-color: $bg-normal;
-              padding: 10px 8px; font-size: 14px; color: #333;
+              padding: 10px 8px;
+              font-size: 14px;
+              color: #333;
               border-bottom: 2px solid #c7c7c7;
-              white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
               transition: background-color 0.15s ease;
-              &.sticky-col { z-index: 20; }
+
+              &.sticky-col {
+                z-index: 20;
+              }
             }
 
-            &.row-selected td { background-color: $bg-selected !important; }
+            &.row-selected td {
+              background-color: $bg-selected !important;
+            }
 
             .empty-rows-cell {
               text-align: center;
@@ -355,17 +480,34 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
             }
 
             .actions-cell {
-              width: $actions-width; min-width: $actions-width; max-width: $actions-width;
-              padding: 0 4px; background-color: #fff;
+              width: $actions-width;
+              min-width: $actions-width;
+              max-width: $actions-width;
+              padding: 0 4px;
+              background-color: #fff;
+
               .actions-container {
-                display: flex; justify-content: center; align-items: center;
-                gap: 4px; height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 4px;
+                height: 100%;
                 button {
-                  border: none; background: none; cursor: pointer;
-                  font-size: 16px; color: #333; line-height: 0; padding: 0;
-                  display: flex; align-items: center;
+                  border: none;
+                  background: none;
+                  cursor: pointer;
+                  font-size: 16px;
+                  color: #333;
+                  line-height: 0;
+                  padding: 0;
+                  display: flex;
+                  align-items: center;
                   transition: v.$transicao-rapida;
-                  &:hover { transform: scale(1.1); color: black; will-change: transform; }
+                  &:hover {
+                    transform: scale(1.1);
+                    color: black;
+                    will-change: transform;
+                  }
                 }
               }
             }
@@ -376,152 +518,221 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 }
 
-// ─── Wizard Overlay ───────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── WIZARD ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
 .wizard-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.38);
   backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
-  animation: fadeOverlay 0.2s ease;
-
   @keyframes fadeOverlay {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
+  animation: fadeOverlay 0.2s ease;
 }
 
 .wizard-card {
   background: #fff;
   border-radius: 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #c7c7c7;
   width: 560px;
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 60px);
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 40px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16);
+  animation: v.$transicao-fadeIn;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(24px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+  // Passo 2 — mais largo para acomodar grupos + tipos
+  &.wizard-card--step2 {
+    width: 700px;
   }
+  // Passo 3 — médio para configs
+  &.wizard-card--step3 {
+    width: 800px;
+  }
+}
 
-  .wizard-header {
+// ── Cabeçalho do wizard ───────────────────────────────────────────────────────
+.wizard-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 14px;
+  border-bottom: 2px solid #f0f0f0;
+  flex-shrink: 0;
+
+  .wizard-steps {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px 14px;
-    border-bottom: 2px solid #f0f0f0;
-    flex-shrink: 0;
-
-    .wizard-steps {
+    gap: 6px;
+    transition: v.$transicao-rapida;
+    
+    .step-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #ddd;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #bbb;
+      transition: v.$transicao-rapida;
 
-      .step-dot {
-        width: 26px; height: 26px;
-        border-radius: 50%;
-        border: 2px solid #ddd;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 600; color: #bbb;
-        transition: all 0.3s;
-
-        &.done {
-          background-color: v.$cor-primaria;
-          border-color: v.$cor-primaria;
-          color: #fff;
-        }
-      }
-
-      .step-line {
-        width: 32px; height: 2px;
-        background: #e0e0e0; border-radius: 2px;
+      &.done {
+        background-color: v.$cor-primaria;
+        border-color: v.$cor-primaria;
+        color: #fff;
       }
     }
 
-    .wizard-close {
-      background: none; border: none; cursor: pointer;
-      color: #aaa; font-size: 14px; padding: 4px;
-      display: flex; align-items: center;
-      transition: color 0.15s;
-      &:hover { color: #333; }
+    .step-line {
+      width: 28px;
+      height: 2px;
+      background: #e0e0e0;
+      border-radius: 8px;
+      transition: v.$transicao-rapida;
+
+      &.step-line--done {
+        background: v.$cor-primaria;
+      }
     }
   }
 
-  .wizard-body {
-    padding: 24px 24px 20px;
+  .wizard-step-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    font-family: v.$jakarta;
+    letter-spacing: 0.02em;
+    transition: v.$transicao-rapida;
+  }
+
+  .wizard-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 13px;
+    padding: 4px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 1;
-    overflow: hidden;
-
-    &.wizard-body--cols {
-      padding: 20px 24px 20px;
-      overflow: hidden;
-    }
-
-    .wizard-title   { font-size: 20px; font-weight: 600; color: #222; margin: 0; }
-    .wizard-subtitle { font-size: 14px; color: #888; margin: 0; }
-
-    .wizard-step2-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .wizard-field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-
-      label { font-size: 13px; font-weight: 500; color: #555; }
-
-      input {
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 15px;
-        font-family: v.$jakarta;
-        color: #222;
-        outline: none;
-        transition: border-color 0.2s;
-        background: #fafafa;
-
-        &::placeholder { color: #ccc; }
-        &:focus { border-color: v.$cor-primaria; background: #fff; }
-        &.input-error { border-color: #e74c3c; }
-      }
-
-      .char-counter {
-        position: absolute;
-        right: 12px; bottom: 10px;
-        font-size: 12px; color: #ccc;
-        pointer-events: none;
-        &.over { color: #e74c3c; }
-      }
-    }
-
-    .wizard-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      flex-shrink: 0;
-      padding-top: 4px;
+    align-items: center;
+    transition: v.$transicao-rapida;
+    
+    &:hover {
+      color: #333;
+      transition: v.$transicao-rapida;
     }
   }
 }
 
-// ─── Botões do Wizard ─────────────────────────────────────────────────────────
+// ── Body ──────────────────────────────────────────────────────────────────────
+.wizard-body {
+  padding: 22px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+  overflow: hidden;
+
+  &.wizard-body--cols,
+  &.wizard-body--cfg {
+    padding: 18px 22px 18px;
+    gap: 14px;
+  }
+
+  .wizard-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    padding-bottom: 6px;
+  }
+  
+  .wizard-subtitle {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+  }
+
+  .wizard-step2-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+}
+
+// ── Campo nome (passo 1) ──────────────────────────────────────────────────────
+.wizard-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+  }
+
+  input {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 48px 10px 14px;
+    font-size: 15px;
+    font-family: v.$jakarta;
+    color: #333;
+    outline: none;
+    transition: v.$transicao-rapida;
+    background: #fafafa;
+
+    &::placeholder {
+      color: #ccc;
+    }
+
+    &:focus {
+      border-color: v.$cor-primaria;
+      background: #fff;
+    }
+  }
+
+  .char-counter {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    font-size: 11px;
+    color: #ccc;
+    pointer-events: none;
+  }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.wizard-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+// ─── Botões globais do wizard ─────────────────────────────────────────────────
 .btn-primary,
 .btn-secondary {
   display: flex;
@@ -534,31 +745,36 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   font-family: v.$jakarta;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.18s;
-  i { font-size: 13px; }
+  transition: v.$transicao-rapida;
+  
+  i {
+    font-size: 13px;
+    padding-top: 4px;
+  }
 }
-
 .btn-primary {
   background-color: v.$cor-primaria;
   color: #fff;
-  &:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-  &:disabled { opacity: 0.55; cursor: not-allowed; }
-}
 
+  &:hover:not(:disabled) {
+    will-change: transform;
+    transform: translateY(-1px);
+    transition: v.$transicao-rapida;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
 .btn-secondary {
   background-color: #f2f2f2;
-  color: #555;
-  &:hover { background-color: #e8e8e8; }
-}
+  color: #333;
 
-.btn-spinner {
-  display: inline-block;
-  width: 15px; height: 15px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  @keyframes spin { to { transform: rotate(360deg); } }
+  &:hover {
+    background-color: #e8e8e8;
+    transition: v.$transicao-rapida;
+  }
 }
 
 .btn-add-col {
@@ -567,147 +783,724 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   gap: 6px;
   background: transparent;
   border: 2px dashed #c7c7c7;
-  color: #888;
+  color: #c7c7c7;
   border-radius: 8px;
   padding: 6px 14px;
+  margin-right: 4px;
   font-size: 13px;
   font-family: v.$jakarta;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: v.$transicao-rapida;
   white-space: nowrap;
-  i { font-size: 12px; }
-  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
+
+  i {
+    font-size: 12px;
+    padding-top: 1px;
+    padding-right: 5px;
+  }
+
+  &:hover {
+    border-color: v.$cor-primaria;
+    transition: v.$transicao-rapida;
+    color: v.$cor-primaria;
+  }
 }
 
-// ─── Lista de colunas — Step 2 ────────────────────────────────────────────────
+.btn-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PASSO 2 — Lista de colunas ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
 .cols-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   overflow-y: auto;
   flex: 1;
   padding-right: 4px;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+  }
 }
 
-.cols-grid {
-  display: grid;
-  grid-template-columns: 160px 44px 1fr 1fr 36px;
+// ── Card de coluna ────────────────────────────────────────────────────────────
+.col-card {
+  border: 2px solid #efefef;
+  border-radius: 12px;
+  background: #fafafa;
+  overflow: hidden;
+  animation: v.$transicao-fadeIn;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: v.$transicao-rapida;
+
+  &:hover {
+    border-color: #ddd;
+    transition: v.$transicao-rapida;
+  }
+}
+
+// Linha principal do card
+.col-card-top {
+  display: flex;
   align-items: center;
   gap: 8px;
-
-  &.cols-grid-header {
-    span {
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #aaa; padding: 0 4px;
-    }
-    .center { text-align: center; }
-  }
-
-  &.cols-grid-row {
-    background: #fafafa;
-    border: 2px solid #efefef;
-    border-radius: 10px;
-    padding: 8px 10px;
-    transition: border-color 0.15s;
-    &:hover { border-color: #d8d8d8; }
-  }
-}
-
-.col-input {
-  width: 100%;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-family: v.$jakarta;
-  color: #222;
+  padding: 10px 12px;
   background: #fff;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-  &::placeholder { color: #ccc; }
-  &:focus { border-color: v.$cor-primaria; }
-}
+  border-bottom: 1.5px solid #f5f5f5;
 
-.pk-btn {
-  background: none;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 6px;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #ccc;
-  transition: all 0.15s;
-  margin: 0 auto;
-  i { font-size: 14px; }
-  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
-  &.pk-active {
-    background: rgba(v.$cor-primaria, 0.12);
-    border-color: v.$cor-primaria;
-    color: v.$cor-primaria;
+  .col-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c7c7c7;
+    font-family: v.$jakarta;
+    min-width: 20px;
+    text-align: center;
   }
-}
 
-.tipo-options {
-  display: flex; flex-wrap: wrap; gap: 4px;
+  .col-nome-input {
+    flex: 1;
+    max-width: 433px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 7px;
+    padding: 7px 11px;
+    font-size: 13px;
+    font-family: v.$jakarta;
+    color: #333;
+    background: #fff;
+    outline: none;
+    box-sizing: border-box;
+    transition: v.$transicao-rapida;
 
-  .tipo-btn {
+    &::placeholder {
+      color: #ccc;
+      transition: v.$transicao-rapida;
+    }
+
+    &:focus {
+      border-color: v.$cor-primaria;
+      transition: v.$transicao-rapida;
+    }
+  }
+
+  // Grupo Identificação
+  .col-ident {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+
+    .col-ident-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #c7c7c7;
+    }
+
+    .col-ident-btns {
+      display: flex;
+      gap: 6px;
+    }
+  }
+
+  .ident-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
     background: #fff;
     border: 1.5px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 3px 8px;
-    font-size: 11px;
-    font-family: v.$jakarta;
-    color: #777;
+    border-radius: 8px;
+    padding: 5px 10px;
     cursor: pointer;
-    transition: all 0.15s;
+    color: #ccc;
+    transition: v.$transicao-rapida;
+
+    i {
+      font-size: 14px;
+    }
+
+    span {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    &.ident-btn--pk:hover {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+    }
+
+    &.ident-btn--fk:hover {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+    }
+
+    &.ident-btn--active {
+      &.ident-btn--pk {
+        border-color: v.$cor-primaria;
+        color: v.$cor-primaria;
+      }
+
+      &.ident-btn--fk {
+        border-color: v.$cor-primaria;
+        color: v.$cor-primaria;
+      }
+    }
+
+    &.ident-btn--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+
+  .col-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+    flex-direction: column;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    transition: v.$transicao-rapida;
+    height: 45px;
+    width: 60px;
+    margin-top: 15px;
+    gap: 2px;
+
+    i {
+      font-size: 14px;
+      transition: v.$transicao-rapida;
+    }
+
+    span {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    &:hover:not(:disabled) {
+      color: #e74c3c;
+      border: solid 1.5px #e74c3c;
+      transition: v.$transicao-rapida;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── FK selector panel ─────────────────────────────────────────────────────────
+.col-fk-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: rgba(99, 102, 241, 0.04);
+  border-bottom: 1.5px solid rgba(99, 102, 241, 0.12);
+
+  .col-fk-icon {
+    font-size: 13px;
+    color: #6366f1;
+    flex-shrink: 0;
+  }
+
+  .fk-select {
+    flex: 1;
+    min-width: 150px;
+    border: 1.5px solid rgba(99, 102, 241, 0.3);
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: v.$jakarta;
+    color: #333;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: #6366f1;
+    }
+  }
+}
+
+// ── Tipo automático (PK/FK) ───────────────────────────────────────────────────
+.col-tipo-auto {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+
+  i {
+    font-size: 13px;
+    color: v.$cor-primaria;
+  }
+  
+  span {
+    font-size: 12px;
+    color: #999;
+    font-family: v.$jakarta;
+    padding-left: 6px;
+  }
+
+  .col-tipo-badge {
+    font-size: 11px;
+    font-weight: 500;
+    background: #0bcd5f34;
+    color: v.$cor-primaria;
+    border-radius: 5px;
+    padding-top: 4px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+    font-family: v.$jakarta;
+  }
+
+  &.col-tipo-auto--waiting {
+    background: rgba(156, 163, 175, 0.06);
+    i {
+      color: #9ca3af;
+    }
+    span {
+      color: #bbb;
+    }
+  }
+}
+
+// ── Seção de tipo de dado ─────────────────────────────────────────────────────
+.col-tipo-section {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+// Tabs dos grupos
+.grupo-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  transition: v.$transicao-rapida;
+
+  .grupo-tab {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 7px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-family: v.$jakarta;
+    color: #333;
+    cursor: pointer;
+    transition: v.$transicao-rapida;
     white-space: nowrap;
-    &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
-    &.tipo-active {
+    font-weight: 500;
+
+    i {
+      font-size: 12px;
+      transition: v.$transicao-rapida;
+    }
+
+    &:hover {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+      transition: v.$transicao-rapida;
+    }
+
+    &.grupo-tab--active {
       background: v.$cor-primaria;
       border-color: v.$cor-primaria;
       color: #fff;
-      font-weight: 600;
+      font-weight: 500;
     }
   }
 }
 
-.config-options {
-  display: flex; flex-wrap: wrap; gap: 4px;
-}
-
-.config-label {
+// Pills de tipo
+.tipo-pills {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-family: v.$jakarta;
-  color: #777;
-  cursor: pointer;
-  transition: all 0.15s;
-  user-select: none;
-  input[type="checkbox"] { display: none; }
-  &:hover { border-color: v.$cor-primaria; color: v.$cor-primaria; }
-  &.config-active {
-    background: rgba(v.$cor-primaria, 0.1);
-    border-color: v.$cor-primaria;
-    color: v.$cor-primaria;
-    font-weight: 600;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 6px 0 2px;
+
+  .tipo-pill {
+    background: #fff;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-family: v.$jakarta;
+    color: #666;
+    cursor: pointer;
+    transition: v.$transicao-rapida;
+    white-space: nowrap;
+    font-weight: 400;
+
+    &:hover {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+      transition: v.$transicao-rapida;
+    }
+    
+    &.tipo-pill--active {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+      font-weight: 400;
+      transition: v.$transicao-rapida;
+    }
   }
 }
 
-.col-remove-btn {
-  background: none; border: none; cursor: pointer;
-  color: #ccc; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0; transition: color 0.15s;
-  &:hover:not(:disabled) { color: #e74c3c; }
-  &:disabled { opacity: 0.3; cursor: not-allowed; }
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PASSO 3 — Configurações ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.cfg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+  animation: v.$transicao-fadeIn;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+  }
+}
+
+.cfg-card {
+  border: 2px solid #efefef;
+  border-radius: 12px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.cfg-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #fff;
+  border-bottom: 1.5px solid #f0f0f0;
+
+  .cfg-col-nome {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    font-family: v.$jakarta;
+  }
+
+  .cfg-col-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .cfg-col-tipo {
+      font-size: 11px;
+      color: #888;
+      background: #f0f0f0;
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-family: v.$jakarta;
+      font-weight: 500;
+    }
+  }
+}
+
+.badge-pk {
+  font-size: 11px;
+  font-weight: 500;
+  color: v.$cor-primaria;
+  background: #f0f0f0;
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+
+.badge-fk {
+  font-size: 10px;
+  font-weight: 500;
+  color: v.$cor-primaria;
+  background: #f0f0f0;
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+
+.cfg-empty {
+  font-size: 12px;
+  color: #bbb;
+  padding: 12px 14px;
+  margin: 0;
+  font-family: v.$jakarta;
+}
+
+.cfg-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── Toggles ───────────────────────────────────────────────────────────────────
+.cfg-toggles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.cfg-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: v.$jakarta;
+  color: #777;
+  transition: v.$transicao-rapida;
+  user-select: none;
+  font-weight: 500;
+
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  .cfg-toggle-dot {
+    width: 28px;
+    height: 16px;
+    border-radius: 8px;
+    background: #ddd;
+    position: relative;
+    flex-shrink: 0;
+    transition: v.$transicao-rapida;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transition: v.$transicao-rapida;
+    }
+  }
+
+  &.cfg-toggle--on {
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
+    font-weight: 500;
+    transition: v.$transicao-rapida;
+
+    .cfg-toggle-dot {
+      background: v.$cor-primaria;
+
+      &::after {
+        transform: translateX(12px);
+      }
+    }
+  }
+
+  &:hover:not(.cfg-toggle--on) {
+    color: #555;
+    transition: v.$transicao-rapida;
+  }
+}
+
+// ── Inputs de config ──────────────────────────────────────────────────────────
+.cfg-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cfg-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 130px;
+  transition: v.$transicao-rapida;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    font-family: v.$jakarta;
+  }
+
+  input {
+    border: 1.5px solid #e0e0e0;
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: v.$jakarta;
+    color: #333;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    transition: v.$transicao-rapida;
+
+    &::placeholder {
+      color: #ccc;
+      transition: v.$transicao-rapida;
+    }
+
+    &:focus {
+      border-color: v.$cor-primaria;
+      transition: v.$transicao-rapida;
+    }
+  }
+}
+
+// ── Opções (tags) ─────────────────────────────────────────────────────────────
+.cfg-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    font-family: v.$jakarta;
+  }
+}
+
+.opcoes-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opcoes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 28px;
+
+  .opcoes-placeholder {
+    font-size: 12px;
+    color: #ccc;
+    align-self: center;
+    font-family: v.$jakarta;
+  }
+}
+
+.opcao-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(v.$cor-primaria, 0.08);
+  color: v.$cor-primaria;
+  border: 1px solid rgba(v.$cor-primaria, 0.2);
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: v.$jakarta;
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.opcoes-add {
+  display: flex;
+  gap: 6px;
+
+  input {
+    flex: 1;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: v.$jakarta;
+    color: #222;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &::placeholder {
+      color: #ccc;
+    }
+
+    &:focus {
+      border-color: v.$cor-primaria;
+    }
+  }
+  .opcoes-add-btn {
+    background: v.$cor-primaria;
+    border: none;
+    border-radius: 7px;
+    color: #fff;
+    width: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
 }
