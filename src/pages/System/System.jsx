@@ -12,10 +12,7 @@ import {
 } from "../../../constants/api_rest.js";
 
 const fadeOutVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 1,
-  },
+  hidden: { opacity: 0, scale: 1 },
   visible: {
     opacity: 1,
     scale: 1,
@@ -40,24 +37,25 @@ const GRUPOS_TIPOS = {
   Avançado: ["Arquivo", "Cálculo"],
 };
 
+// Mapa de tipos do frontend → API
 const MAPA_TIPOS_API = {
-  Moeda: "moeda",
   Texto: "texto",
-  Cálculo: "calculo",
-  Telefone: "telefone",
-  "Data / Hora": "data_hora",
-  "Número Inteiro": "numero_int",
-  Arquivo: "arquivo",
   Descrição: "desc",
-  "Lista Única": "lista_unica",
-  Hora: "hora",
-  CPF: "cpf",
-  Link: "link",
-  Booleano: "boleano",
-  "Número Decimal": "numero_dec",
-  Data: "data",
-  "Lista Múltipla": "lista_mult",
   Email: "email",
+  Link: "link",
+  "Número Decimal": "numero_dec",
+  "Número Inteiro": "numero_int",
+  CPF: "cpf",
+  Telefone: "telefone",
+  Moeda: "moeda",
+  Hora: "hora",
+  Data: "data",
+  "Data / Hora": "data_hora",
+  "Lista Única": "lista_unica",
+  "Lista Múltipla": "lista_mult",
+  Booleano: "boleano",
+  Arquivo: "arquivo",
+  Cálculo: "calculo",
 };
 
 const GRUPO_ICONS = {
@@ -68,7 +66,6 @@ const GRUPO_ICONS = {
   Avançado: "fi-sr-settings-sliders",
 };
 
-// ─── Moedas disponíveis ────────────────────────────────────────────────────
 const MOEDAS = [
   { id: "BRL", label: "Real", simbolo: "R$", mascara: "R$ #.###,##" },
   { id: "USD", label: "Dólar", simbolo: "$", mascara: "$ #,###.##" },
@@ -77,7 +74,6 @@ const MOEDAS = [
   { id: "JPY", label: "Iene / Yuan", simbolo: "¥", mascara: "¥ #,###" },
 ];
 
-// ─── Máscaras automáticas por tipo ────────────────────────────────────────
 const MASCARA_AUTO = {
   CPF: "###.###.###-##",
   Telefone: "+## (##) #####-####",
@@ -136,43 +132,75 @@ const CONFIG_META = {
   opcoes: { label: "Opções", tipo: "tags" },
 };
 
-// configs que ficam BLOQUEADAS quando a coluna é PK ou FK
-// (valor padrão permanece editável)
+// Chaves bloqueadas para PK/FK (todas exceto valorPadrao)
+// Usa as MESMAS chaves do CONFIG_META / CONFIG_PADRAO
 const CONFIGS_BLOQUEADAS_IDENT = [
-  "not_null",
-  "unique",
-  "auto_increment",
-  "index",
-  "max_length",
-  "min_value",
-  "max_value",
-  "mask",
-  "options",
+  "naoVazio",
+  "unico",
+  "autoIncremento",
+  "indice",
+  "alcanceMaximo",
+  "valorMinimo",
+  "valorMaximo",
+  "mascara",
+  "opcoes",
 ];
 
+// ─── CONFIG_PADRAO usa as mesmas chaves camelCase do CONFIG_META ──────────
+// Isso garante que col.config[key] funcione corretamente no passo 3
 const CONFIG_PADRAO = {
-  not_null: false,
-  unique: false,
-  default_value: "",
-  max_length: "",
-  min_value: "",
-  max_value: "",
-  auto_increment: false,
-  index: false,
-  mask: "",
-  options: [],
+  naoVazio: false,
+  unico: false,
+  valorPadrao: "",
+  alcanceMaximo: "",
+  valorMinimo: "",
+  valorMaximo: "",
+  autoIncremento: false,
+  indice: false,
+  mascara: "",
+  opcoes: [],
   moeda: null,
+};
+
+// ─── Mapeia as chaves camelCase do frontend para snake_case da API ────────
+const mapConfigParaApi = (config, tipoDado, isForeignKey) => {
+  const isNumeric = ["numero_int", "numero_dec", "moeda"].includes(tipoDado);
+  let defaultValue = config.valorPadrao;
+  if (defaultValue === "" || defaultValue === null) defaultValue = null;
+  else if (isNumeric && !isNaN(defaultValue))
+    defaultValue = Number(defaultValue);
+
+  const rawConfig = {
+    not_null: config.naoVazio || false,
+    unique: config.unico || false,
+    auto_increment: config.autoIncremento || false,
+    index: config.indice || false,
+    mask: config.mascara || "",
+    options: Array.isArray(config.opcoes) ? config.opcoes : [],
+    moeda: config.moeda && config.moeda !== "" ? config.moeda : null,
+  };
+
+  // Só adiciona se tiver valor válido (não null/undefined/vazio)
+  if (defaultValue !== null) rawConfig.default_value = defaultValue;
+  if (config.alcanceMaximo !== "" && config.alcanceMaximo !== null)
+    rawConfig.max_length = Number(config.alcanceMaximo);
+  if (config.valorMinimo !== "" && config.valorMinimo !== null)
+    rawConfig.min_value = Number(config.valorMinimo);
+  if (config.valorMaximo !== "" && config.valorMaximo !== null)
+    rawConfig.max_value = Number(config.valorMaximo);
+
+  return rawConfig;
 };
 
 const NOME_MAX = 15;
 const TOUR_SEEN_KEY = "system_tour_seen";
 
 const COLUNA_VAZIA = () => ({
-  id: Date.now() + Math.random(),
+  id: Math.random().toString(36).substr(2, 9),
   nome: "",
   identificacao: null,
   fkTabela: null,
-  fkColuna: null,
+  fkColunaId: null,
   grupo: null,
   tipoDado: null,
   config: { ...CONFIG_PADRAO, opcoes: [] },
@@ -235,10 +263,8 @@ function OpcoesInput({ opcoes, onChange }) {
 export function System() {
   const MIN_COL_WIDTH = 60;
   const CHECKBOX_WIDTH = 50;
-  const ID_WIDTH = 70;
   const ACTIONS_WIDTH = 60;
 
-  // Manter o estado do database atual para criar tabelas vinculadas a ela
   const location = useLocation();
   const navigate = useNavigate();
   const idDoDatabaseAtual = location.state?.dbId;
@@ -253,11 +279,12 @@ export function System() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
   const [nomeTabela, setNomeTabela] = useState("");
+  const [colunas, setColunas] = useState([COLUNA_VAZIA()]);
+  const [loadingCreate, setLoadingCreate] = useState(false);
+
   const [tabelaParaExcluir, setTabelaParaExcluir] = useState(null);
   const [confirmacaoExclusaoTabela, setConfirmacaoExclusaoTabela] =
     useState("");
-  const [colunas, setColunas] = useState([COLUNA_VAZIA()]);
-  const [loadingCreate, setLoadingCreate] = useState(false);
 
   const tabsRef = useRef({});
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -267,15 +294,12 @@ export function System() {
   const resizableCols = Object.keys(colWidths);
   const totalTableWidth =
     CHECKBOX_WIDTH +
-    ID_WIDTH +
     resizableCols.reduce((acc, col) => acc + colWidths[col], 0) +
     ACTIONS_WIDTH;
 
-  // Segurança: Impede que um usuario entre sem escolher a database
+  // ── Segurança: redireciona se não há database selecionada ─────────────────
   useEffect(() => {
-    if (!idDoDatabaseAtual) {
-      navigate("/database");
-    }
+    if (!idDoDatabaseAtual) navigate("/database");
   }, [idDoDatabaseAtual, navigate]);
 
   // ── Notificações ──────────────────────────────────────────────────────────
@@ -289,6 +313,7 @@ export function System() {
     [],
   );
 
+  // ── Indicador de tab ──────────────────────────────────────────────────────
   useEffect(() => {
     const el = tabsRef.current[activeTab];
     if (el)
@@ -298,18 +323,13 @@ export function System() {
       });
   }, [activeTab, tabs]);
 
-  // ── Carregar tabelas e colunas da database ─────────────────────────────────
-  // 1. Função principal de busca de dados
+  // ── Carregar tabelas da database ──────────────────────────────────────────
   const carregarDados = useCallback(async () => {
     const idDb = idDoDatabaseAtual || localStorage.getItem("lastDbId");
-
     if (!idDb) return;
-
     try {
       const response = await API.get(TABELA_CRUD_ROUTES.LISTAR(idDb));
-      const tabelasBanco = response.data;
-
-      const tabelasFormatadas = tabelasBanco.map((tab) => ({
+      const tabelasFormatadas = response.data.map((tab) => ({
         id: tab.id,
         name: tab.nomeTabela,
         rows: [],
@@ -321,49 +341,37 @@ export function System() {
           config: col.config || {},
         })),
       }));
-
       setTabs(tabelasFormatadas);
-
-      // Se houver tabelas e nenhuma estiver ativa, define a primeira
       if (tabelasFormatadas.length > 0 && !activeTab) {
         setActiveTab(tabelasFormatadas[0].id);
       }
     } catch (err) {
-      console.error("Erro na sincronização:", err);
-      const mensagem =
+      console.error("Erro ao carregar tabelas:", err);
+      pushNotification(
+        "error",
+        "Erro",
         err.response?.data?.message ||
-        "Falha ao sincronizar com o banco de dados.";
-      pushNotification("error", "Erro", mensagem);
+          "Falha ao sincronizar com o banco de dados.",
+      );
     }
   }, [idDoDatabaseAtual, activeTab, pushNotification]);
 
-  // 2. useEffect para persistência e gatilho inicial
   useEffect(() => {
-    if (idDoDatabaseAtual) {
-      localStorage.setItem("lastDbId", idDoDatabaseAtual);
-    }
+    if (idDoDatabaseAtual) localStorage.setItem("lastDbId", idDoDatabaseAtual);
     carregarDados();
   }, [idDoDatabaseAtual, carregarDados]);
 
-  // 3. NOVO: useEffect para gerenciar larguras das colunas dinamicamente
   useEffect(() => {
-    // Só executamos se houver uma aba ativa e dados nas abas
     if (activeTab && tabs.length > 0) {
       const tabAtual = tabs.find((t) => t.id === activeTab);
-
       if (tabAtual) {
         const novasLarguras = {};
         tabAtual.cols.forEach((c) => {
-          // Definimos a largura padrão (150).
-          // Se você quiser persistir redimensionamentos manuais,
-          // teria que usar uma Ref ou um estado separado para não causar loop.
           novasLarguras[c.nome] = 150;
         });
-
         setColWidths(novasLarguras);
       }
     }
-    // Removemos 'colWidths' daqui para evitar o loop infinito avisado pelo ESLint
   }, [activeTab, tabs]);
 
   // ── Seleção ───────────────────────────────────────────────────────────────
@@ -376,7 +384,6 @@ export function System() {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
-
   const deleteSelected = () => {
     setTabs((prev) =>
       prev.map((tab) =>
@@ -416,7 +423,7 @@ export function System() {
     document.addEventListener("mouseup", onUp);
   };
 
-  // ── Wizard helpers ────────────────────────────────────────────────────────
+  // ── Wizard ────────────────────────────────────────────────────────────────
   const openWizard = () => {
     setNomeTabela("");
     setColunas([COLUNA_VAZIA()]);
@@ -495,7 +502,7 @@ export function System() {
           ...c,
           identificacao: "pk",
           fkTabela: null,
-          fkColuna: null,
+          fkColunaId: null,
           grupo: "Numérico",
           tipoDado: "Número Inteiro",
           config: {
@@ -520,7 +527,7 @@ export function System() {
             ...c,
             identificacao: null,
             fkTabela: null,
-            fkColuna: null,
+            fkColunaId: null,
             grupo: null,
             tipoDado: null,
             config: { ...CONFIG_PADRAO, opcoes: [] },
@@ -543,25 +550,28 @@ export function System() {
     return tab?.cols?.filter((c) => c.identificacao === "pk") ?? [];
   };
 
-  const handleFKTabelaChange = (colId, tabelaId) =>
+  const handleFKTabelaChange = (colId, tabelaId) => {
+    const idNum = parseInt(tabelaId, 10);
+
     setColunas((prev) =>
       prev.map((c) =>
         c.id !== colId
           ? c
           : {
               ...c,
-              fkTabela: tabelaId,
-              fkColuna: null,
+              fkTabela: idNum,
+              fkColunaId: null,
               grupo: null,
               tipoDado: null,
             },
       ),
     );
+  };
 
-  const handleFKColunaChange = (colId, colNome) => {
+  const handleFKColunaChange = (colId, pkColId, pkColNome) => {
     const col = colunas.find((c) => c.id === colId);
     const tab = tabs.find((t) => String(t.id) === String(col?.fkTabela));
-    const pkCol = tab?.cols?.find((c) => c.nome === colNome);
+    const pkCol = tab?.cols?.find((c) => c.id === pkColId); // busca por ID
     if (!pkCol) return;
     setColunas((prev) =>
       prev.map((c) =>
@@ -569,7 +579,8 @@ export function System() {
           ? c
           : {
               ...c,
-              fkColuna: colNome,
+              fkColunaId: pkColId,
+              fkColunaNome: pkColNome,
               grupo: pkCol.grupo,
               tipoDado: pkCol.tipoDado,
               config: {
@@ -581,7 +592,7 @@ export function System() {
     );
   };
 
-  // ── Grupo / Tipo — com máscaras automáticas ───────────────────────────────
+  // ── Grupo / Tipo com máscaras automáticas ─────────────────────────────────
   const handleGrupoChange = (id, grupo) =>
     setColunas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, grupo, tipoDado: null } : c)),
@@ -592,15 +603,12 @@ export function System() {
       prev.map((c) => {
         if (c.id !== id) return c;
         const newConfig = { ...c.config };
-        // Máscara automática
         if (MASCARA_AUTO[tipo]) {
           newConfig.mascara = MASCARA_AUTO[tipo];
         } else if (tipo !== "Moeda") {
-          // limpa máscara se não for Moeda nem CPF/Telefone
           newConfig.mascara = "";
           newConfig.moeda = null;
         }
-        // Moeda: limpa máscara (será definida ao escolher a moeda)
         if (tipo === "Moeda") {
           newConfig.mascara = "";
           newConfig.moeda = null;
@@ -626,7 +634,7 @@ export function System() {
     );
   };
 
-  // ── Criar tabela ──────────────────────────────────────────────────────────
+  // ── Criar tabela + colunas ────────────────────────────────────────────────
   const handleCriarTabela = async () => {
     const colsValidas = colunas.filter((c) => c.nome.trim() && c.tipoDado);
 
@@ -638,7 +646,6 @@ export function System() {
       );
       return;
     }
-
     if (!idDoDatabaseAtual) {
       pushNotification("error", "Erro", "Database não identificada.");
       return;
@@ -646,6 +653,7 @@ export function System() {
 
     setLoadingCreate(true);
     try {
+      // 1. Cria a tabela
       const resTabela = await API.post(
         TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
         {
@@ -653,93 +661,83 @@ export function System() {
         },
       );
 
-      console.log("ID Recebido do Servidor:", resTabela.data.id);
-
       const idTabelaCriada = resTabela.data.id;
+      if (!idTabelaCriada)
+        throw new Error("ID da tabela não retornado pelo servidor.");
 
+      // 2. Cria as colunas em paralelo, mapeando config para snake_case
       const promises = colsValidas.map((col) => {
-        return API.post(COLUNA_CRUD_ROUTES.CRIAR, {
+        const payload = {
           nomeColuna: col.nome.trim(),
           tipoDado: MAPA_TIPOS_API[col.tipoDado] || col.tipoDado,
           isPrimaryKey: col.identificacao === "pk",
-          idTabela: idTabelaCriada,
-          config: col.config,
-        });
-      });
+          isForeignKey: col.identificacao === "fk",
+          fkTabelaId: col.fkTabela || null,
+          fkColunaId: col.fkColunaId || null,
+          tabelaId: idTabelaCriada,
+          config: mapConfigParaApi(
+            col.config,
+            MAPA_TIPOS_API[col.tipoDado],
+            col.identificacao === "fk",
+          ),
+        };
+        console.log("Payload da coluna:", payload);  // 👈 inspecione no console
+        return API.post(COLUNA_CRUD_ROUTES.CRIAR, payload);
+    });
 
       await Promise.all(promises);
+      await carregarDados();
 
+      // 3. Atualiza estado local
       const newTab = {
         id: idTabelaCriada,
         name: nomeTabela.trim(),
         rows: [],
         cols: colsValidas,
       };
-
       setTabs((prev) => [...prev, newTab]);
       setActiveTab(newTab.id);
       closeWizard();
-
       pushNotification(
         "success",
         "Sucesso!",
-        `Tabela "${nomeTabela}" criada com suas colunas.`,
+        `Tabela "${nomeTabela}" e suas colunas foram criadas.`,
       );
     } catch (err) {
-      console.error("Erro na requisição:", err.response?.data || err.message);
-
+      const errorData = err.response?.data;
+      console.error("Erro detalhado:", errorData);
       pushNotification(
         "error",
         "Erro ao salvar",
-        err.response?.data?.message ||
-          "Não foi possível salvar os dados no servidor.",
+        errorData?.message || errorData?.errors?.[0]?.message || err.message,
       );
     } finally {
       setLoadingCreate(false);
     }
   };
 
+  // ── Excluir tabela ────────────────────────────────────────────────────────
   const handleExcluirTabela = async (idTabela) => {
-    // 1. Criamos uma função auxiliar para facilitar o envio das notificações
-    const addNotify = (type, title, message) => {
-      setNotifications((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          type,
-          title,
-          message,
-          duration: 4000,
-        },
-      ]);
-    };
-
     try {
-      // 3. Chamada utilizando Axios e a rota mapeada
-      // O interceptor do seu Axios já cuidará do Token e da BaseURL
       const response = await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabela));
-
       if (response.status === 200 || response.status === 204) {
-        addNotify(
+        pushNotification(
           "success",
           "Sucesso!",
           "A tabela e seus dados foram apagados.",
         );
-
-        // 4. Atualize seu estado local de tabelas aqui para refletir na UI
         setTabs((prev) => prev.filter((t) => t.id !== idTabela));
-
-        if (activeTab === idTabela) {
-          setActiveTab(null);
-        }
-
+        if (activeTab === idTabela) setActiveTab(null);
         setTabelaParaExcluir(null);
         setConfirmacaoExclusaoTabela("");
       }
     } catch (error) {
       console.error("Erro ao excluir tabela:", error);
-      const msg = error.response?.data?.message || "Erro ao excluir tabela.";
-      addNotify("error", "Erro", msg);
+      pushNotification(
+        "error",
+        "Erro",
+        error.response?.data?.message || "Erro ao excluir tabela.",
+      );
     }
   };
 
@@ -761,6 +759,7 @@ export function System() {
   return (
     <div className="system-container">
       <SegundoMenu />
+      {/* Notificacao declarado UMA única vez */}
       <Notificacao
         notifications={notifications}
         setNotifications={setNotifications}
@@ -768,6 +767,7 @@ export function System() {
       {tourActive && <TourGuide onFinish={handleFinishTour} />}
 
       <main className="main-layout">
+        {/* ── Tabs ────────────────────────────────────────────────────────── */}
         <div className="tab-layout">
           {tabs.map((tab) => (
             <button
@@ -791,6 +791,7 @@ export function System() {
           </button>
         </div>
 
+        {/* ── Conteúdo ────────────────────────────────────────────────────── */}
         <div className="content-area">
           {tabs.length === 0 ? (
             <div className="empty-state">
@@ -818,13 +819,13 @@ export function System() {
                 </span>
                 <div className="table-header-right">
                   <button className="action-header-btn">
-                    <i className="fi-sr-add-document" /> Inserir registro
+                    <i className="fi fi-sr-add-document" /> Inserir registro
                   </button>
                   <button className="action-header-btn">
-                    <i className="fi fi-sr-pencil"></i> Renomear tabela
+                    <i className="fi fi-sr-pencil" /> Renomear tabela
                   </button>
                   <button className="action-header-btn">
-                    <i className="fi-sr-refresh"></i> Recarregar tabela
+                    <i className="fi fi-sr-refresh" /> Recarregar tabela
                   </button>
                   <button
                     className="apagar-tabela-btn"
@@ -832,13 +833,13 @@ export function System() {
                       if (activeTabData) {
                         setTabelaParaExcluir({
                           id: activeTabData.id,
-                          nomeTabela: activeTabData.title,
+                          nomeTabela: activeTabData.name,
                         });
                         setConfirmacaoExclusaoTabela("");
                       }
                     }}
                   >
-                    <i className="fi-sr-remove-folder" /> Excluir tabela
+                    <i className="fi fi-sr-remove-folder" /> Excluir tabela
                   </button>
                 </div>
               </div>
@@ -871,7 +872,6 @@ export function System() {
                   >
                     <colgroup>
                       <col style={{ width: `${CHECKBOX_WIDTH}px` }} />
-                      <col style={{ width: `${ID_WIDTH}px` }} />
                       {resizableCols.map((col) => (
                         <col
                           key={col}
@@ -1078,11 +1078,9 @@ export function System() {
                     const fkDisabled = tabs.length === 0;
                     return (
                       <div key={col.id} className="col-card">
-                        {/* Linha topo */}
                         <div className="col-card-top">
                           <span className="col-num">#{idx + 1}</span>
 
-                          {/* ── Nome ── */}
                           <div className="col-nome-wrap">
                             <span className="col-nome-label">
                               Nome da coluna
@@ -1099,7 +1097,6 @@ export function System() {
                             />
                           </div>
 
-                          {/* ── Definição (era Identificação) ── */}
                           <div className="col-ident">
                             <span className="col-ident-label">Definição</span>
                             <div className="col-ident-btns">
@@ -1143,7 +1140,6 @@ export function System() {
                           </button>
                         </div>
 
-                        {/* FK selector */}
                         {col.identificacao === "fk" && (
                           <div className="col-fk-panel">
                             <i className="fi fi-rr-link col-fk-icon" />
@@ -1163,17 +1159,25 @@ export function System() {
                             </select>
                             {col.fkTabela && (
                               <select
-                                className="fk-select"
-                                value={col.fkColuna || ""}
-                                onChange={(e) =>
-                                  handleFKColunaChange(col.id, e.target.value)
-                                }
+                                value={col.fkColunaId || ""}
+                                onChange={(e) => {
+                                  const pkId = parseInt(e.target.value);
+                                  const pkCol = getPKsDeTabela(
+                                    col.fkTabela,
+                                  ).find((pk) => pk.id === pkId);
+                                  if (pkCol)
+                                    handleFKColunaChange(
+                                      col.id,
+                                      pkCol.id,
+                                      pkCol.nome,
+                                    );
+                                }}
                               >
                                 <option value="">
                                   Selecione a chave primária...
                                 </option>
                                 {getPKsDeTabela(col.fkTabela).map((pk) => (
-                                  <option key={pk.nome} value={pk.nome}>
+                                  <option key={pk.id} value={pk.id}>
                                     {pk.nome}
                                   </option>
                                 ))}
@@ -1182,7 +1186,6 @@ export function System() {
                           </div>
                         )}
 
-                        {/* Tipo de dado */}
                         {col.identificacao === "pk" ? (
                           <div className="col-tipo-auto">
                             <i className="fi fi-rr-magic-wand" />
@@ -1233,7 +1236,6 @@ export function System() {
                                 ))}
                               </div>
                             )}
-                            {/* Seletor de moeda inline */}
                             {col.tipoDado === "Moeda" && (
                               <div className="moeda-picker">
                                 <span className="moeda-picker-label">
@@ -1297,7 +1299,6 @@ export function System() {
                     .map((col) => {
                       const cat = getTipoCategoria(col.tipoDado);
                       const cfgs = cat ? CONFIGS_POR_CATEGORIA[cat] : [];
-                      // PK / FK: bloqueia tudo exceto valorPadrao
                       const locked =
                         col.identificacao === "pk" ||
                         col.identificacao === "fk";
@@ -1347,7 +1348,6 @@ export function System() {
                             </p>
                           ) : (
                             <div className="cfg-body">
-                              {/* Toggles — bloqueados se PK/FK */}
                               {toggles.length > 0 && (
                                 <div className="cfg-toggles">
                                   {toggles.map((key) => {
@@ -1380,14 +1380,12 @@ export function System() {
                                 </div>
                               )}
 
-                              {/* Inputs */}
                               {inputs.length > 0 && (
                                 <div className="cfg-inputs">
                                   {inputs.map((key) => {
                                     const isBlocked =
                                       locked &&
                                       CONFIGS_BLOQUEADAS_IDENT.includes(key);
-                                    // Máscara bloqueada para CPF e Telefone (auto)
                                     const mascaraAuto =
                                       key === "mascara" &&
                                       !!MASCARA_AUTO[col.tipoDado];
@@ -1406,13 +1404,13 @@ export function System() {
                                           )}
                                         </label>
                                         <input
-                                          type="text" /* sempre text — sem spinner */
+                                          type="text"
                                           inputMode={
                                             CONFIG_META[key].tipo === "number"
                                               ? "numeric"
                                               : "text"
                                           }
-                                          value={col.config[key]}
+                                          value={col.config[key] ?? ""}
                                           disabled={bloqueado}
                                           onChange={(e) =>
                                             !bloqueado &&
@@ -1434,12 +1432,11 @@ export function System() {
                                 </div>
                               )}
 
-                              {/* Tags para opções */}
                               {hasTags && !locked && (
                                 <div className="cfg-opcoes">
                                   <label>Opções disponíveis</label>
                                   <OpcoesInput
-                                    opcoes={col.config.opcoes}
+                                    opcoes={col.config.opcoes ?? []}
                                     onChange={(v) =>
                                       updateConfig(col.id, "opcoes", v)
                                     }
@@ -1479,6 +1476,8 @@ export function System() {
           </div>
         </div>
       )}
+
+      {/* ══════════════════════ MODAL EXCLUSÃO ════════════════════════════ */}
       <AnimatePresence mode="wait">
         {tabelaParaExcluir && (
           <div className="modal-overlay">
@@ -1491,10 +1490,7 @@ export function System() {
               exit="exit"
             >
               <h2>Excluir a tabela {tabelaParaExcluir.nomeTabela}?</h2>
-              <p>
-                Essa ação apagará todos os registros vinculados.
-              </p>
-
+              <p>Essa ação apagará todos os registros vinculados.</p>
               <input
                 type="text"
                 value={confirmacaoExclusaoTabela}
@@ -1502,15 +1498,13 @@ export function System() {
                 placeholder={`Digite "${tabelaParaExcluir.nomeTabela}" para confirmar`}
                 autoFocus
               />
-
               <div className="acoes-exclusao">
                 <button
                   className="btn-cancelar"
                   onClick={() => setTabelaParaExcluir(null)}
                 >
-                  <i className="fi-rr-trash-undo icon-modal"></i>
+                  <i className="fi-rr-trash-undo icon-modal" />
                 </button>
-
                 <button
                   className="btn-confirmar"
                   disabled={
@@ -1518,19 +1512,13 @@ export function System() {
                   }
                   onClick={() => handleExcluirTabela(tabelaParaExcluir.id)}
                 >
-                  <i className="fi-rr-trash-check icon-modal"></i>
+                  <i className="fi-rr-trash-check icon-modal" />
                 </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
-      {/* Componente de Notificações costuma ficar aqui também */}
-      <Notificacao
-        notifications={notifications}
-        setNotifications={setNotifications}
-      />
     </div>
   );
 }

@@ -26,25 +26,25 @@ export const AUTH_ROUTES = {
 };
 
 export const DATABASE_CRUD_ROUTES = {
-  CRIAR: "/databases/criar",
-  LISTAR: "/databases/listar",
+  CRIAR:     "/databases/criar",
+  LISTAR:    "/databases/listar",
   ATUALIZAR: (id) => `/databases/atualizar/${id}`,
-  EXCLUIR: (id) => `/databases/excluir/${id}`
+  EXCLUIR:   (id) => `/databases/excluir/${id}`
 };
 
 export const TABELA_CRUD_ROUTES = {
-  CRIAR: (dbId) => `/tabelas/criar/${dbId}`,
-  LISTAR: (dbId) => `/tabelas/listar/${dbId}`,
+  CRIAR:     (dbId) => `/tabelas/criar/${dbId}`,
+  LISTAR:    (dbId) => `/tabelas/listar/${dbId}`,
   ATUALIZAR: (tabelaId) => `/tabelas/atualizar/${tabelaId}`,
-  EXCLUIR: (tabelaId) => `/tabelas/excluir/${tabelaId}`
+  EXCLUIR:   (tabelaId) => `/tabelas/excluir/${tabelaId}`
 };
 
 export const COLUNA_CRUD_ROUTES = {
-  CRIAR: "/colunas/criar",
-  LISTAR: (tabelaId) => `/colunas/listar/${tabelaId}`,
+  CRIAR:     "/colunas/criar",
+  LISTAR:    (tabelaId) => `/colunas/listar/${tabelaId}`,
   ATUALIZAR: (colunaId) => `/colunas/atualizar/${colunaId}`,
-  EXCLUIR: (colunaId) => `/colunas/excluir/${colunaId}`
-}
+  EXCLUIR:   (colunaId) => `/colunas/excluir/${colunaId}`,
+};
 
 export const DADOS_CRUD_ROUTES = {}
 
