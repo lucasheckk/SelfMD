@@ -332,7 +332,8 @@ export function Database() {
                             </button>
                             <button
                               className="acessar"
-                              onClick={() => navigate("/system")}
+                              onClick={() => navigate("/system", 
+                                { state: { dbId: db.id, dbNome: db.nomeDatabase }})}
                             >
                               <i className="fi fi-sr-server-key"></i>
                             </button>

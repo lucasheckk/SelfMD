@@ -1,12 +1,35 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./System.scss";
 import { SegundoMenu } from "../../components/SegundoMenu/SegundoMenu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import { TourGuide } from "../../components/TourGuide/TourGuide";
-import { TABELA_CRUD_ROUTES } from "../../../constants/api_rest.js";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  API,
+  TABELA_CRUD_ROUTES,
+  COLUNA_CRUD_ROUTES,
+} from "../../../constants/api_rest.js";
+
+const fadeOutVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 1,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 1,
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ─── Constantes de tipo ────────────────────────────────────────────────────
+// ─── Constantes de tipo
 // ═══════════════════════════════════════════════════════════════════════════
 
 const GRUPOS_TIPOS = {
@@ -17,12 +40,47 @@ const GRUPOS_TIPOS = {
   Avançado: ["Arquivo", "Cálculo"],
 };
 
+const MAPA_TIPOS_API = {
+  Moeda: "moeda",
+  Texto: "texto",
+  Cálculo: "calculo",
+  Telefone: "telefone",
+  "Data / Hora": "data_hora",
+  "Número Inteiro": "numero_int",
+  Arquivo: "arquivo",
+  Descrição: "desc",
+  "Lista Única": "lista_unica",
+  Hora: "hora",
+  CPF: "cpf",
+  Link: "link",
+  Booleano: "boleano",
+  "Número Decimal": "numero_dec",
+  Data: "data",
+  "Lista Múltipla": "lista_mult",
+  Email: "email",
+};
+
 const GRUPO_ICONS = {
-  Texto: "fi-rr-text",
-  Numérico: "fi-rr-calculator",
-  Tempo: "fi-rr-calendar",
-  Seleção: "fi-rr-list",
-  Avançado: "fi-rr-settings-sliders",
+  Texto: "fi-sr-text",
+  Numérico: "fi-sr-calculator",
+  Tempo: "fi-sr-calendar",
+  Seleção: "fi-sr-list",
+  Avançado: "fi-sr-settings-sliders",
+};
+
+// ─── Moedas disponíveis ────────────────────────────────────────────────────
+const MOEDAS = [
+  { id: "BRL", label: "Real", simbolo: "R$", mascara: "R$ #.###,##" },
+  { id: "USD", label: "Dólar", simbolo: "$", mascara: "$ #,###.##" },
+  { id: "EUR", label: "Euro", simbolo: "€", mascara: "€ #.###,##" },
+  { id: "GBP", label: "Libra", simbolo: "£", mascara: "£ #,###.##" },
+  { id: "JPY", label: "Iene / Yuan", simbolo: "¥", mascara: "¥ #,###" },
+];
+
+// ─── Máscaras automáticas por tipo ────────────────────────────────────────
+const MASCARA_AUTO = {
+  CPF: "###.###.###-##",
+  Telefone: "+## (##) #####-####",
 };
 
 // ─── Categoria de config por tipo ─────────────────────────────────────────
@@ -78,17 +136,32 @@ const CONFIG_META = {
   opcoes: { label: "Opções", tipo: "tags" },
 };
 
+// configs que ficam BLOQUEADAS quando a coluna é PK ou FK
+// (valor padrão permanece editável)
+const CONFIGS_BLOQUEADAS_IDENT = [
+  "not_null",
+  "unique",
+  "auto_increment",
+  "index",
+  "max_length",
+  "min_value",
+  "max_value",
+  "mask",
+  "options",
+];
+
 const CONFIG_PADRAO = {
-  naoVazio: false,
-  unico: false,
-  valorPadrao: "",
-  alcanceMaximo: "",
-  valorMinimo: "",
-  valorMaximo: "",
-  autoIncremento: false,
-  indice: false,
-  mascara: "",
-  opcoes: [],
+  not_null: false,
+  unique: false,
+  default_value: "",
+  max_length: "",
+  min_value: "",
+  max_value: "",
+  auto_increment: false,
+  index: false,
+  mask: "",
+  options: [],
+  moeda: null,
 };
 
 const NOME_MAX = 15;
@@ -97,7 +170,7 @@ const TOUR_SEEN_KEY = "system_tour_seen";
 const COLUNA_VAZIA = () => ({
   id: Date.now() + Math.random(),
   nome: "",
-  identificacao: null, // null | "pk" | "fk"
+  identificacao: null,
   fkTabela: null,
   fkColuna: null,
   grupo: null,
@@ -106,12 +179,10 @@ const COLUNA_VAZIA = () => ({
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ─── Sub-componente: input de opções (tags) ────────────────────────────────
+// ─── Sub-componente: input de opções (tags)
 // ═══════════════════════════════════════════════════════════════════════════
-
 function OpcoesInput({ opcoes, onChange }) {
   const [inputVal, setInputVal] = useState("");
-
   const add = () => {
     const v = inputVal.trim();
     if (v && !opcoes.includes(v)) {
@@ -119,7 +190,6 @@ function OpcoesInput({ opcoes, onChange }) {
       setInputVal("");
     }
   };
-
   return (
     <div className="opcoes-input">
       <div className="opcoes-tags">
@@ -160,16 +230,19 @@ function OpcoesInput({ opcoes, onChange }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ─── Componente Principal ──────────────────────────────────────────────────
+// ─── Componente Principal
 // ═══════════════════════════════════════════════════════════════════════════
-
 export function System() {
   const MIN_COL_WIDTH = 60;
   const CHECKBOX_WIDTH = 50;
   const ID_WIDTH = 70;
   const ACTIONS_WIDTH = 60;
 
-  // ── Estado global ─────────────────────────────────────────────────────────
+  // Manter o estado do database atual para criar tabelas vinculadas a ela
+  const location = useLocation();
+  const navigate = useNavigate();
+  const idDoDatabaseAtual = location.state?.dbId;
+
   const [tabs, setTabs] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -177,10 +250,12 @@ export function System() {
   const [notifications, setNotifications] = useState([]);
   const [tourActive, setTourActive] = useState(false);
 
-  // ── Wizard ────────────────────────────────────────────────────────────────
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardStep, setWizardStep] = useState(1); // 1 | 2 | 3
+  const [wizardStep, setWizardStep] = useState(1);
   const [nomeTabela, setNomeTabela] = useState("");
+  const [tabelaParaExcluir, setTabelaParaExcluir] = useState(null);
+  const [confirmacaoExclusaoTabela, setConfirmacaoExclusaoTabela] =
+    useState("");
   const [colunas, setColunas] = useState([COLUNA_VAZIA()]);
   const [loadingCreate, setLoadingCreate] = useState(false);
 
@@ -190,12 +265,18 @@ export function System() {
   const activeTabData = tabs.find((t) => t.id === activeTab);
   const rows = activeTabData?.rows || [];
   const resizableCols = Object.keys(colWidths);
-
   const totalTableWidth =
     CHECKBOX_WIDTH +
     ID_WIDTH +
     resizableCols.reduce((acc, col) => acc + colWidths[col], 0) +
     ACTIONS_WIDTH;
+
+  // Segurança: Impede que um usuario entre sem escolher a database
+  useEffect(() => {
+    if (!idDoDatabaseAtual) {
+      navigate("/database");
+    }
+  }, [idDoDatabaseAtual, navigate]);
 
   // ── Notificações ──────────────────────────────────────────────────────────
   const pushNotification = useCallback(
@@ -208,7 +289,6 @@ export function System() {
     [],
   );
 
-  // ── Indicador de tab ──────────────────────────────────────────────────────
   useEffect(() => {
     const el = tabsRef.current[activeTab];
     if (el)
@@ -218,7 +298,75 @@ export function System() {
       });
   }, [activeTab, tabs]);
 
-  // ── Seleção de linhas ─────────────────────────────────────────────────────
+  // ── Carregar tabelas e colunas da database ─────────────────────────────────
+  // 1. Função principal de busca de dados
+  const carregarDados = useCallback(async () => {
+    const idDb = idDoDatabaseAtual || localStorage.getItem("lastDbId");
+
+    if (!idDb) return;
+
+    try {
+      const response = await API.get(TABELA_CRUD_ROUTES.LISTAR(idDb));
+      const tabelasBanco = response.data;
+
+      const tabelasFormatadas = tabelasBanco.map((tab) => ({
+        id: tab.id,
+        name: tab.nomeTabela,
+        rows: [],
+        cols: (tab.colunas || []).map((col) => ({
+          id: col.id,
+          nome: col.nomeColuna,
+          tipoDado: col.tipoDado,
+          identificacao: col.isPrimaryKey ? "pk" : null,
+          config: col.config || {},
+        })),
+      }));
+
+      setTabs(tabelasFormatadas);
+
+      // Se houver tabelas e nenhuma estiver ativa, define a primeira
+      if (tabelasFormatadas.length > 0 && !activeTab) {
+        setActiveTab(tabelasFormatadas[0].id);
+      }
+    } catch (err) {
+      console.error("Erro na sincronização:", err);
+      const mensagem =
+        err.response?.data?.message ||
+        "Falha ao sincronizar com o banco de dados.";
+      pushNotification("error", "Erro", mensagem);
+    }
+  }, [idDoDatabaseAtual, activeTab, pushNotification]);
+
+  // 2. useEffect para persistência e gatilho inicial
+  useEffect(() => {
+    if (idDoDatabaseAtual) {
+      localStorage.setItem("lastDbId", idDoDatabaseAtual);
+    }
+    carregarDados();
+  }, [idDoDatabaseAtual, carregarDados]);
+
+  // 3. NOVO: useEffect para gerenciar larguras das colunas dinamicamente
+  useEffect(() => {
+    // Só executamos se houver uma aba ativa e dados nas abas
+    if (activeTab && tabs.length > 0) {
+      const tabAtual = tabs.find((t) => t.id === activeTab);
+
+      if (tabAtual) {
+        const novasLarguras = {};
+        tabAtual.cols.forEach((c) => {
+          // Definimos a largura padrão (150).
+          // Se você quiser persistir redimensionamentos manuais,
+          // teria que usar uma Ref ou um estado separado para não causar loop.
+          novasLarguras[c.nome] = 150;
+        });
+
+        setColWidths(novasLarguras);
+      }
+    }
+    // Removemos 'colWidths' daqui para evitar o loop infinito avisado pelo ESLint
+  }, [activeTab, tabs]);
+
+  // ── Seleção ───────────────────────────────────────────────────────────────
   const toggleSelectAll = () => {
     if (selectedRows.length === rows.length && rows.length > 0)
       setSelectedRows([]);
@@ -268,7 +416,7 @@ export function System() {
     document.addEventListener("mouseup", onUp);
   };
 
-  // ─── Wizard helpers ────────────────────────────────────────────────────────
+  // ── Wizard helpers ────────────────────────────────────────────────────────
   const openWizard = () => {
     setNomeTabela("");
     setColunas([COLUNA_VAZIA()]);
@@ -280,7 +428,6 @@ export function System() {
     setWizardStep(1);
   };
 
-  // Passo 1 → 2
   const handleStep1Proximo = () => {
     const nome = nomeTabela.trim();
     if (!nome) {
@@ -302,7 +449,6 @@ export function System() {
     setWizardStep(2);
   };
 
-  // Passo 2 → 3
   const handleStep2Proximo = () => {
     const invalidas = colunas.filter((c) => !c.nome.trim() || !c.tipoDado);
     if (invalidas.length > 0) {
@@ -316,16 +462,14 @@ export function System() {
     setWizardStep(3);
   };
 
-  // ─── Coluna helpers ────────────────────────────────────────────────────────
+  // ── Coluna helpers ────────────────────────────────────────────────────────
   const addColuna = () => setColunas((prev) => [...prev, COLUNA_VAZIA()]);
   const removeColuna = (id) =>
     setColunas((prev) => prev.filter((c) => c.id !== id));
-
   const updateColuna = (id, field, value) =>
     setColunas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
     );
-
   const updateConfig = (id, key, value) =>
     setColunas((prev) =>
       prev.map((c) =>
@@ -333,13 +477,12 @@ export function System() {
       ),
     );
 
-  // ─── PK ────────────────────────────────────────────────────────────────────
+  // ── PK ───────────────────────────────────────────────────────────────────
   const handleTogglePK = (id) => {
     setColunas((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
         if (c.identificacao === "pk") {
-          // desligar
           return {
             ...c,
             identificacao: null,
@@ -348,7 +491,6 @@ export function System() {
             config: { ...CONFIG_PADRAO, opcoes: [] },
           };
         }
-        // ligar: auto-config
         return {
           ...c,
           identificacao: "pk",
@@ -368,7 +510,7 @@ export function System() {
     );
   };
 
-  // ─── FK ────────────────────────────────────────────────────────────────────
+  // ── FK ───────────────────────────────────────────────────────────────────
   const handleToggleFK = (id) => {
     setColunas((prev) =>
       prev.map((c) => {
@@ -398,11 +540,10 @@ export function System() {
 
   const getPKsDeTabela = (tabelaId) => {
     const tab = tabs.find((t) => String(t.id) === String(tabelaId));
-    if (!tab?.cols) return [];
-    return tab.cols.filter((c) => c.identificacao === "pk");
+    return tab?.cols?.filter((c) => c.identificacao === "pk") ?? [];
   };
 
-  const handleFKTabelaChange = (colId, tabelaId) => {
+  const handleFKTabelaChange = (colId, tabelaId) =>
     setColunas((prev) =>
       prev.map((c) =>
         c.id !== colId
@@ -416,12 +557,10 @@ export function System() {
             },
       ),
     );
-  };
 
   const handleFKColunaChange = (colId, colNome) => {
     const col = colunas.find((c) => c.id === colId);
-    if (!col) return;
-    const tab = tabs.find((t) => String(t.id) === String(col.fkTabela));
+    const tab = tabs.find((t) => String(t.id) === String(col?.fkTabela));
     const pkCol = tab?.cols?.find((c) => c.nome === colNome);
     if (!pkCol) return;
     setColunas((prev) =>
@@ -442,19 +581,55 @@ export function System() {
     );
   };
 
+  // ── Grupo / Tipo — com máscaras automáticas ───────────────────────────────
   const handleGrupoChange = (id, grupo) =>
     setColunas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, grupo, tipoDado: null } : c)),
     );
 
-  const handleTipoChange = (id, tipo) =>
+  const handleTipoChange = (id, tipo) => {
     setColunas((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, tipoDado: tipo } : c)),
+      prev.map((c) => {
+        if (c.id !== id) return c;
+        const newConfig = { ...c.config };
+        // Máscara automática
+        if (MASCARA_AUTO[tipo]) {
+          newConfig.mascara = MASCARA_AUTO[tipo];
+        } else if (tipo !== "Moeda") {
+          // limpa máscara se não for Moeda nem CPF/Telefone
+          newConfig.mascara = "";
+          newConfig.moeda = null;
+        }
+        // Moeda: limpa máscara (será definida ao escolher a moeda)
+        if (tipo === "Moeda") {
+          newConfig.mascara = "";
+          newConfig.moeda = null;
+        }
+        return { ...c, tipoDado: tipo, config: newConfig };
+      }),
     );
+  };
 
-  // ─── Criar tabela (API) ────────────────────────────────────────────────────
+  // ── Moeda ─────────────────────────────────────────────────────────────────
+  const handleMoedaChange = (colId, moedaId) => {
+    const moeda = MOEDAS.find((m) => m.id === moedaId);
+    if (!moeda) return;
+    setColunas((prev) =>
+      prev.map((c) =>
+        c.id !== colId
+          ? c
+          : {
+              ...c,
+              config: { ...c.config, moeda: moedaId, mascara: moeda.mascara },
+            },
+      ),
+    );
+  };
+
+  // ── Criar tabela ──────────────────────────────────────────────────────────
   const handleCriarTabela = async () => {
     const colsValidas = colunas.filter((c) => c.nome.trim() && c.tipoDado);
+
     if (colsValidas.length === 0) {
       pushNotification(
         "warning",
@@ -464,71 +639,116 @@ export function System() {
       return;
     }
 
-    const payload = {
-      nome: nomeTabela.trim(),
-      colunas: colsValidas.map((c) => ({
-        nome: c.nome.trim(),
-        identificacao: c.identificacao,
-        fkTabela: c.fkTabela,
-        fkColuna: c.fkColuna,
-        tipoDado: c.tipoDado,
-        config: c.config,
-      })),
-    };
+    if (!idDoDatabaseAtual) {
+      pushNotification("error", "Erro", "Database não identificada.");
+      return;
+    }
 
     setLoadingCreate(true);
     try {
-      const res = await fetch(TABELA_CRUD_ROUTES.CRIAR, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const resTabela = await API.post(
+        TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
+        {
+          nomeTabela: nomeTabela.trim(),
+        },
+      );
 
-      const newWidths = {};
-      colsValidas.forEach((c) => {
-        newWidths[c.nome.trim()] = 150;
+      console.log("ID Recebido do Servidor:", resTabela.data.id);
+
+      const idTabelaCriada = resTabela.data.id;
+
+      const promises = colsValidas.map((col) => {
+        return API.post(COLUNA_CRUD_ROUTES.CRIAR, {
+          nomeColuna: col.nome.trim(),
+          tipoDado: MAPA_TIPOS_API[col.tipoDado] || col.tipoDado,
+          isPrimaryKey: col.identificacao === "pk",
+          idTabela: idTabelaCriada,
+          config: col.config,
+        });
       });
+
+      await Promise.all(promises);
 
       const newTab = {
-        id: data?.id || Date.now(),
-        name: payload.nome,
+        id: idTabelaCriada,
+        name: nomeTabela.trim(),
         rows: [],
         cols: colsValidas,
       };
 
       setTabs((prev) => [...prev, newTab]);
       setActiveTab(newTab.id);
-      setColWidths(newWidths);
-      setSelectedRows([]);
       closeWizard();
+
       pushNotification(
         "success",
-        "Tabela criada!",
-        `A tabela "${payload.nome}" foi criada com sucesso.`,
+        "Sucesso!",
+        `Tabela "${nomeTabela}" criada com suas colunas.`,
       );
     } catch (err) {
-      console.error(err);
+      console.error("Erro na requisição:", err.response?.data || err.message);
+
       pushNotification(
         "error",
-        "Erro ao criar tabela",
-        "Não foi possível conectar-se à API.",
+        "Erro ao salvar",
+        err.response?.data?.message ||
+          "Não foi possível salvar os dados no servidor.",
       );
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  // ─── Tour ──────────────────────────────────────────────────────────────────
+  const handleExcluirTabela = async (idTabela) => {
+    // 1. Criamos uma função auxiliar para facilitar o envio das notificações
+    const addNotify = (type, title, message) => {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type,
+          title,
+          message,
+          duration: 4000,
+        },
+      ]);
+    };
+
+    try {
+      // 3. Chamada utilizando Axios e a rota mapeada
+      // O interceptor do seu Axios já cuidará do Token e da BaseURL
+      const response = await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabela));
+
+      if (response.status === 200 || response.status === 204) {
+        addNotify(
+          "success",
+          "Sucesso!",
+          "A tabela e seus dados foram apagados.",
+        );
+
+        // 4. Atualize seu estado local de tabelas aqui para refletir na UI
+        setTabs((prev) => prev.filter((t) => t.id !== idTabela));
+
+        if (activeTab === idTabela) {
+          setActiveTab(null);
+        }
+
+        setTabelaParaExcluir(null);
+        setConfirmacaoExclusaoTabela("");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir tabela:", error);
+      const msg = error.response?.data?.message || "Erro ao excluir tabela.";
+      addNotify("error", "Erro", msg);
+    }
+  };
+
+  // ── Tour ──────────────────────────────────────────────────────────────────
   const handleFinishTour = useCallback(() => {
     setTourActive(false);
     localStorage.setItem(TOUR_SEEN_KEY, "1");
   }, []);
 
-  // ─── Render ────────────────────────────────────────────────────────────────
-
-  // classe do card wizard por passo
   const wizardCardClass = [
     "wizard-card",
     wizardStep === 2 ? "wizard-card--step2" : "",
@@ -537,6 +757,7 @@ export function System() {
     .filter(Boolean)
     .join(" ");
 
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="system-container">
       <SegundoMenu />
@@ -547,7 +768,6 @@ export function System() {
       {tourActive && <TourGuide onFinish={handleFinishTour} />}
 
       <main className="main-layout">
-        {/* ── Tabs ──────────────────────────────────────────────────────────── */}
         <div className="tab-layout">
           {tabs.map((tab) => (
             <button
@@ -571,7 +791,6 @@ export function System() {
           </button>
         </div>
 
-        {/* ── Conteúdo ──────────────────────────────────────────────────────── */}
         <div className="content-area">
           {tabs.length === 0 ? (
             <div className="empty-state">
@@ -597,14 +816,31 @@ export function System() {
                 <span className="row-counter">
                   {activeTabData?.rows?.length || 0}
                 </span>
-                <button
-                  className="tour-trigger-btn"
-                  onClick={() => setTourActive(true)}
-                  title="Tour"
-                >
-                  <i className="fi fi-rr-map-marker-question" />
-                  Tour
-                </button>
+                <div className="table-header-right">
+                  <button className="action-header-btn">
+                    <i className="fi-sr-add-document" /> Inserir registro
+                  </button>
+                  <button className="action-header-btn">
+                    <i className="fi fi-sr-pencil"></i> Renomear tabela
+                  </button>
+                  <button className="action-header-btn">
+                    <i className="fi-sr-refresh"></i> Recarregar tabela
+                  </button>
+                  <button
+                    className="apagar-tabela-btn"
+                    onClick={() => {
+                      if (activeTabData) {
+                        setTabelaParaExcluir({
+                          id: activeTabData.id,
+                          nomeTabela: activeTabData.title,
+                        });
+                        setConfirmacaoExclusaoTabela("");
+                      }
+                    }}
+                  >
+                    <i className="fi-sr-remove-folder" /> Excluir tabela
+                  </button>
+                </div>
               </div>
 
               <div
@@ -748,13 +984,11 @@ export function System() {
         </div>
       </main>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          WIZARD OVERLAY
-          ══════════════════════════════════════════════════════════════════ */}
+      {/* ══════════════════════════ WIZARD ════════════════════════════════ */}
       {wizardOpen && (
         <div className="wizard-overlay" onClick={closeWizard}>
           <div className={wizardCardClass} onClick={(e) => e.stopPropagation()}>
-            {/* ── Cabeçalho ─────────────────────────────────────────────── */}
+            {/* Cabeçalho */}
             <div className="wizard-header">
               <div className="wizard-steps">
                 {[1, 2, 3].map((n, i) => (
@@ -782,9 +1016,7 @@ export function System() {
               </button>
             </div>
 
-            {/* ══════════════════════════════════════════════════════════════
-                PASSO 1 — Nome
-                ══════════════════════════════════════════════════════════ */}
+            {/* ── PASSO 1 ── */}
             {wizardStep === 1 && (
               <div className="wizard-body">
                 <div>
@@ -793,7 +1025,6 @@ export function System() {
                     Dê um nome claro e objetivo para identificar sua tabela.
                   </p>
                 </div>
-
                 <div className="wizard-field">
                   <label htmlFor="nomeTabela">Nome da tabela</label>
                   <input
@@ -815,7 +1046,6 @@ export function System() {
                     {nomeTabela.length}/{NOME_MAX}
                   </span>
                 </div>
-
                 <div className="wizard-footer">
                   <button className="btn-secondary" onClick={closeWizard}>
                     Cancelar
@@ -827,9 +1057,7 @@ export function System() {
               </div>
             )}
 
-            {/* ══════════════════════════════════════════════════════════════
-                PASSO 2 — Colunas
-                ══════════════════════════════════════════════════════════ */}
+            {/* ── PASSO 2 ── */}
             {wizardStep === 2 && (
               <div className="wizard-body wizard-body--cols">
                 <div className="wizard-step2-header">
@@ -848,28 +1076,32 @@ export function System() {
                 <div className="cols-list">
                   {colunas.map((col, idx) => {
                     const fkDisabled = tabs.length === 0;
-
                     return (
                       <div key={col.id} className="col-card">
+                        {/* Linha topo */}
                         <div className="col-card-top">
                           <span className="col-num">#{idx + 1}</span>
 
-                          <input
-                            type="text"
-                            className="col-nome-input"
-                            placeholder="Ex: id, nome, email..."
-                            value={col.nome}
-                            maxLength={15}
-                            onChange={(e) =>
-                              updateColuna(col.id, "nome", e.target.value)
-                            }
-                          />
-
-                          {/* Identificação */}
-                          <div className="col-ident">
-                            <span className="col-ident-label">
-                              Identificação
+                          {/* ── Nome ── */}
+                          <div className="col-nome-wrap">
+                            <span className="col-nome-label">
+                              Nome da coluna
                             </span>
+                            <input
+                              type="text"
+                              className="col-nome-input"
+                              placeholder="Ex: id, nome, email..."
+                              value={col.nome}
+                              maxLength={15}
+                              onChange={(e) =>
+                                updateColuna(col.id, "nome", e.target.value)
+                              }
+                            />
+                          </div>
+
+                          {/* ── Definição (era Identificação) ── */}
+                          <div className="col-ident">
+                            <span className="col-ident-label">Definição</span>
                             <div className="col-ident-btns">
                               <button
                                 type="button"
@@ -893,7 +1125,7 @@ export function System() {
                                 }
                                 disabled={fkDisabled}
                               >
-                                <i className="fi fi-rr-link" />
+                                <i className="fi fi-sr-share" />
                                 <span>Chave Estrangeira</span>
                               </button>
                             </div>
@@ -906,12 +1138,12 @@ export function System() {
                             disabled={colunas.length === 1}
                             title="Remover coluna"
                           >
-                            <i className="fi fi-rr-trash" />
+                            <i className="fi fi-sr-trash" />
                             <span>Excluir</span>
                           </button>
                         </div>
 
-                        {/* ─ FK selector ─ */}
+                        {/* FK selector */}
                         {col.identificacao === "fk" && (
                           <div className="col-fk-panel">
                             <i className="fi fi-rr-link col-fk-icon" />
@@ -929,7 +1161,6 @@ export function System() {
                                 </option>
                               ))}
                             </select>
-
                             {col.fkTabela && (
                               <select
                                 className="fk-select"
@@ -951,27 +1182,23 @@ export function System() {
                           </div>
                         )}
 
-                        {/* ─ Tipo de dado ─ */}
+                        {/* Tipo de dado */}
                         {col.identificacao === "pk" ? (
                           <div className="col-tipo-auto">
                             <i className="fi fi-rr-magic-wand" />
-                            <span>Tipo definido automaticamente:</span>
-                            <span className="col-tipo-badge">
-                              Número Inteiro
+                            <span>
+                              Chave primária definida automaticamente!
                             </span>
                           </div>
                         ) : col.identificacao === "fk" ? (
                           col.tipoDado ? (
                             <div className="col-tipo-auto">
-                              <i className="fi fi-rr-magic-wand" />
-                              <span>Tipo herdado da chave primária:</span>
-                              <span className="col-tipo-badge">
-                                {col.tipoDado}
-                              </span>
+                              <i className="fi fi-rr-magic-wand fk" />
+                              <span>Chave estrangeira definida!</span>
                             </div>
                           ) : (
                             <div className="col-tipo-auto col-tipo-auto--waiting">
-                              <i className="fi fi-rr-info" />
+                              <i className="fi fi-rr-info aviso" />
                               <span>
                                 Selecione a tabela e a chave primária acima para
                                 herdar o tipo.
@@ -980,7 +1207,6 @@ export function System() {
                           )
                         ) : (
                           <div className="col-tipo-section">
-                            {/* Grupos */}
                             <div className="grupo-tabs">
                               {Object.keys(GRUPOS_TIPOS).map((g) => (
                                 <button
@@ -989,13 +1215,10 @@ export function System() {
                                   className={`grupo-tab ${col.grupo === g ? "grupo-tab--active" : ""}`}
                                   onClick={() => handleGrupoChange(col.id, g)}
                                 >
-                                  <i className={`fi ${GRUPO_ICONS[g]}`} />
-                                  {g}
+                                  <i className={`fi ${GRUPO_ICONS[g]}`} /> {g}
                                 </button>
                               ))}
                             </div>
-
-                            {/* Tipos do grupo */}
                             {col.grupo && (
                               <div className="tipo-pills">
                                 {GRUPOS_TIPOS[col.grupo].map((t) => (
@@ -1008,6 +1231,33 @@ export function System() {
                                     {t}
                                   </button>
                                 ))}
+                              </div>
+                            )}
+                            {/* Seletor de moeda inline */}
+                            {col.tipoDado === "Moeda" && (
+                              <div className="moeda-picker">
+                                <span className="moeda-picker-label">
+                                  Tipo de moeda
+                                </span>
+                                <div className="moeda-pills">
+                                  {MOEDAS.map((m) => (
+                                    <button
+                                      key={m.id}
+                                      type="button"
+                                      className={`moeda-pill ${col.config.moeda === m.id ? "moeda-pill--active" : ""}`}
+                                      onClick={() =>
+                                        handleMoedaChange(col.id, m.id)
+                                      }
+                                    >
+                                      <span className="moeda-simbolo">
+                                        {m.simbolo}
+                                      </span>
+                                      <span className="moeda-label">
+                                        {m.label}
+                                      </span>
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -1031,9 +1281,7 @@ export function System() {
               </div>
             )}
 
-            {/* ══════════════════════════════════════════════════════════════
-                PASSO 3 — Configurações
-                ══════════════════════════════════════════════════════════ */}
+            {/* ── PASSO 3 ── */}
             {wizardStep === 3 && (
               <div className="wizard-body wizard-body--cfg">
                 <div>
@@ -1049,6 +1297,10 @@ export function System() {
                     .map((col) => {
                       const cat = getTipoCategoria(col.tipoDado);
                       const cfgs = cat ? CONFIGS_POR_CATEGORIA[cat] : [];
+                      // PK / FK: bloqueia tudo exceto valorPadrao
+                      const locked =
+                        col.identificacao === "pk" ||
+                        col.identificacao === "fk";
                       const toggles = cfgs.filter(
                         (k) => CONFIG_META[k]?.tipo === "toggle",
                       );
@@ -1058,8 +1310,10 @@ export function System() {
                       const hasTags = cfgs.includes("opcoes");
 
                       return (
-                        <div key={col.id} className="cfg-card">
-                          {/* Cabeçalho */}
+                        <div
+                          key={col.id}
+                          className={`cfg-card ${locked ? "cfg-card--locked" : ""}`}
+                        >
                           <div className="cfg-card-header">
                             <span className="cfg-col-nome">{col.nome}</span>
                             <div className="cfg-col-meta">
@@ -1067,7 +1321,9 @@ export function System() {
                                 <span className="badge-pk">Chave Primária</span>
                               )}
                               {col.identificacao === "fk" && (
-                                <span className="badge-fk">Chave Estrangeira</span>
+                                <span className="badge-fk">
+                                  Chave Estrangeira
+                                </span>
                               )}
                               <span className="cfg-col-tipo">
                                 {col.tipoDado}
@@ -1075,67 +1331,111 @@ export function System() {
                             </div>
                           </div>
 
+                          {locked && (
+                            <div className="cfg-locked-notice">
+                              <i className="fi fi-rr-lock" />
+                              <span>
+                                As configurações desta coluna são automáticas.
+                                Apenas o valor padrão pode ser editado.
+                              </span>
+                            </div>
+                          )}
+
                           {cfgs.length === 0 ? (
                             <p className="cfg-empty">
                               Nenhuma configuração disponível para este tipo.
                             </p>
                           ) : (
                             <div className="cfg-body">
-                              {/* Toggles */}
+                              {/* Toggles — bloqueados se PK/FK */}
                               {toggles.length > 0 && (
                                 <div className="cfg-toggles">
-                                  {toggles.map((key) => (
-                                    <label
-                                      key={key}
-                                      className={`cfg-toggle ${col.config[key] ? "cfg-toggle--on" : ""}`}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={!!col.config[key]}
-                                        onChange={(e) =>
-                                          updateConfig(
-                                            col.id,
-                                            key,
-                                            e.target.checked,
-                                          )
-                                        }
-                                      />
-                                      <span className="cfg-toggle-dot" />
-                                      {CONFIG_META[key].label}
-                                    </label>
-                                  ))}
+                                  {toggles.map((key) => {
+                                    const isBlocked =
+                                      locked &&
+                                      CONFIGS_BLOQUEADAS_IDENT.includes(key);
+                                    return (
+                                      <label
+                                        key={key}
+                                        className={`cfg-toggle ${col.config[key] ? "cfg-toggle--on" : ""} ${isBlocked ? "cfg-toggle--locked" : ""}`}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={!!col.config[key]}
+                                          disabled={isBlocked}
+                                          onChange={(e) =>
+                                            !isBlocked &&
+                                            updateConfig(
+                                              col.id,
+                                              key,
+                                              e.target.checked,
+                                            )
+                                          }
+                                        />
+                                        <span className="cfg-toggle-dot" />
+                                        {CONFIG_META[key].label}
+                                      </label>
+                                    );
+                                  })}
                                 </div>
                               )}
 
-                              {/* Inputs de texto/número */}
+                              {/* Inputs */}
                               {inputs.length > 0 && (
                                 <div className="cfg-inputs">
-                                  {inputs.map((key) => (
-                                    <div key={key} className="cfg-input-field">
-                                      <label>{CONFIG_META[key].label}</label>
-                                      <input
-                                        type={
-                                          CONFIG_META[key].tipo === "number"
-                                            ? "number"
-                                            : "text"
-                                        }
-                                        value={col.config[key]}
-                                        onChange={(e) =>
-                                          updateConfig(
-                                            col.id,
-                                            key,
-                                            e.target.value,
-                                          )
-                                        }
-                                        placeholder={"Defina um " +CONFIG_META[key].label}
-                                      />
-                                    </div>
-                                  ))}
+                                  {inputs.map((key) => {
+                                    const isBlocked =
+                                      locked &&
+                                      CONFIGS_BLOQUEADAS_IDENT.includes(key);
+                                    // Máscara bloqueada para CPF e Telefone (auto)
+                                    const mascaraAuto =
+                                      key === "mascara" &&
+                                      !!MASCARA_AUTO[col.tipoDado];
+                                    const bloqueado = isBlocked || mascaraAuto;
+                                    return (
+                                      <div
+                                        key={key}
+                                        className={`cfg-input-field ${bloqueado ? "cfg-input-field--locked" : ""}`}
+                                      >
+                                        <label>
+                                          {CONFIG_META[key].label}
+                                          {mascaraAuto && (
+                                            <span className="cfg-auto-badge">
+                                              auto
+                                            </span>
+                                          )}
+                                        </label>
+                                        <input
+                                          type="text" /* sempre text — sem spinner */
+                                          inputMode={
+                                            CONFIG_META[key].tipo === "number"
+                                              ? "numeric"
+                                              : "text"
+                                          }
+                                          value={col.config[key]}
+                                          disabled={bloqueado}
+                                          onChange={(e) =>
+                                            !bloqueado &&
+                                            updateConfig(
+                                              col.id,
+                                              key,
+                                              e.target.value,
+                                            )
+                                          }
+                                          placeholder={
+                                            bloqueado
+                                              ? col.config[key] || "—"
+                                              : `Defina ${CONFIG_META[key].label.toLowerCase()}`
+                                          }
+                                        />
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               )}
 
                               {/* Tags para opções */}
-                              {hasTags && (
+                              {hasTags && !locked && (
                                 <div className="cfg-opcoes">
                                   <label>Opções disponíveis</label>
                                   <OpcoesInput
@@ -1179,6 +1479,58 @@ export function System() {
           </div>
         </div>
       )}
+      <AnimatePresence mode="wait">
+        {tabelaParaExcluir && (
+          <div className="modal-overlay">
+            <motion.div
+              key="modal-exclusao-tabela"
+              className="modal-exclusao-container"
+              variants={fadeOutVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <h2>Excluir a tabela {tabelaParaExcluir.nomeTabela}?</h2>
+              <p>
+                Essa ação apagará todos os registros vinculados.
+              </p>
+
+              <input
+                type="text"
+                value={confirmacaoExclusaoTabela}
+                onChange={(e) => setConfirmacaoExclusaoTabela(e.target.value)}
+                placeholder={`Digite "${tabelaParaExcluir.nomeTabela}" para confirmar`}
+                autoFocus
+              />
+
+              <div className="acoes-exclusao">
+                <button
+                  className="btn-cancelar"
+                  onClick={() => setTabelaParaExcluir(null)}
+                >
+                  <i className="fi-rr-trash-undo icon-modal"></i>
+                </button>
+
+                <button
+                  className="btn-confirmar"
+                  disabled={
+                    confirmacaoExclusaoTabela !== tabelaParaExcluir.nomeTabela
+                  }
+                  onClick={() => handleExcluirTabela(tabelaParaExcluir.id)}
+                >
+                  <i className="fi-rr-trash-check icon-modal"></i>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Componente de Notificações costuma ficar aqui também */}
+      <Notificacao
+        notifications={notifications}
+        setNotifications={setNotifications}
+      />
     </div>
   );
 }

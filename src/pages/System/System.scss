@@ -38,7 +38,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     overflow: hidden;
     animation: v.$transicao-fadeIn;
 
-    // ── Tabs ──────────────────────────────────────────────────────────────
     .tab-layout {
       display: flex;
       align-items: center;
@@ -96,7 +95,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     }
   }
 
-  // ── Área de conteúdo ─────────────────────────────────────────────────────
   .content-area {
     flex: 1;
     display: flex;
@@ -135,11 +133,13 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       display: flex;
       align-items: center;
       gap: 8px;
+
       .qtd-reg {
         font-size: 22px;
         font-weight: 300;
         color: #333;
       }
+
       .row-counter {
         font-size: 18px;
         font-weight: 300;
@@ -148,27 +148,61 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         padding-top: 4px;
         line-height: 0;
       }
-      .tour-trigger-btn {
+
+      .table-header-right {
+        margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 5px;
-        margin-left: auto;
-        background: transparent;
-        border: 1.5px dashed #c7c7c7;
-        border-radius: 8px;
-        padding: 4px 12px;
-        font-size: 13px;
-        font-family: v.$jakarta;
-        color: #aaa;
-        cursor: pointer;
-        transition: v.$transicao-rapida;
-        i {
-          font-size: 14px;
-          padding-top: 2px;
+        gap: 8px;
+
+        .action-header-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: none;
+          font-size: 15px;
+          font-weight: 500;
+          font-family: v.$jakarta;
+          color: #aaa;
+          cursor: pointer;
+          transition: v.$transicao-rapida;
+
+          i {
+            font-size: 17px;
+            padding-top: 2px;
+            transition: v.$transicao-rapida;
+          }
+
+          &:hover {
+            color: #777;
+            transition: v.$transicao-rapida;
+          }
         }
-        &:hover {
-          border-color: v.$cor-primaria;
-          color: v.$cor-primaria;
+
+        .apagar-tabela-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: none;
+          font-size: 15px;
+          font-weight: 500;
+          font-family: v.$jakarta;
+          color: #aaa;
+          cursor: pointer;
+          transition: v.$transicao-rapida;
+
+          i {
+            font-size: 17px;
+            padding-top: 4px;
+            transition: v.$transicao-rapida;
+          }
+
+          &:hover {
+            color: #e74c3c;
+            transition: v.$transicao-rapida;
+          }
         }
       }
     }
@@ -252,7 +286,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           border-spacing: 0;
           width: 100%;
           min-width: 0;
-
           .sticky-col {
             position: sticky;
             z-index: 20;
@@ -295,7 +328,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               pointer-events: none;
             }
           }
-
           thead th {
             position: sticky;
             top: 0;
@@ -314,7 +346,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               background-color: #eee;
             }
           }
-
           .checkbox-col {
             width: $checkbox-width;
             min-width: $checkbox-width;
@@ -379,7 +410,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
             min-width: $id-width;
             max-width: $id-width;
           }
-
           .resizable-col {
             overflow: visible !important;
             .cell-content {
@@ -423,13 +453,11 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
             width: $actions-width;
             min-width: $actions-width;
             max-width: $actions-width;
-
             .actions-cell-content {
               display: flex;
               justify-content: center;
               align-items: center;
               gap: 8px;
-
               button {
                 border: none;
                 background: none;
@@ -439,19 +467,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
                 line-height: 0;
                 padding: 0;
                 transition: v.$transicao-rapida;
-
                 &:hover {
                   color: black;
                 }
               }
             }
           }
-
           tbody tr {
             &:not(.row-selected):hover td {
               background-color: $bg-hover;
             }
-
             td {
               background-color: $bg-normal;
               padding: 10px 8px;
@@ -462,30 +487,25 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               overflow: hidden;
               text-overflow: ellipsis;
               transition: background-color 0.15s ease;
-
               &.sticky-col {
                 z-index: 20;
               }
             }
-
             &.row-selected td {
               background-color: $bg-selected !important;
             }
-
             .empty-rows-cell {
               text-align: center;
               color: #bbb;
               font-size: 14px;
               padding: 30px 8px;
             }
-
             .actions-cell {
               width: $actions-width;
               min-width: $actions-width;
               max-width: $actions-width;
               padding: 0 4px;
               background-color: #fff;
-
               .actions-container {
                 display: flex;
                 justify-content: center;
@@ -531,6 +551,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   align-items: center;
   justify-content: center;
   z-index: 200;
+  animation: fadeOverlay 0.2s ease;
   @keyframes fadeOverlay {
     from {
       opacity: 0;
@@ -539,7 +560,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       opacity: 1;
     }
   }
-  animation: fadeOverlay 0.2s ease;
 }
 
 .wizard-card {
@@ -556,17 +576,15 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   animation: v.$transicao-fadeIn;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  // Passo 2 — mais largo para acomodar grupos + tipos
   &.wizard-card--step2 {
-    width: 700px;
+    width: min(700px, calc(100vw - 32px));
   }
-  // Passo 3 — médio para configs
   &.wizard-card--step3 {
-    width: 800px;
+    width: min(800px, calc(100vw - 32px));
   }
 }
 
-// ── Cabeçalho do wizard ───────────────────────────────────────────────────────
+// ── Cabeçalho ─────────────────────────────────────────────────────────────────
 .wizard-header {
   display: flex;
   align-items: center;
@@ -579,8 +597,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: v.$transicao-rapida;
-    
     .step-dot {
       width: 24px;
       height: 24px;
@@ -593,36 +609,30 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       font-weight: 700;
       color: #bbb;
       transition: v.$transicao-rapida;
-
       &.done {
         background-color: v.$cor-primaria;
         border-color: v.$cor-primaria;
         color: #fff;
       }
     }
-
     .step-line {
       width: 28px;
       height: 2px;
       background: #e0e0e0;
       border-radius: 8px;
       transition: v.$transicao-rapida;
-
       &.step-line--done {
         background: v.$cor-primaria;
       }
     }
   }
-
   .wizard-step-label {
     font-size: 13px;
     font-weight: 600;
     color: #888;
     font-family: v.$jakarta;
     letter-spacing: 0.02em;
-    transition: v.$transicao-rapida;
   }
-
   .wizard-close {
     margin-left: auto;
     background: none;
@@ -634,10 +644,8 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     display: flex;
     align-items: center;
     transition: v.$transicao-rapida;
-    
     &:hover {
       color: #333;
-      transition: v.$transicao-rapida;
     }
   }
 }
@@ -650,13 +658,11 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   gap: 18px;
   flex: 1;
   overflow: hidden;
-
   &.wizard-body--cols,
   &.wizard-body--cfg {
     padding: 18px 22px 18px;
     gap: 14px;
   }
-
   .wizard-title {
     font-size: 20px;
     font-weight: 700;
@@ -664,13 +670,11 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     margin: 0;
     padding-bottom: 6px;
   }
-  
   .wizard-subtitle {
     font-size: 14px;
     color: #888;
     margin: 0;
   }
-
   .wizard-step2-header {
     display: flex;
     align-items: flex-end;
@@ -679,19 +683,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 }
 
-// ── Campo nome (passo 1) ──────────────────────────────────────────────────────
 .wizard-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
   position: relative;
-
   label {
     font-size: 13px;
     font-weight: 500;
     color: #555;
   }
-
   input {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -702,17 +703,14 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     outline: none;
     transition: v.$transicao-rapida;
     background: #fafafa;
-
     &::placeholder {
       color: #ccc;
     }
-
     &:focus {
       border-color: v.$cor-primaria;
       background: #fff;
     }
   }
-
   .char-counter {
     position: absolute;
     right: 12px;
@@ -723,7 +721,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 }
 
-// ── Footer ────────────────────────────────────────────────────────────────────
 .wizard-footer {
   display: flex;
   justify-content: flex-end;
@@ -732,7 +729,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   margin-top: auto;
 }
 
-// ─── Botões globais do wizard ─────────────────────────────────────────────────
 .btn-primary,
 .btn-secondary {
   display: flex;
@@ -746,7 +742,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   cursor: pointer;
   font-weight: 500;
   transition: v.$transicao-rapida;
-  
   i {
     font-size: 13px;
     padding-top: 4px;
@@ -755,13 +750,10 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 .btn-primary {
   background-color: v.$cor-primaria;
   color: #fff;
-
   &:hover:not(:disabled) {
-    will-change: transform;
     transform: translateY(-1px);
-    transition: v.$transicao-rapida;
+    will-change: transform;
   }
-
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -770,13 +762,10 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 .btn-secondary {
   background-color: #f2f2f2;
   color: #333;
-
   &:hover {
     background-color: #e8e8e8;
-    transition: v.$transicao-rapida;
   }
 }
-
 .btn-add-col {
   display: flex;
   align-items: center;
@@ -792,20 +781,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   cursor: pointer;
   transition: v.$transicao-rapida;
   white-space: nowrap;
-
   i {
     font-size: 12px;
     padding-top: 1px;
     padding-right: 5px;
   }
-
   &:hover {
     border-color: v.$cor-primaria;
-    transition: v.$transicao-rapida;
     color: v.$cor-primaria;
   }
 }
-
 .btn-spinner {
   display: inline-block;
   width: 15px;
@@ -822,7 +807,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── PASSO 2 — Lista de colunas ────────────────────────────────────────────────
+// ─── PASSO 2 — Lista de colunas
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .cols-list {
@@ -832,34 +817,28 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   overflow-y: auto;
   flex: 1;
   padding-right: 4px;
-
   &::-webkit-scrollbar {
     width: 4px;
   }
-
   &::-webkit-scrollbar-thumb {
     background: #ddd;
     border-radius: 10px;
   }
 }
 
-// ── Card de coluna ────────────────────────────────────────────────────────────
 .col-card {
   border: 2px solid #efefef;
   border-radius: 12px;
   background: #fafafa;
   overflow: hidden;
   animation: v.$transicao-fadeIn;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transition: v.$transicao-rapida;
-
   &:hover {
     border-color: #ddd;
-    transition: v.$transicao-rapida;
   }
 }
 
-// Linha principal do card
+// Linha principal
 .col-card-top {
   display: flex;
   align-items: center;
@@ -877,39 +856,51 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     text-align: center;
   }
 
-  .col-nome-input {
+  // ── Nome com label acima ─────────────────────────────────────────────
+  .col-nome-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     flex: 1;
     max-width: 433px;
-    border: 1.5px solid #e0e0e0;
-    border-radius: 7px;
-    padding: 7px 11px;
-    font-size: 13px;
-    font-family: v.$jakarta;
-    color: #333;
-    background: #fff;
-    outline: none;
-    box-sizing: border-box;
-    transition: v.$transicao-rapida;
 
-    &::placeholder {
-      color: #ccc;
-      transition: v.$transicao-rapida;
+    .col-nome-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #c7c7c7;
+      font-family: v.$jakarta;
     }
 
-    &:focus {
-      border-color: v.$cor-primaria;
+    .col-nome-input {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 7px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-family: v.$jakarta;
+      color: #333;
+      background: #fff;
+      outline: none;
+      box-sizing: border-box;
       transition: v.$transicao-rapida;
+      width: 100%;
+      &::placeholder {
+        color: #ccc;
+      }
+      &:focus {
+        border-color: v.$cor-primaria;
+      }
     }
   }
 
-  // Grupo Identificação
+  // Definição (era Identificação)
   .col-ident {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 3px;
     flex-shrink: 0;
-
     .col-ident-label {
       font-size: 9px;
       font-weight: 700;
@@ -917,7 +908,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       letter-spacing: 0.06em;
       color: #c7c7c7;
     }
-
     .col-ident-btns {
       display: flex;
       gap: 6px;
@@ -936,11 +926,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     cursor: pointer;
     color: #ccc;
     transition: v.$transicao-rapida;
-
     i {
       font-size: 14px;
     }
-
     span {
       font-size: 9px;
       font-weight: 700;
@@ -951,24 +939,23 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
     }
-
     &.ident-btn--fk:hover {
-      border-color: v.$cor-primaria;
-      color: v.$cor-primaria;
+      border-color: v.$cor-secundaria;
+      color: v.$cor-secundaria;
     }
 
     &.ident-btn--active {
       &.ident-btn--pk {
         border-color: v.$cor-primaria;
-        color: v.$cor-primaria;
+        background-color: v.$cor-primaria;
+        color: #fff;
       }
-
       &.ident-btn--fk {
-        border-color: v.$cor-primaria;
-        color: v.$cor-primaria;
+        border-color: v.$cor-secundaria;
+        background-color: v.$cor-secundaria;
+        color: #fff;
       }
     }
-
     &.ident-btn--disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -978,41 +965,33 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 
   .col-remove-btn {
     background: none;
-    border: none;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
     cursor: pointer;
     color: #ccc;
     font-size: 15px;
     display: flex;
     align-items: center;
-    padding: 5px 10px;
-    transition: color 0.15s;
-    flex-shrink: 0;
     flex-direction: column;
-    border: 1.5px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 5px 10px;
     transition: v.$transicao-rapida;
+    flex-shrink: 0;
     height: 45px;
     width: 60px;
     margin-top: 15px;
     gap: 2px;
-
     i {
       font-size: 14px;
-      transition: v.$transicao-rapida;
     }
-
     span {
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.04em;
     }
-
     &:hover:not(:disabled) {
       color: #e74c3c;
-      border: solid 1.5px #e74c3c;
-      transition: v.$transicao-rapida;
+      border-color: #e74c3c;
     }
-
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -1020,26 +999,26 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 }
 
-// ── FK selector panel ─────────────────────────────────────────────────────────
+// FK panel
 .col-fk-panel {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   padding: 8px 14px;
-  background: rgba(99, 102, 241, 0.04);
-  border-bottom: 1.5px solid rgba(99, 102, 241, 0.12);
 
   .col-fk-icon {
     font-size: 13px;
-    color: #6366f1;
+    color: v.$cor-secundaria;
     flex-shrink: 0;
+    line-height: 0;
+    padding-right: 5px;
   }
 
   .fk-select {
     flex: 1;
     min-width: 150px;
-    border: 1.5px solid rgba(99, 102, 241, 0.3);
+    border: 1.5px solid rgba(v.$cor-secundaria, 0.3);
     border-radius: 7px;
     padding: 6px 10px;
     font-size: 13px;
@@ -1048,27 +1027,26 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     background: #fff;
     outline: none;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition: v.$transicao-rapida;
 
     &:focus {
-      border-color: #6366f1;
+      border-color: v.$cor-secundaria;
+      transition: v.$transicao-rapida;
     }
   }
 }
 
-// ── Tipo automático (PK/FK) ───────────────────────────────────────────────────
+// Tipo auto
 .col-tipo-auto {
   display: flex;
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
   padding: 8px 14px;
-
   i {
     font-size: 13px;
     color: v.$cor-primaria;
   }
-  
   span {
     font-size: 12px;
     color: #999;
@@ -1076,45 +1054,27 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     padding-left: 6px;
   }
 
-  .col-tipo-badge {
-    font-size: 11px;
-    font-weight: 500;
-    background: #0bcd5f34;
-    color: v.$cor-primaria;
-    border-radius: 5px;
-    padding-top: 4px;
-    padding-bottom: 5px;
-    padding-right: 5px;
-    padding-left: 5px;
-    font-family: v.$jakarta;
+  .fk {
+    color: v.$cor-secundaria;
   }
 
-  &.col-tipo-auto--waiting {
-    background: rgba(156, 163, 175, 0.06);
-    i {
-      color: #9ca3af;
-    }
-    span {
-      color: #bbb;
-    }
+  .aviso {
+    color: v.$cor-secundaria;
   }
 }
 
-// ── Seção de tipo de dado ─────────────────────────────────────────────────────
+// Tipo section
 .col-tipo-section {
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-// Tabs dos grupos
 .grupo-tabs {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  transition: v.$transicao-rapida;
-
   .grupo-tab {
     display: flex;
     align-items: center;
@@ -1130,34 +1090,27 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     transition: v.$transicao-rapida;
     white-space: nowrap;
     font-weight: 500;
-
     i {
       font-size: 12px;
-      transition: v.$transicao-rapida;
+      margin-top: 3.5px;
     }
-
     &:hover {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
-      transition: v.$transicao-rapida;
     }
-
     &.grupo-tab--active {
       background: v.$cor-primaria;
       border-color: v.$cor-primaria;
       color: #fff;
-      font-weight: 500;
     }
   }
 }
 
-// Pills de tipo
 .tipo-pills {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
-  padding: 6px 0 2px;
-
+  padding: 2px 0;
   .tipo-pill {
     background: #fff;
     border: 1.5px solid #e8e8e8;
@@ -1170,24 +1123,89 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     transition: v.$transicao-rapida;
     white-space: nowrap;
     font-weight: 400;
-
     &:hover {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
-      transition: v.$transicao-rapida;
     }
-    
     &.tipo-pill--active {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
-      font-weight: 400;
-      transition: v.$transicao-rapida;
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Moeda picker ──────────────────────────────────────────────────────────────
+.moeda-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 0 2px;
+  border-top: 1.5px solid #f0f0f0;
+  margin-top: 2px;
+
+  .moeda-picker-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #aaa;
+    font-family: v.$jakarta;
+  }
+
+  .moeda-pills {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+}
+
+.moeda-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: v.$transicao-rapida;
+
+  .moeda-simbolo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #555;
+    line-height: 1.2;
+  }
+  .moeda-label {
+    font-size: 9px;
+    color: #aaa;
+    font-family: v.$jakarta;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: v.$cor-primaria;
+    .moeda-simbolo {
+      color: v.$cor-primaria;
+    }
+  }
+
+  &.moeda-pill--active {
+    background: rgba(v.$cor-primaria, 0.08);
+    border-color: v.$cor-primaria;
+    .moeda-simbolo {
+      color: v.$cor-primaria;
+    }
+    .moeda-label {
+      color: v.$cor-primaria;
     }
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── PASSO 3 — Configurações ───────────────────────────────────────────────────
+// ─── PASSO 3 — Configurações
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .cfg-list {
@@ -1198,8 +1216,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   flex: 1;
   padding-right: 4px;
   animation: v.$transicao-fadeIn;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -1214,6 +1230,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   border-radius: 12px;
   background: #fafafa;
   overflow: hidden;
+  &.cfg-card--locked {
+    border-color: rgba(v.$cor-primaria, 0.2);
+  }
 }
 
 .cfg-card-header {
@@ -1223,19 +1242,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   padding: 10px 14px;
   background: #fff;
   border-bottom: 1.5px solid #f0f0f0;
-
   .cfg-col-nome {
     font-size: 14px;
     font-weight: 700;
     color: #333;
     font-family: v.$jakarta;
   }
-
   .cfg-col-meta {
     display: flex;
     align-items: center;
     gap: 6px;
-
     .cfg-col-tipo {
       font-size: 11px;
       color: #888;
@@ -1252,18 +1268,37 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   font-size: 11px;
   font-weight: 500;
   color: v.$cor-primaria;
-  background: #f0f0f0;
+  background: rgba(v.$cor-primaria, 0.1);
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+.badge-fk {
+  font-size: 11px;
+  font-weight: 500;
+  color: v.$cor-secundaria;
+  background: rgba(v.$cor-secundaria, 0.1);
   border-radius: 5px;
   padding: 4px 8px;
 }
 
-.badge-fk {
-  font-size: 10px;
-  font-weight: 500;
-  color: v.$cor-primaria;
-  background: #f0f0f0;
-  border-radius: 5px;
-  padding: 4px 8px;
+// Aviso de lock
+.cfg-locked-notice {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  background: rgba(v.$cor-primaria, 0.04);
+  border-bottom: 1.5px solid rgba(v.$cor-primaria, 0.1);
+  i {
+    font-size: 12px;
+    color: v.$cor-primaria;
+    flex-shrink: 0;
+  }
+  span {
+    font-size: 11.5px;
+    color: #888;
+    font-family: v.$jakarta;
+  }
 }
 
 .cfg-empty {
@@ -1273,7 +1308,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   margin: 0;
   font-family: v.$jakarta;
 }
-
 .cfg-body {
   padding: 12px 14px;
   display: flex;
@@ -1281,12 +1315,13 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   gap: 10px;
 }
 
-// ── Toggles ───────────────────────────────────────────────────────────────────
+// Toggles
 .cfg-toggles {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .cfg-toggle {
@@ -1302,11 +1337,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   transition: v.$transicao-rapida;
   user-select: none;
   font-weight: 500;
-
   input[type="checkbox"] {
     display: none;
   }
-
   .cfg-toggle-dot {
     width: 28px;
     height: 16px;
@@ -1315,7 +1348,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     position: relative;
     flex-shrink: 0;
     transition: v.$transicao-rapida;
-
     &::after {
       content: "";
       position: absolute;
@@ -1328,29 +1360,27 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       transition: v.$transicao-rapida;
     }
   }
-
   &.cfg-toggle--on {
-    border-color: v.$cor-primaria;
     color: v.$cor-primaria;
     font-weight: 500;
-    transition: v.$transicao-rapida;
-
     .cfg-toggle-dot {
       background: v.$cor-primaria;
-
       &::after {
         transform: translateX(12px);
       }
     }
   }
-
-  &:hover:not(.cfg-toggle--on) {
+  &.cfg-toggle--locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  &:hover:not(.cfg-toggle--on):not(.cfg-toggle--locked) {
     color: #555;
-    transition: v.$transicao-rapida;
   }
 }
 
-// ── Inputs de config ──────────────────────────────────────────────────────────
+// Inputs
 .cfg-inputs {
   display: flex;
   flex-wrap: wrap;
@@ -1363,15 +1393,15 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   gap: 4px;
   flex: 1;
   min-width: 130px;
-  transition: v.$transicao-rapida;
-
   label {
     font-size: 11px;
     font-weight: 600;
     color: #888;
     font-family: v.$jakarta;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
-
   input {
     border: 1.5px solid #e0e0e0;
     border-radius: 7px;
@@ -1381,29 +1411,58 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     color: #333;
     background: #fff;
     outline: none;
-    transition: border-color 0.15s;
+    transition: v.$transicao-rapida;
     width: 100%;
     box-sizing: border-box;
-    transition: v.$transicao-rapida;
-
+    // Remove setas/spinner dos campos numéricos
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
     &::placeholder {
       color: #ccc;
-      transition: v.$transicao-rapida;
     }
-
     &:focus {
       border-color: v.$cor-primaria;
-      transition: v.$transicao-rapida;
+    }
+    &:disabled {
+      background: #f8f8f8;
+      color: #bbb;
+      cursor: not-allowed;
+    }
+  }
+  &.cfg-input-field--locked {
+    input {
+      background: #f5f5f5;
+      color: #aaa;
+      cursor: not-allowed;
+      border-color: #efefef;
+    }
+    label {
+      color: #bbb;
     }
   }
 }
 
-// ── Opções (tags) ─────────────────────────────────────────────────────────────
+// Badge "auto" na label
+.cfg-auto-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(v.$cor-primaria, 0.1);
+  color: v.$cor-primaria;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: v.$jakarta;
+}
+
+// Opções (tags)
 .cfg-opcoes {
   display: flex;
   flex-direction: column;
   gap: 6px;
-
   label {
     font-size: 11px;
     font-weight: 600;
@@ -1423,7 +1482,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   flex-wrap: wrap;
   gap: 5px;
   min-height: 28px;
-
   .opcoes-placeholder {
     font-size: 12px;
     color: #ccc;
@@ -1443,7 +1501,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   padding: 3px 8px;
   font-size: 12px;
   font-family: v.$jakarta;
-
   button {
     background: none;
     border: none;
@@ -1453,7 +1510,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     line-height: 1;
     padding: 0;
     opacity: 0.6;
-
     &:hover {
       opacity: 1;
     }
@@ -1463,7 +1519,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 .opcoes-add {
   display: flex;
   gap: 6px;
-
   input {
     flex: 1;
     border: 1.5px solid #e0e0e0;
@@ -1475,11 +1530,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     background: #fff;
     outline: none;
     transition: border-color 0.15s;
-
     &::placeholder {
       color: #ccc;
     }
-
     &:focus {
       border-color: v.$cor-primaria;
     }
@@ -1498,9 +1551,49 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     justify-content: center;
     transition: opacity 0.15s;
     flex-shrink: 0;
-
     &:hover {
       opacity: 0.85;
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);    
+  font-family: v.$jakarta;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;    
+  
+  .modal-exclusao-container {
+    height: 350px;
+    width: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    button {
+      display: flex;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+      gap: 10px;
+    }
+
+    .icon-modal {
+      font-size: 35px;
+
+      &:hover {
+        transform: scale(0.9);
+        transition: v.$transicao-rapida;
+        will-change: transform;
+      }
     }
   }
 }
