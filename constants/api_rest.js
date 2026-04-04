@@ -35,6 +35,7 @@ export const DATABASE_CRUD_ROUTES = {
 export const TABELA_CRUD_ROUTES = {
   CRIAR:     (dbId) => `/tabelas/criar/${dbId}`,
   LISTAR:    (dbId) => `/tabelas/listar/${dbId}`,
+  SINCRONIZAR: (tabelaId) => `/tabelas/${tabelaId}/sincronizar`,
   ATUALIZAR: (tabelaId) => `/tabelas/atualizar/${tabelaId}`,
   EXCLUIR:   (tabelaId) => `/tabelas/excluir/${tabelaId}`
 };

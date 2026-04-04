@@ -30,19 +30,16 @@ const fadeOutVariants = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const GRUPOS_TIPOS = {
-  Texto: ["Texto", "Descrição", "Email", "Link"],
-  Numérico: ["Número Decimal", "Número Inteiro", "CPF", "Telefone", "Moeda"],
+  Texto: ["Texto", "Email", "CPF", "Telefone"],
+  Numérico: ["Número Decimal", "Número Inteiro", "Moeda"],
   Tempo: ["Hora", "Data", "Data / Hora"],
-  Seleção: ["Lista Única", "Lista Múltipla", "Booleano"],
-  Avançado: ["Arquivo", "Cálculo"],
+  Avançado: ["Booleano", "Cálculo"],
 };
 
 // Mapa de tipos do frontend → API
 const MAPA_TIPOS_API = {
   Texto: "texto",
-  Descrição: "desc",
   Email: "email",
-  Link: "link",
   "Número Decimal": "numero_dec",
   "Número Inteiro": "numero_int",
   CPF: "cpf",
@@ -51,10 +48,7 @@ const MAPA_TIPOS_API = {
   Hora: "hora",
   Data: "data",
   "Data / Hora": "data_hora",
-  "Lista Única": "lista_unica",
-  "Lista Múltipla": "lista_mult",
   Booleano: "boleano",
-  Arquivo: "arquivo",
   Cálculo: "calculo",
 };
 
@@ -81,41 +75,30 @@ const MASCARA_AUTO = {
 
 // ─── Categoria de config por tipo ─────────────────────────────────────────
 const getTipoCategoria = (tipo) => {
-  if (["Texto", "Email", "Link", "CPF", "Telefone"].includes(tipo))
-    return "textoCurto";
+  if (["Texto", "Email", "CPF", "Telefone"].includes(tipo)) return "texto";
   if (tipo === "Descrição") return "textoLongo";
   if (["Número Inteiro", "Número Decimal", "Moeda"].includes(tipo))
     return "numerico";
   if (["Hora", "Data", "Data / Hora"].includes(tipo)) return "temporal";
-  if (["Lista Única", "Lista Múltipla"].includes(tipo)) return "selecao";
   if (tipo === "Booleano") return "booleano";
-  if (tipo === "Arquivo") return "arquivo";
   if (tipo === "Cálculo") return "calculo";
   return null;
 };
 
 const CONFIGS_POR_CATEGORIA = {
-  textoCurto: [
-    "naoVazio",
-    "unico",
-    "valorPadrao",
-    "alcanceMaximo",
-    "mascara",
-    "indice",
-  ],
-  textoLongo: ["naoVazio", "valorPadrao", "alcanceMaximo"],
+  texto: ["naoVazio", "alcanceMaximo", "unico", "mascara"],
+
   numerico: [
     "naoVazio",
     "valorPadrao",
     "valorMinimo",
     "valorMaximo",
     "autoIncremento",
-    "indice",
+    "mascara",
   ],
+
   temporal: ["naoVazio", "valorPadrao", "indice"],
-  selecao: ["naoVazio", "valorPadrao", "opcoes"],
   booleano: ["naoVazio", "valorPadrao"],
-  arquivo: ["naoVazio"],
   calculo: ["naoVazio", "indice"],
 };
 
@@ -129,7 +112,6 @@ const CONFIG_META = {
   valorMinimo: { label: "Valor mínimo", tipo: "number" },
   valorMaximo: { label: "Valor máximo", tipo: "number" },
   mascara: { label: "Máscara", tipo: "text" },
-  opcoes: { label: "Opções", tipo: "tags" },
 };
 
 // Chaves bloqueadas para PK/FK (todas exceto valorPadrao)
@@ -143,7 +125,6 @@ const CONFIGS_BLOQUEADAS_IDENT = [
   "valorMinimo",
   "valorMaximo",
   "mascara",
-  "opcoes",
 ];
 
 // ─── CONFIG_PADRAO usa as mesmas chaves camelCase do CONFIG_META ──────────
@@ -158,8 +139,6 @@ const CONFIG_PADRAO = {
   autoIncremento: false,
   indice: false,
   mascara: "",
-  opcoes: [],
-  moeda: null,
 };
 
 // ─── Mapeia as chaves camelCase do frontend para snake_case da API ────────
@@ -176,7 +155,6 @@ const mapConfigParaApi = (config, tipoDado, isForeignKey) => {
     auto_increment: config.autoIncremento || false,
     index: config.indice || false,
     mask: config.mascara || "",
-    options: Array.isArray(config.opcoes) ? config.opcoes : [],
     moeda: config.moeda && config.moeda !== "" ? config.moeda : null,
   };
 
@@ -291,7 +269,7 @@ export function System() {
 
   const activeTabData = tabs.find((t) => t.id === activeTab);
   const rows = activeTabData?.rows || [];
-  const resizableCols = Object.keys(colWidths);
+  const resizableCols = activeTabData?.cols?.map((c) => c.nome) || [];
   const totalTableWidth =
     CHECKBOX_WIDTH +
     resizableCols.reduce((acc, col) => acc + colWidths[col], 0) +
@@ -332,13 +310,12 @@ export function System() {
       const tabelasFormatadas = response.data.map((tab) => ({
         id: tab.id,
         name: tab.nomeTabela,
-        rows: [],
+        rows: tab.dados || [],
         cols: (tab.colunas || []).map((col) => ({
           id: col.id,
           nome: col.nomeColuna,
           tipoDado: col.tipoDado,
           identificacao: col.isPrimaryKey ? "pk" : null,
-          config: col.config || {},
         })),
       }));
       setTabs(tabelasFormatadas);
@@ -401,17 +378,18 @@ export function System() {
   // ── Resize coluna ─────────────────────────────────────────────────────────
   const handleMouseDown = (e, colName) => {
     e.preventDefault();
-    const startX = e.pageX,
-      startWidth = colWidths[colName],
-      MAX = 580;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+    const startX = e.pageX;
+    const startWidth = colWidths[colName];
+
     const onMove = (ev) => {
-      const w = Math.max(
+      const newWidth = Math.max(
         MIN_COL_WIDTH,
-        Math.min(startWidth + (ev.pageX - startX), MAX),
+        startWidth + (ev.pageX - startX),
       );
-      setColWidths((prev) => ({ ...prev, [colName]: w }));
+      setColWidths((prev) => ({
+        ...prev,
+        [colName]: newWidth,
+      }));
     };
     const onUp = () => {
       document.removeEventListener("mousemove", onMove);
@@ -642,7 +620,7 @@ export function System() {
       pushNotification(
         "warning",
         "Sem colunas",
-        "Adicione pelo menos uma coluna com nome e tipo definidos.",
+        "Adicione pelo menos uma coluna.",
       );
       return;
     }
@@ -681,14 +659,13 @@ export function System() {
             col.identificacao === "fk",
           ),
         };
-        console.log("Payload da coluna:", payload);  // 👈 inspecione no console
+        console.log("Payload da coluna:", payload);
         return API.post(COLUNA_CRUD_ROUTES.CRIAR, payload);
-    });
+      });
 
       await Promise.all(promises);
       await carregarDados();
 
-      // 3. Atualiza estado local
       const newTab = {
         id: idTabelaCriada,
         name: nomeTabela.trim(),
@@ -716,7 +693,7 @@ export function System() {
     }
   };
 
-  // ── Excluir tabela ────────────────────────────────────────────────────────
+  // ── Excluir tabela ───────────────────────────────────────────────────────
   const handleExcluirTabela = async (idTabela) => {
     try {
       const response = await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabela));
@@ -822,10 +799,10 @@ export function System() {
                     <i className="fi fi-sr-add-document" /> Inserir registro
                   </button>
                   <button className="action-header-btn">
-                    <i className="fi fi-sr-pencil" /> Renomear tabela
+                    <i className="fi fi-sr-refresh" /> Recarregar dados
                   </button>
                   <button className="action-header-btn">
-                    <i className="fi fi-sr-refresh" /> Recarregar tabela
+                    <i className="fi fi-sr-pencil" /> Renomear tabela
                   </button>
                   <button
                     className="apagar-tabela-btn"
@@ -892,20 +869,23 @@ export function System() {
                             />
                           </button>
                         </th>
-                        <th className="id-col sticky-col sticky-id">
-                          <div className="cell-content">ID</div>
-                        </th>
                         {resizableCols.map((col) => (
-                          <th key={col} className="resizable-col">
+                          <th
+                            key={col}
+                            className="resizable-col"
+                            style={{ width: `${colWidths[col]}px` }}
+                          >
                             <div className="cell-content">
                               <span className="col-label">
                                 {col.toUpperCase()}
                               </span>
+                              {/* O resizer deve ser o último elemento da div */}
                               <button
-                                className="resizer-btn"
+                                className="resizer-handle"
                                 onMouseDown={(e) => handleMouseDown(e, col)}
                               >
-                                <i className="fi fi-sr-arrows-alt-h" />
+                                {/* Um ícone de barra vertical costuma ser melhor que o de setas */}
+                                <div className="resizer-line" />
                               </button>
                             </div>
                           </th>
@@ -925,8 +905,9 @@ export function System() {
                     <tbody>
                       {rows.length === 0 ? (
                         <tr>
+                          {/* O colSpan deve ser 2 (checkbox + ações) + número de colunas dinâmicas */}
                           <td
-                            colSpan={3 + resizableCols.length}
+                            colSpan={2 + resizableCols.length}
                             className="empty-rows-cell"
                           >
                             <span>
@@ -944,6 +925,7 @@ export function System() {
                                 : ""
                             }
                           >
+                            {/* 1. Checkbox */}
                             <td className="checkbox-col sticky-col sticky-checkbox">
                               <button
                                 className="custom-checkbox"
@@ -954,14 +936,17 @@ export function System() {
                                 />
                               </button>
                             </td>
-                            <td className="id-cell sticky-col sticky-id">
-                              {row.id}
-                            </td>
+
+                            {/* 2. REMOVIDO: a célula de ID fixa que estava aqui foi embora */}
+
+                            {/* 3. Dados dinâmicos */}
                             {resizableCols.map((col) => (
                               <td key={col} className="data-cell">
                                 {row[col]}
                               </td>
                             ))}
+
+                            {/* 4. Ações */}
                             <td className="actions-cell sticky-col sticky-actions">
                               <div className="actions-container">
                                 <button>
