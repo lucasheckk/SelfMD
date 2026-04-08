@@ -12,16 +12,16 @@ import {
 } from "../../../constants/api_rest.js";
 
 const fadeOutVariants = {
-  hidden: { opacity: 0, scale: 1 },
+  hidden: { opacity: 0, scale: 0.97 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.3, ease: "easeInOut" },
+    transition: { duration: 0.2, ease: "easeOut" },
   },
   exit: {
     opacity: 0,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeInOut" },
+    scale: 0.97,
+    transition: { duration: 0.15, ease: "easeIn" },
   },
 };
 
@@ -30,13 +30,13 @@ const fadeOutVariants = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const GRUPOS_TIPOS = {
-  Texto: ["Texto", "Email", "CPF", "Telefone"],
-  Numérico: ["Número Decimal", "Número Inteiro", "Moeda"],
+  Texto: ["Texto", "Lista"],
+  Numérico: ["Número Decimal", "Número Inteiro"],
   Tempo: ["Hora", "Data", "Data / Hora"],
-  Avançado: ["Booleano", "Cálculo"],
+  Avançado: ["Cálculo", "Boleano"],
+  Pre_definido: ["Email", "CPF", "Telefone", "Moeda"],
 };
 
-// Mapa de tipos do frontend → API
 const MAPA_TIPOS_API = {
   Texto: "texto",
   Email: "email",
@@ -48,7 +48,8 @@ const MAPA_TIPOS_API = {
   Hora: "hora",
   Data: "data",
   "Data / Hora": "data_hora",
-  Booleano: "boleano",
+  Lista: "lista",
+  Boleano: "boleano",
   Cálculo: "calculo",
 };
 
@@ -56,8 +57,8 @@ const GRUPO_ICONS = {
   Texto: "fi-sr-text",
   Numérico: "fi-sr-calculator",
   Tempo: "fi-sr-calendar",
-  Seleção: "fi-sr-list",
   Avançado: "fi-sr-settings-sliders",
+  Pre_definido: "fi-sr-crown",
 };
 
 const MOEDAS = [
@@ -76,30 +77,30 @@ const MASCARA_AUTO = {
 // ─── Categoria de config por tipo ─────────────────────────────────────────
 const getTipoCategoria = (tipo) => {
   if (["Texto", "Email", "CPF", "Telefone"].includes(tipo)) return "texto";
-  if (tipo === "Descrição") return "textoLongo";
   if (["Número Inteiro", "Número Decimal", "Moeda"].includes(tipo))
     return "numerico";
   if (["Hora", "Data", "Data / Hora"].includes(tipo)) return "temporal";
-  if (tipo === "Booleano") return "booleano";
+  if (["Email", "CPF", "Telefone", "Moeda"].includes(tipo))
+    return "pre_definido";
+  if (tipo === "Boleano") return "boleano";
   if (tipo === "Cálculo") return "calculo";
+  if (tipo === "Lista") return "lista";
   return null;
 };
 
 const CONFIGS_POR_CATEGORIA = {
-  texto: ["naoVazio", "alcanceMaximo", "unico", "mascara"],
-
+  texto: ["naoVazio", "alcanceMaximo", "unico"],
   numerico: [
     "naoVazio",
-    "valorPadrao",
-    "valorMinimo",
-    "valorMaximo",
+    "indice",
     "autoIncremento",
-    "mascara",
+    "valorPadrao",
+    "alcanceMaximo",
   ],
-
-  temporal: ["naoVazio", "valorPadrao", "indice"],
-  booleano: ["naoVazio", "valorPadrao"],
+  temporal: ["naoVazio", "indice", "mascaraData"],
+  boleano: ["naoVazio", "mascara"],
   calculo: ["naoVazio", "indice"],
+  lista: ["naoVazio", "mascaraLista"],
 };
 
 const CONFIG_META = {
@@ -109,69 +110,59 @@ const CONFIG_META = {
   indice: { label: "Índice", tipo: "toggle" },
   valorPadrao: { label: "Valor padrão", tipo: "text" },
   alcanceMaximo: { label: "Alcance máximo", tipo: "number" },
-  valorMinimo: { label: "Valor mínimo", tipo: "number" },
-  valorMaximo: { label: "Valor máximo", tipo: "number" },
   mascara: { label: "Máscara", tipo: "text" },
+  mascaraLista: { label: "Máscara de itens", tipo: "select" },
+  mascaraData: { label: "Formato de data", tipo: "select" },
 };
 
-// Chaves bloqueadas para PK/FK (todas exceto valorPadrao)
-// Usa as MESMAS chaves do CONFIG_META / CONFIG_PADRAO
-const CONFIGS_BLOQUEADAS_IDENT = [
-  "naoVazio",
-  "unico",
-  "autoIncremento",
-  "indice",
-  "alcanceMaximo",
-  "valorMinimo",
-  "valorMaximo",
-  "mascara",
-];
-
-// ─── CONFIG_PADRAO usa as mesmas chaves camelCase do CONFIG_META ──────────
-// Isso garante que col.config[key] funcione corretamente no passo 3
 const CONFIG_PADRAO = {
   naoVazio: false,
   unico: false,
   valorPadrao: "",
   alcanceMaximo: "",
-  valorMinimo: "",
-  valorMaximo: "",
   autoIncremento: false,
   indice: false,
   mascara: "",
 };
 
-// ─── Mapeia as chaves camelCase do frontend para snake_case da API ────────
-const mapConfigParaApi = (config, tipoDado, isForeignKey) => {
+const mapConfigParaApi = (config, tipoDado) => {
   const isNumeric = ["numero_int", "numero_dec", "moeda"].includes(tipoDado);
   let defaultValue = config.valorPadrao;
-  if (defaultValue === "" || defaultValue === null) defaultValue = null;
+  if (defaultValue === "" || defaultValue == null) defaultValue = null;
   else if (isNumeric && !isNaN(defaultValue))
     defaultValue = Number(defaultValue);
 
-  const rawConfig = {
+  const out = {
     not_null: config.naoVazio || false,
     unique: config.unico || false,
     auto_increment: config.autoIncremento || false,
     index: config.indice || false,
     mask: config.mascara || "",
-    moeda: config.moeda && config.moeda !== "" ? config.moeda : null,
   };
-
-  // Só adiciona se tiver valor válido (não null/undefined/vazio)
-  if (defaultValue !== null) rawConfig.default_value = defaultValue;
-  if (config.alcanceMaximo !== "" && config.alcanceMaximo !== null)
-    rawConfig.max_length = Number(config.alcanceMaximo);
-  if (config.valorMinimo !== "" && config.valorMinimo !== null)
-    rawConfig.min_value = Number(config.valorMinimo);
-  if (config.valorMaximo !== "" && config.valorMaximo !== null)
-    rawConfig.max_value = Number(config.valorMaximo);
-
-  return rawConfig;
+  if (defaultValue !== null) out.default_value = defaultValue;
+  if (config.alcanceMaximo !== "" && config.alcanceMaximo != null)
+    out.max_length = Number(config.alcanceMaximo);
+  return out;
 };
 
 const NOME_MAX = 15;
 const TOUR_SEEN_KEY = "system_tour_seen";
+
+const PRIMEIRA_COLUNA_PK = () => ({
+  id: Math.random().toString(36).substr(2, 9),
+  nome: "",
+  identificacao: "pk",
+  fkTabela: null,
+  fkColunaId: null,
+  grupo: "Numérico",
+  tipoDado: "Número Inteiro",
+  config: {
+    ...CONFIG_PADRAO,
+    naoVazio: true,
+    autoIncremento: true,
+    indice: true,
+  },
+});
 
 const COLUNA_VAZIA = () => ({
   id: Math.random().toString(36).substr(2, 9),
@@ -181,59 +172,107 @@ const COLUNA_VAZIA = () => ({
   fkColunaId: null,
   grupo: null,
   tipoDado: null,
-  config: { ...CONFIG_PADRAO, opcoes: [] },
+  config: { ...CONFIG_PADRAO },
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ─── Sub-componente: input de opções (tags)
+// ─── Validação de dados por tipo ─────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════════
-function OpcoesInput({ opcoes, onChange }) {
-  const [inputVal, setInputVal] = useState("");
-  const add = () => {
-    const v = inputVal.trim();
-    if (v && !opcoes.includes(v)) {
-      onChange([...opcoes, v]);
-      setInputVal("");
-    }
-  };
-  return (
-    <div className="opcoes-input">
-      <div className="opcoes-tags">
-        {opcoes.length === 0 && (
-          <span className="opcoes-placeholder">Nenhuma opção adicionada</span>
-        )}
-        {opcoes.map((op, i) => (
-          <span key={i} className="opcao-tag">
-            {op}
-            <button
-              type="button"
-              onClick={() => onChange(opcoes.filter((_, j) => j !== i))}
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="opcoes-add">
-        <input
-          type="text"
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              add();
-            }
-          }}
-          placeholder="Nova opção... (Enter para adicionar)"
-        />
-        <button type="button" className="opcoes-add-btn" onClick={add}>
-          +
-        </button>
-      </div>
-    </div>
-  );
-}
+
+const validarCampo = (valor, col) => {
+  const v = String(valor ?? "").trim();
+
+  if (col.identificacao === "pk") return null; 
+
+  if (col.config?.naoVazio && v === "") {
+    return `O campo "${col.nome}" é obrigatório.`;
+  }
+  if (v === "") return null; 
+
+  switch (col.tipoDado) {
+    case "Email":
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
+        return `"${col.nome}" deve ser um e-mail válido.`;
+      break;
+    case "CPF":
+      if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v))
+        return `"${col.nome}" deve seguir o formato 000.000.000-00.`;
+      break;
+    case "Telefone":
+      if (!/^\+\d{2} \(\d{2}\) \d{4,5}-\d{4}$/.test(v))
+        return `"${col.nome}" deve seguir o formato +55 (99) 99999-9999.`;
+      break;
+    case "Número Inteiro":
+      if (!/^-?\d+$/.test(v))
+        return `"${col.nome}" deve ser um número inteiro.`;
+      if (
+        col.config?.alcanceMaximo &&
+        v.length > Number(col.config.alcanceMaximo)
+      )
+        return `"${col.nome}" excede o alcance máximo de ${col.config.alcanceMaximo} caracteres.`;
+      break;
+    case "Número Decimal":
+      if (!/^-?\d+([.,]\d+)?$/.test(v))
+        return `"${col.nome}" deve ser um número decimal (ex: 3,14).`;
+      break;
+    case "Moeda":
+      if (!/^[\d.,]+$/.test(v))
+        return `"${col.nome}" deve conter apenas dígitos.`;
+      break;
+    case "Hora":
+      if (!/^\d{2}:\d{2}(:\d{2})?$/.test(v))
+        return `"${col.nome}" deve seguir o formato HH:MM ou HH:MM:SS.`;
+      break;
+    case "Data":
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(v) && !/^\d{2}\/\d{2}\/\d{4}$/.test(v))
+        return `"${col.nome}" deve ser uma data válida.`;
+      break;
+    case "Data / Hora":
+      if (!v.includes("T") && !v.includes(" "))
+        return `"${col.nome}" deve incluir data e hora.`;
+      break;
+    case "Boleano":
+      if (!["true", "false", "sim", "não", "1", "0"].includes(v.toLowerCase()))
+        return `"${col.nome}" deve ser verdadeiro ou falso.`;
+      break;
+    default:
+      if (
+        col.config?.alcanceMaximo &&
+        v.length > Number(col.config.alcanceMaximo)
+      )
+        return `"${col.nome}" excede o alcance máximo de ${col.config.alcanceMaximo} caracteres.`;
+  }
+  return null;
+};
+
+const getPlaceholderPorTipo = (col) => {
+  switch (col.tipoDado) {
+    case "Email":
+      return "exemplo@email.com";
+    case "CPF":
+      return "000.000.000-00";
+    case "Telefone":
+      return "+55 (99) 99999-9999";
+    case "Número Inteiro":
+      return "0";
+    case "Número Decimal":
+      return "0,00";
+    case "Moeda":
+      return "0,00";
+    case "Hora":
+      return "HH:MM";
+    case "Data":
+      return "AAAA-MM-DD";
+    case "Data / Hora":
+      return "AAAA-MM-DD HH:MM";
+    case "Boleano":
+      return "sim / não";
+    case "Lista":
+      return "Selecione...";
+    default:
+      return `Digite ${col.nome}...`;
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── Componente Principal
@@ -257,12 +296,24 @@ export function System() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
   const [nomeTabela, setNomeTabela] = useState("");
-  const [colunas, setColunas] = useState([COLUNA_VAZIA()]);
+  const [colunas, setColunas] = useState([PRIMEIRA_COLUNA_PK()]);
   const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [tabelaParaExcluir, setTabelaParaExcluir] = useState(null);
   const [confirmacaoExclusaoTabela, setConfirmacaoExclusaoTabela] =
     useState("");
+
+  // ── Estado de renomear tabela ─────────────────────────────────────────────
+  const [renomearOpen, setRenomearOpen] = useState(false);
+  const [novoNomeTabela, setNovoNomeTabela] = useState("");
+  const [erroRenomear, setErroRenomear] = useState("");
+
+  // ── Estado de inserir dados ───────────────────────────────────────────────
+  const [inserirOpen, setInserirOpen] = useState(false);
+  const [inserirValores, setInserirValores] = useState({});
+  const [inserirErros, setInserirErros] = useState({});
+  const [loadingInserir, setLoadingInserir] = useState(false);
 
   const tabsRef = useRef({});
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -272,10 +323,10 @@ export function System() {
   const resizableCols = activeTabData?.cols?.map((c) => c.nome) || [];
   const totalTableWidth =
     CHECKBOX_WIDTH +
-    resizableCols.reduce((acc, col) => acc + colWidths[col], 0) +
+    resizableCols.reduce((acc, col) => acc + (colWidths[col] || 150), 0) +
     ACTIONS_WIDTH;
 
-  // ── Segurança: redireciona se não há database selecionada ─────────────────
+  // ── Segurança ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!idDoDatabaseAtual) navigate("/database");
   }, [idDoDatabaseAtual, navigate]);
@@ -301,7 +352,7 @@ export function System() {
       });
   }, [activeTab, tabs]);
 
-  // ── Carregar tabelas da database ──────────────────────────────────────────
+  // ── Carregar tabelas ──────────────────────────────────────────────────────
   const carregarDados = useCallback(async () => {
     const idDb = idDoDatabaseAtual || localStorage.getItem("lastDbId");
     if (!idDb) return;
@@ -316,6 +367,7 @@ export function System() {
           nome: col.nomeColuna,
           tipoDado: col.tipoDado,
           identificacao: col.isPrimaryKey ? "pk" : null,
+          config: col.config || {},
         })),
       }));
       setTabs(tabelasFormatadas);
@@ -323,12 +375,10 @@ export function System() {
         setActiveTab(tabelasFormatadas[0].id);
       }
     } catch (err) {
-      console.error("Erro ao carregar tabelas:", err);
       pushNotification(
         "error",
         "Erro",
-        err.response?.data?.message ||
-          "Falha ao sincronizar com o banco de dados.",
+        err.response?.data?.message || "Falha ao sincronizar.",
       );
     }
   }, [idDoDatabaseAtual, activeTab, pushNotification]);
@@ -378,18 +428,13 @@ export function System() {
   // ── Resize coluna ─────────────────────────────────────────────────────────
   const handleMouseDown = (e, colName) => {
     e.preventDefault();
-    const startX = e.pageX;
-    const startWidth = colWidths[colName];
-
+    const startX = e.pageX,
+      startWidth = colWidths[colName] || 150;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
     const onMove = (ev) => {
-      const newWidth = Math.max(
-        MIN_COL_WIDTH,
-        startWidth + (ev.pageX - startX),
-      );
-      setColWidths((prev) => ({
-        ...prev,
-        [colName]: newWidth,
-      }));
+      const w = Math.max(MIN_COL_WIDTH, startWidth + (ev.pageX - startX));
+      setColWidths((prev) => ({ ...prev, [colName]: w }));
     };
     const onUp = () => {
       document.removeEventListener("mousemove", onMove);
@@ -404,7 +449,7 @@ export function System() {
   // ── Wizard ────────────────────────────────────────────────────────────────
   const openWizard = () => {
     setNomeTabela("");
-    setColunas([COLUNA_VAZIA()]);
+    setColunas([PRIMEIRA_COLUNA_PK()]);
     setWizardStep(1);
     setWizardOpen(true);
   };
@@ -435,6 +480,20 @@ export function System() {
   };
 
   const handleStep2Proximo = () => {
+    const nomesPreenchidos = colunas
+      .map((c) => c.nome.trim().toLowerCase())
+      .filter((n) => n !== "");
+    const duplicados = nomesPreenchidos.filter(
+      (n, i) => nomesPreenchidos.indexOf(n) !== i,
+    );
+    if (duplicados.length > 0) {
+      pushNotification(
+        "warning",
+        "Nomes duplicados",
+        `Já existe outra coluna com o nome "${duplicados[0]}".`,
+      );
+      return;
+    }
     const invalidas = colunas.filter((c) => !c.nome.trim() || !c.tipoDado);
     if (invalidas.length > 0) {
       pushNotification(
@@ -447,10 +506,17 @@ export function System() {
     setWizardStep(3);
   };
 
+  const handleStep3Proximo = () => {
+    setWizardStep(4);
+  };
+
   // ── Coluna helpers ────────────────────────────────────────────────────────
   const addColuna = () => setColunas((prev) => [...prev, COLUNA_VAZIA()]);
   const removeColuna = (id) =>
-    setColunas((prev) => prev.filter((c) => c.id !== id));
+    setColunas((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((c) => c.id !== id);
+    });
   const updateColuna = (id, field, value) =>
     setColunas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
@@ -462,20 +528,32 @@ export function System() {
       ),
     );
 
-  // ── PK ───────────────────────────────────────────────────────────────────
+  // ── PK ────────────────────────────────────────────────────────────────────
   const handleTogglePK = (id) => {
+    const col = colunas.find((c) => c.id === id);
+    if (!col) return;
+    if (col.identificacao !== "pk") {
+      const jaTemPK = colunas.some((c) => c.identificacao === "pk");
+      if (jaTemPK) {
+        pushNotification(
+          "warning",
+          "Uma PK por tabela",
+          "Só é possível ter uma chave primária por tabela.",
+        );
+        return;
+      }
+    }
     setColunas((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
-        if (c.identificacao === "pk") {
+        if (c.identificacao === "pk")
           return {
             ...c,
             identificacao: null,
             grupo: null,
             tipoDado: null,
-            config: { ...CONFIG_PADRAO, opcoes: [] },
+            config: { ...CONFIG_PADRAO },
           };
-        }
         return {
           ...c,
           identificacao: "pk",
@@ -485,7 +563,6 @@ export function System() {
           tipoDado: "Número Inteiro",
           config: {
             ...CONFIG_PADRAO,
-            opcoes: [],
             naoVazio: true,
             autoIncremento: true,
             valorPadrao: "0",
@@ -495,12 +572,12 @@ export function System() {
     );
   };
 
-  // ── FK ───────────────────────────────────────────────────────────────────
+  // ── FK ────────────────────────────────────────────────────────────────────
   const handleToggleFK = (id) => {
     setColunas((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
-        if (c.identificacao === "fk") {
+        if (c.identificacao === "fk")
           return {
             ...c,
             identificacao: null,
@@ -508,14 +585,13 @@ export function System() {
             fkColunaId: null,
             grupo: null,
             tipoDado: null,
-            config: { ...CONFIG_PADRAO, opcoes: [] },
+            config: { ...CONFIG_PADRAO },
           };
-        }
         return {
           ...c,
           identificacao: "fk",
           fkTabela: null,
-          fkColuna: null,
+          fkColunaId: null,
           grupo: null,
           tipoDado: null,
         };
@@ -530,7 +606,6 @@ export function System() {
 
   const handleFKTabelaChange = (colId, tabelaId) => {
     const idNum = parseInt(tabelaId, 10);
-
     setColunas((prev) =>
       prev.map((c) =>
         c.id !== colId
@@ -549,7 +624,7 @@ export function System() {
   const handleFKColunaChange = (colId, pkColId, pkColNome) => {
     const col = colunas.find((c) => c.id === colId);
     const tab = tabs.find((t) => String(t.id) === String(col?.fkTabela));
-    const pkCol = tab?.cols?.find((c) => c.id === pkColId); // busca por ID
+    const pkCol = tab?.cols?.find((c) => c.id === pkColId);
     if (!pkCol) return;
     setColunas((prev) =>
       prev.map((c) =>
@@ -561,16 +636,13 @@ export function System() {
               fkColunaNome: pkColNome,
               grupo: pkCol.grupo,
               tipoDado: pkCol.tipoDado,
-              config: {
-                ...pkCol.config,
-                opcoes: [...(pkCol.config?.opcoes ?? [])],
-              },
+              config: { ...pkCol.config },
             },
       ),
     );
   };
 
-  // ── Grupo / Tipo com máscaras automáticas ─────────────────────────────────
+  // ── Grupo / Tipo ──────────────────────────────────────────────────────────
   const handleGrupoChange = (id, grupo) =>
     setColunas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, grupo, tipoDado: null } : c)),
@@ -581,9 +653,8 @@ export function System() {
       prev.map((c) => {
         if (c.id !== id) return c;
         const newConfig = { ...c.config };
-        if (MASCARA_AUTO[tipo]) {
-          newConfig.mascara = MASCARA_AUTO[tipo];
-        } else if (tipo !== "Moeda") {
+        if (MASCARA_AUTO[tipo]) newConfig.mascara = MASCARA_AUTO[tipo];
+        else if (tipo !== "Moeda") {
           newConfig.mascara = "";
           newConfig.moeda = null;
         }
@@ -596,7 +667,6 @@ export function System() {
     );
   };
 
-  // ── Moeda ─────────────────────────────────────────────────────────────────
   const handleMoedaChange = (colId, moedaId) => {
     const moeda = MOEDAS.find((m) => m.id === moedaId);
     if (!moeda) return;
@@ -615,7 +685,6 @@ export function System() {
   // ── Criar tabela + colunas ────────────────────────────────────────────────
   const handleCriarTabela = async () => {
     const colsValidas = colunas.filter((c) => c.nome.trim() && c.tipoDado);
-
     if (colsValidas.length === 0) {
       pushNotification(
         "warning",
@@ -631,85 +700,58 @@ export function System() {
 
     setLoadingCreate(true);
     try {
-      // 1. Cria a tabela
       const resTabela = await API.post(
         TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
-        {
-          nomeTabela: nomeTabela.trim(),
-        },
+        { nomeTabela: nomeTabela.trim() },
       );
-
       const idTabelaCriada = resTabela.data.id;
       if (!idTabelaCriada)
         throw new Error("ID da tabela não retornado pelo servidor.");
 
-      // 2. Cria as colunas em paralelo, mapeando config para snake_case
-      const promises = colsValidas.map((col) => {
-        const payload = {
-          nomeColuna: col.nome.trim(),
-          tipoDado: MAPA_TIPOS_API[col.tipoDado] || col.tipoDado,
-          isPrimaryKey: col.identificacao === "pk",
-          isForeignKey: col.identificacao === "fk",
-          fkTabelaId: col.fkTabela || null,
-          fkColunaId: col.fkColunaId || null,
-          tabelaId: idTabelaCriada,
-          config: mapConfigParaApi(
-            col.config,
-            MAPA_TIPOS_API[col.tipoDado],
-            col.identificacao === "fk",
-          ),
-        };
-        console.log("Payload da coluna:", payload);
-        return API.post(COLUNA_CRUD_ROUTES.CRIAR, payload);
-      });
+      const payloadColunas = colsValidas.map((col) => ({
+        nomeColuna: col.nome.trim(),
+        tipoDado: MAPA_TIPOS_API[col.tipoDado] || col.tipoDado,
+        isPrimaryKey: col.identificacao === "pk",
+        isForeignKey: col.identificacao === "fk",
+        fkTabelaId: col.fkTabela || null,
+        fkColunaId: col.fkColunaId || null,
+        tabelaId: idTabelaCriada,
+        config: mapConfigParaApi(col.config, MAPA_TIPOS_API[col.tipoDado]),
+      }));
 
-      await Promise.all(promises);
+      await API.post(COLUNA_CRUD_ROUTES.CRIAR, payloadColunas);
       await carregarDados();
-
-      const newTab = {
-        id: idTabelaCriada,
-        name: nomeTabela.trim(),
-        rows: [],
-        cols: colsValidas,
-      };
-      setTabs((prev) => [...prev, newTab]);
-      setActiveTab(newTab.id);
+      setActiveTab(idTabelaCriada);
       closeWizard();
       pushNotification(
         "success",
         "Sucesso!",
-        `Tabela "${nomeTabela}" e suas colunas foram criadas.`,
+        `Tabela "${nomeTabela}" criada com suas colunas.`,
       );
     } catch (err) {
       const errorData = err.response?.data;
-      console.error("Erro detalhado:", errorData);
       pushNotification(
         "error",
         "Erro ao salvar",
-        errorData?.message || errorData?.errors?.[0]?.message || err.message,
+        errorData?.message || err.message,
       );
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  // ── Excluir tabela ───────────────────────────────────────────────────────
+  // ── Excluir tabela ────────────────────────────────────────────────────────
   const handleExcluirTabela = async (idTabela) => {
     try {
       const response = await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabela));
       if (response.status === 200 || response.status === 204) {
-        pushNotification(
-          "success",
-          "Sucesso!",
-          "A tabela e seus dados foram apagados.",
-        );
+        pushNotification("success", "Sucesso!", "A tabela foi apagada.");
         setTabs((prev) => prev.filter((t) => t.id !== idTabela));
         if (activeTab === idTabela) setActiveTab(null);
         setTabelaParaExcluir(null);
         setConfirmacaoExclusaoTabela("");
       }
     } catch (error) {
-      console.error("Erro ao excluir tabela:", error);
       pushNotification(
         "error",
         "Erro",
@@ -718,7 +760,130 @@ export function System() {
     }
   };
 
-  // ── Tour ──────────────────────────────────────────────────────────────────
+  const handleEditarTabela = async (idTabela, novoNome) => {
+    if (!novoNome.trim()) {
+      pushNotification(
+        "warning",
+        "Atenção",
+        "O nome da tabela não pode estar vazio.",
+      );
+      return;
+    }
+    setLoading(true);
+    try {
+      await API.put(TABELA_CRUD_ROUTES.ATUALIZAR(idTabela), {
+        nomeTabela: novoNome.trim(),
+      });
+      setTabs((prev) =>
+        prev.map((t) =>
+          t.id === idTabela ? { ...t, name: novoNome.trim() } : t,
+        ),
+      );
+      pushNotification("success", "Sucesso", "Nome da tabela atualizado!");
+    } catch (err) {
+      const errorData = err.response?.data;
+      pushNotification(
+        "error",
+        "Erro ao atualizar",
+        errorData?.message || "Não foi possível renomear a tabela.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── Renomear tabela (modal) ────────────────────────────────────────────────
+  const openRenomear = () => {
+    if (!activeTabData) return;
+    setNovoNomeTabela(activeTabData.name);
+    setErroRenomear("");
+    setRenomearOpen(true);
+  };
+
+  const handleConfirmarRenomear = async () => {
+    const nome = novoNomeTabela.trim();
+    if (!nome) {
+      setErroRenomear("O nome não pode estar vazio.");
+      return;
+    }
+    if (nome.length > NOME_MAX) {
+      setErroRenomear(`Máximo de ${NOME_MAX} caracteres.`);
+      return;
+    }
+    const nomeExistente = tabs.some(
+      (t) => t.id !== activeTab && t.name.toLowerCase() === nome.toLowerCase(),
+    );
+    if (nomeExistente) {
+      setErroRenomear("Já existe uma tabela com este nome.");
+      return;
+    }
+    setErroRenomear("");
+    await handleEditarTabela(activeTab, nome);
+    setRenomearOpen(false);
+  };
+
+  // ── Inserir dados ─────────────────────────────────────────────────────────
+  const openInserir = () => {
+    setInserirValores({});
+    setInserirErros({});
+    setInserirOpen(true);
+  };
+
+  const colsParaInserir =
+    activeTabData?.cols?.filter((c) => c.identificacao !== "pk") || [];
+
+  const handleInserirChange = (colNome, valor) => {
+    setInserirValores((prev) => ({ ...prev, [colNome]: valor }));
+    // Validação em tempo real
+    const col = colsParaInserir.find((c) => c.nome === colNome);
+    if (col) {
+      const erro = validarCampo(valor, col);
+      setInserirErros((prev) => ({ ...prev, [colNome]: erro }));
+    }
+  };
+
+  const handleInserirSubmit = () => {
+    // Valida todos os campos
+    const novosErros = {};
+    let temErro = false;
+    colsParaInserir.forEach((col) => {
+      const erro = validarCampo(inserirValores[col.nome] ?? "", col);
+      if (erro) {
+        novosErros[col.nome] = erro;
+        temErro = true;
+      }
+    });
+    setInserirErros(novosErros);
+    if (temErro) return;
+
+    // Insere o registro localmente (em produção faria API call)
+    const novoRow = { id: Date.now() };
+    colsParaInserir.forEach((col) => {
+      novoRow[col.nome] = inserirValores[col.nome] ?? "";
+    });
+
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === activeTab ? { ...tab, rows: [...tab.rows, novoRow] } : tab,
+      ),
+    );
+    pushNotification(
+      "success",
+      "Registro inserido!",
+      "Os dados foram adicionados à tabela.",
+    );
+    setInserirOpen(false);
+    setInserirValores({});
+    setInserirErros({});
+  };
+
+  const inserirFormValido =
+    colsParaInserir.length > 0 &&
+    Object.values(inserirErros).every((e) => !e) &&
+    colsParaInserir
+      .filter((c) => c.config?.naoVazio)
+      .every((c) => inserirValores[c.nome]?.trim());
+
   const handleFinishTour = useCallback(() => {
     setTourActive(false);
     localStorage.setItem(TOUR_SEEN_KEY, "1");
@@ -728,15 +893,48 @@ export function System() {
     "wizard-card",
     wizardStep === 2 ? "wizard-card--step2" : "",
     wizardStep === 3 ? "wizard-card--step3" : "",
+    wizardStep === 4 ? "wizard-card--step4" : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  // ── Helper: input alcanceMaximo ────────────────────────────────────────────
+  const renderAlcanceMaximo = (col, bloqueado) => (
+    <div
+      key="alcanceMaximo"
+      className={`cfg-input-field ${bloqueado ? "cfg-input-field--locked" : ""}`}
+    >
+      <label>
+        {CONFIG_META.alcanceMaximo.label}
+        <span className="cfg-max-hint">máx. 255</span>
+      </label>
+      <input
+        type="text"
+        inputMode="numeric"
+        disabled={bloqueado}
+        value={col.config.alcanceMaximo ?? ""}
+        onChange={(e) => {
+          if (bloqueado) return;
+          const raw = e.target.value.replace(/\D/g, "");
+          if (raw === "") {
+            updateConfig(col.id, "alcanceMaximo", "");
+            return;
+          }
+          const num = Math.min(parseInt(raw, 10), 255);
+          updateConfig(col.id, "alcanceMaximo", String(num));
+        }}
+        placeholder="1 – 255"
+      />
+    </div>
+  );
+
+  // ─── Colunas válidas para o passo 4
+  const colsValidasWizard = colunas.filter((c) => c.nome.trim() && c.tipoDado);
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="system-container">
       <SegundoMenu />
-      {/* Notificacao declarado UMA única vez */}
       <Notificacao
         notifications={notifications}
         setNotifications={setNotifications}
@@ -744,7 +942,7 @@ export function System() {
       {tourActive && <TourGuide onFinish={handleFinishTour} />}
 
       <main className="main-layout">
-        {/* ── Tabs ────────────────────────────────────────────────────────── */}
+        {/* ── Tabs ──────────────────────────────────────────────────── */}
         <div className="tab-layout">
           {tabs.map((tab) => (
             <button
@@ -768,7 +966,7 @@ export function System() {
           </button>
         </div>
 
-        {/* ── Conteúdo ────────────────────────────────────────────────────── */}
+        {/* ── Conteúdo ──────────────────────────────────────────────── */}
         <div className="content-area">
           {tabs.length === 0 ? (
             <div className="empty-state">
@@ -795,13 +993,13 @@ export function System() {
                   {activeTabData?.rows?.length || 0}
                 </span>
                 <div className="table-header-right">
-                  <button className="action-header-btn">
+                  <button className="action-header-btn" onClick={openInserir}>
                     <i className="fi fi-sr-add-document" /> Inserir registro
                   </button>
                   <button className="action-header-btn">
                     <i className="fi fi-sr-refresh" /> Recarregar dados
                   </button>
-                  <button className="action-header-btn">
+                  <button className="action-header-btn" onClick={openRenomear}>
                     <i className="fi fi-sr-pencil" /> Renomear tabela
                   </button>
                   <button
@@ -852,7 +1050,7 @@ export function System() {
                       {resizableCols.map((col) => (
                         <col
                           key={col}
-                          style={{ width: `${colWidths[col]}px` }}
+                          style={{ width: `${colWidths[col] || 150}px` }}
                         />
                       ))}
                       <col style={{ width: `${ACTIONS_WIDTH}px` }} />
@@ -870,21 +1068,15 @@ export function System() {
                           </button>
                         </th>
                         {resizableCols.map((col) => (
-                          <th
-                            key={col}
-                            className="resizable-col"
-                            style={{ width: `${colWidths[col]}px` }}
-                          >
+                          <th key={col} className="resizable-col">
                             <div className="cell-content">
                               <span className="col-label">
                                 {col.toUpperCase()}
                               </span>
-                              {/* O resizer deve ser o último elemento da div */}
                               <button
                                 className="resizer-handle"
                                 onMouseDown={(e) => handleMouseDown(e, col)}
                               >
-                                {/* Um ícone de barra vertical costuma ser melhor que o de setas */}
                                 <div className="resizer-line" />
                               </button>
                             </div>
@@ -905,7 +1097,6 @@ export function System() {
                     <tbody>
                       {rows.length === 0 ? (
                         <tr>
-                          {/* O colSpan deve ser 2 (checkbox + ações) + número de colunas dinâmicas */}
                           <td
                             colSpan={2 + resizableCols.length}
                             className="empty-rows-cell"
@@ -925,7 +1116,6 @@ export function System() {
                                 : ""
                             }
                           >
-                            {/* 1. Checkbox */}
                             <td className="checkbox-col sticky-col sticky-checkbox">
                               <button
                                 className="custom-checkbox"
@@ -936,17 +1126,11 @@ export function System() {
                                 />
                               </button>
                             </td>
-
-                            {/* 2. REMOVIDO: a célula de ID fixa que estava aqui foi embora */}
-
-                            {/* 3. Dados dinâmicos */}
                             {resizableCols.map((col) => (
                               <td key={col} className="data-cell">
                                 {row[col]}
                               </td>
                             ))}
-
-                            {/* 4. Ações */}
                             <td className="actions-cell sticky-col sticky-actions">
                               <div className="actions-container">
                                 <button>
@@ -969,21 +1153,21 @@ export function System() {
         </div>
       </main>
 
-      {/* ══════════════════════════ WIZARD ════════════════════════════════ */}
+      {/* ══════════════════════ WIZARD ════════════════════════════════════ */}
       {wizardOpen && (
         <div className="wizard-overlay" onClick={closeWizard}>
           <div className={wizardCardClass} onClick={(e) => e.stopPropagation()}>
             {/* Cabeçalho */}
             <div className="wizard-header">
               <div className="wizard-steps">
-                {[1, 2, 3].map((n, i) => (
+                {[1, 2, 3, 4].map((n, i) => (
                   <React.Fragment key={n}>
                     <span
                       className={`step-dot ${wizardStep >= n ? "done" : ""}`}
                     >
                       {n}
                     </span>
-                    {i < 2 && (
+                    {i < 3 && (
                       <span
                         className={`step-line ${wizardStep > n ? "step-line--done" : ""}`}
                       />
@@ -995,6 +1179,7 @@ export function System() {
                 {wizardStep === 1 && "Nome da tabela"}
                 {wizardStep === 2 && "Colunas"}
                 {wizardStep === 3 && "Configurações"}
+                {wizardStep === 4 && "Prévia"}
               </div>
               <button className="wizard-close" onClick={closeWizard}>
                 <i className="fi fi-rr-cross" />
@@ -1060,36 +1245,51 @@ export function System() {
 
                 <div className="cols-list">
                   {colunas.map((col, idx) => {
-                    const fkDisabled = tabs.length === 0;
+                    const isPrimeira = idx === 0;
+                    const fkDisabled = tabs.length === 0 || isPrimeira;
+
                     return (
                       <div key={col.id} className="col-card">
+                        {/* Topo: nome + definição + excluir */}
                         <div className="col-card-top">
                           <span className="col-num">#{idx + 1}</span>
 
+                          {/* Nome da coluna — contador DENTRO do input */}
                           <div className="col-nome-wrap">
                             <span className="col-nome-label">
-                              Nome da coluna
+                              NOME DA COLUNA
                             </span>
-                            <input
-                              type="text"
-                              className="col-nome-input"
-                              placeholder="Ex: id, nome, email..."
-                              value={col.nome}
-                              maxLength={15}
-                              onChange={(e) =>
-                                updateColuna(col.id, "nome", e.target.value)
-                              }
-                            />
+                            <div className="col-nome-input-wrapper">
+                              <input
+                                type="text"
+                                className="col-nome-input"
+                                placeholder="Ex: id, nome, email..."
+                                value={col.nome}
+                                maxLength={NOME_MAX}
+                                onChange={(e) =>
+                                  updateColuna(col.id, "nome", e.target.value)
+                                }
+                              />
+                              <span
+                                className={`col-nome-counter-inline ${col.nome.length >= NOME_MAX ? "col-nome-counter--over" : ""}`}
+                              >
+                                {col.nome.length}/{NOME_MAX}
+                              </span>
+                            </div>
                           </div>
 
+                          {/* Definição: PK e FK */}
                           <div className="col-ident">
-                            <span className="col-ident-label">Definição</span>
+                            <span className="col-ident-label">DEFINIÇÃO</span>
                             <div className="col-ident-btns">
                               <button
                                 type="button"
                                 title="Chave Primária (PK)"
-                                className={`ident-btn ident-btn--pk ${col.identificacao === "pk" ? "ident-btn--active" : ""}`}
-                                onClick={() => handleTogglePK(col.id)}
+                                className={`ident-btn ident-btn--pk ${col.identificacao === "pk" ? "ident-btn--active" : ""} ${isPrimeira ? "ident-btn--locked-pk" : ""}`}
+                                onClick={() =>
+                                  !isPrimeira && handleTogglePK(col.id)
+                                }
+                                disabled={isPrimeira}
                               >
                                 <i className="fi fi-sr-key" />
                                 <span>Chave Primária</span>
@@ -1098,7 +1298,9 @@ export function System() {
                                 type="button"
                                 title={
                                   fkDisabled
-                                    ? "Crie ao menos uma tabela para usar FK"
+                                    ? isPrimeira
+                                      ? "A primeira coluna é sempre PK"
+                                      : "Crie ao menos uma tabela para usar FK"
                                     : "Chave Estrangeira (FK)"
                                 }
                                 className={`ident-btn ident-btn--fk ${col.identificacao === "fk" ? "ident-btn--active" : ""} ${fkDisabled ? "ident-btn--disabled" : ""}`}
@@ -1117,14 +1319,19 @@ export function System() {
                             type="button"
                             className="col-remove-btn"
                             onClick={() => removeColuna(col.id)}
-                            disabled={colunas.length === 1}
-                            title="Remover coluna"
+                            disabled={isPrimeira || colunas.length === 1}
+                            title={
+                              isPrimeira
+                                ? "A chave primária não pode ser removida"
+                                : "Remover coluna"
+                            }
                           >
                             <i className="fi fi-sr-trash" />
                             <span>Excluir</span>
                           </button>
                         </div>
 
+                        {/* FK selector */}
                         {col.identificacao === "fk" && (
                           <div className="col-fk-panel">
                             <i className="fi fi-rr-link col-fk-icon" />
@@ -1171,6 +1378,7 @@ export function System() {
                           </div>
                         )}
 
+                        {/* Tipo de dado */}
                         {col.identificacao === "pk" ? (
                           <div className="col-tipo-auto">
                             <i className="fi fi-rr-magic-wand" />
@@ -1282,11 +1490,29 @@ export function System() {
                   {colunas
                     .filter((c) => c.nome.trim() && c.tipoDado)
                     .map((col) => {
+                      if (col.identificacao === "pk") {
+                        return (
+                          <div key={col.id} className="cfg-card cfg-card--pk">
+                            <div className="cfg-card-header">
+                              <div className="cfg-col-nome-group">
+                                <span className="cfg-col-nome">{col.nome}</span>
+                                <span className="cfg-col-desc">
+                                  Configuração gerada automaticamente pelo
+                                  sistema.
+                                </span>
+                              </div>
+                              <div className="cfg-col-meta">
+                                <span className="badge-pk">Chave Primária</span>
+                                <i className="fi-sr-lock cadeado"></i>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
                       const cat = getTipoCategoria(col.tipoDado);
                       const cfgs = cat ? CONFIGS_POR_CATEGORIA[cat] : [];
-                      const locked =
-                        col.identificacao === "pk" ||
-                        col.identificacao === "fk";
+                      const locked = col.identificacao === "fk";
                       const toggles = cfgs.filter(
                         (k) => CONFIG_META[k]?.tipo === "toggle",
                       );
@@ -1303,9 +1529,6 @@ export function System() {
                           <div className="cfg-card-header">
                             <span className="cfg-col-nome">{col.nome}</span>
                             <div className="cfg-col-meta">
-                              {col.identificacao === "pk" && (
-                                <span className="badge-pk">Chave Primária</span>
-                              )}
                               {col.identificacao === "fk" && (
                                 <span className="badge-fk">
                                   Chave Estrangeira
@@ -1336,9 +1559,7 @@ export function System() {
                               {toggles.length > 0 && (
                                 <div className="cfg-toggles">
                                   {toggles.map((key) => {
-                                    const isBlocked =
-                                      locked &&
-                                      CONFIGS_BLOQUEADAS_IDENT.includes(key);
+                                    const isBlocked = locked;
                                     return (
                                       <label
                                         key={key}
@@ -1358,23 +1579,27 @@ export function System() {
                                           }
                                         />
                                         <span className="cfg-toggle-dot" />
-                                        {CONFIG_META[key].label}
+                                        <span className="cfg-toggle-label">
+                                          {CONFIG_META[key].label}
+                                        </span>
                                       </label>
                                     );
                                   })}
                                 </div>
                               )}
-
                               {inputs.length > 0 && (
                                 <div className="cfg-inputs">
                                   {inputs.map((key) => {
-                                    const isBlocked =
-                                      locked &&
-                                      CONFIGS_BLOQUEADAS_IDENT.includes(key);
+                                    const isBlocked = locked;
                                     const mascaraAuto =
                                       key === "mascara" &&
                                       !!MASCARA_AUTO[col.tipoDado];
                                     const bloqueado = isBlocked || mascaraAuto;
+                                    if (key === "alcanceMaximo")
+                                      return renderAlcanceMaximo(
+                                        col,
+                                        bloqueado,
+                                      );
                                     return (
                                       <div
                                         key={key}
@@ -1416,11 +1641,10 @@ export function System() {
                                   })}
                                 </div>
                               )}
-
                               {hasTags && !locked && (
                                 <div className="cfg-opcoes">
                                   <label>Opções disponíveis</label>
-                                  <OpcoesInput
+                                  <OpcoesInputLocal
                                     opcoes={col.config.opcoes ?? []}
                                     onChange={(v) =>
                                       updateConfig(col.id, "opcoes", v)
@@ -1442,8 +1666,136 @@ export function System() {
                   >
                     <i className="fi fi-rr-arrow-left" /> Voltar
                   </button>
+                  <button className="btn-primary" onClick={handleStep3Proximo}>
+                    Próximo <i className="fi fi-rr-arrow-right" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── PASSO 4 — PRÉVIA DA TABELA ── */}
+            {wizardStep === 4 && (
+              <div className="wizard-body wizard-body--preview">
+                <div>
+                  <h2 className="wizard-title">Prévia da tabela</h2>
+                  <p className="wizard-subtitle">
+                    Confira como a tabela <strong>"{nomeTabela}"</strong> ficará
+                    antes de criá-la.
+                  </p>
+                </div>
+
+                <div className="preview-table-wrapper">
+                  <table className="preview-table">
+                    <thead>
+                      <tr>
+                        {colsValidasWizard.map((col) => (
+                          <th key={col.id}>
+                            <div className="preview-th-content">
+                              {col.identificacao === "pk" && (
+                                <i className="fi fi-sr-key preview-th-icon preview-th-icon--pk" />
+                              )}
+                              {col.identificacao === "fk" && (
+                                <i className="fi fi-sr-share preview-th-icon preview-th-icon--fk" />
+                              )}
+                              <span>{col.nome.toUpperCase()}</span>
+                              <span className="preview-th-tipo">
+                                {col.tipoDado}
+                              </span>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* 3 linhas de exemplo */}
+                      {[1, 2, 3].map((i) => (
+                        <tr key={i}>
+                          {colsValidasWizard.map((col) => (
+                            <td key={col.id} className="preview-td-empty">
+                              <span className="preview-td-dash">—</span>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="preview-summary">
+                  <div className="preview-summary-item">
+                    <i className="fi fi-rr-table" />
+                    <span>
+                      <strong>{colsValidasWizard.length}</strong> coluna
+                      {colsValidasWizard.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  {colsValidasWizard.filter((c) => c.identificacao === "pk")
+                    .length > 0 && (
+                    <div className="preview-summary-item">
+                      <i className="fi fi-sr-key preview-summary-pk" />
+                      <span>
+                        <strong>
+                          {
+                            colsValidasWizard.filter(
+                              (c) => c.identificacao === "pk",
+                            ).length
+                          }
+                        </strong>{" "}
+                        chave primária
+                      </span>
+                    </div>
+                  )}
+                  {colsValidasWizard.filter((c) => c.identificacao === "fk")
+                    .length > 0 && (
+                    <div className="preview-summary-item">
+                      <i className="fi fi-sr-share preview-summary-fk" />
+                      <span>
+                        <strong>
+                          {
+                            colsValidasWizard.filter(
+                              (c) => c.identificacao === "fk",
+                            ).length
+                          }
+                        </strong>{" "}
+                        chave estrangeira
+                      </span>
+                    </div>
+                  )}
+                  {colsValidasWizard.filter((c) => c.config?.naoVazio).length >
+                    0 && (
+                    <div className="preview-summary-item">
+                      <i className="fi fi-rr-exclamation" />
+                      <span>
+                        <strong>
+                          {
+                            colsValidasWizard.filter((c) => c.config?.naoVazio)
+                              .length
+                          }
+                        </strong>{" "}
+                        campo
+                        {colsValidasWizard.filter((c) => c.config?.naoVazio)
+                          .length !== 1
+                          ? "s"
+                          : ""}{" "}
+                        obrigatório
+                        {colsValidasWizard.filter((c) => c.config?.naoVazio)
+                          .length !== 1
+                          ? "s"
+                          : ""}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="wizard-footer">
                   <button
-                    className="btn-primary"
+                    className="btn-secondary"
+                    onClick={() => setWizardStep(3)}
+                  >
+                    <i className="fi fi-rr-arrow-left" /> Voltar
+                  </button>
+                  <button
+                    className="btn-primary btn-gerar"
                     onClick={handleCriarTabela}
                     disabled={loadingCreate}
                   >
@@ -1451,7 +1803,7 @@ export function System() {
                       <span className="btn-spinner" />
                     ) : (
                       <>
-                        Criar tabela <i className="fi fi-rr-check" />
+                        <i className="fi fi-rr-magic-wand" /> Gerar tabela
                       </>
                     )}
                   </button>
@@ -1468,42 +1820,377 @@ export function System() {
           <div className="modal-overlay">
             <motion.div
               key="modal-exclusao-tabela"
-              className="modal-exclusao-container"
+              className="modal-styled"
               variants={fadeOutVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              <h2>Excluir a tabela {tabelaParaExcluir.nomeTabela}?</h2>
-              <p>Essa ação apagará todos os registros vinculados.</p>
-              <input
-                type="text"
-                value={confirmacaoExclusaoTabela}
-                onChange={(e) => setConfirmacaoExclusaoTabela(e.target.value)}
-                placeholder={`Digite "${tabelaParaExcluir.nomeTabela}" para confirmar`}
-                autoFocus
-              />
-              <div className="acoes-exclusao">
+              <div className="modal-styled-header modal-styled-header--danger">
+                <div className="modal-styled-icon">
+                  <i className="fi fi-sr-remove-folder" />
+                </div>
+                <div>
+                  <h2 className="modal-styled-title">Excluir tabela</h2>
+                  <p className="modal-styled-subtitle">
+                    "{tabelaParaExcluir.nomeTabela}"
+                  </p>
+                </div>
+              </div>
+
+              <div className="modal-styled-body">
+                <p className="modal-styled-desc">
+                  Esta ação é irreversível. Todos os registros vinculados serão
+                  permanentemente apagados.
+                </p>
+                <div className="modal-styled-field">
+                  <label>
+                    Digite <strong>{tabelaParaExcluir.nomeTabela}</strong> para
+                    confirmar
+                  </label>
+                  <input
+                    type="text"
+                    value={confirmacaoExclusaoTabela}
+                    onChange={(e) =>
+                      setConfirmacaoExclusaoTabela(e.target.value)
+                    }
+                    placeholder={`${tabelaParaExcluir.nomeTabela}`}
+                    autoFocus
+                    className={
+                      confirmacaoExclusaoTabela === tabelaParaExcluir.nomeTabela
+                        ? "input-match"
+                        : ""
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="modal-styled-footer">
                 <button
-                  className="btn-cancelar"
+                  className="btn-secondary"
                   onClick={() => setTabelaParaExcluir(null)}
                 >
-                  <i className="fi-rr-trash-undo icon-modal" />
+                  Cancelar
                 </button>
                 <button
-                  className="btn-confirmar"
+                  className="btn-danger"
                   disabled={
                     confirmacaoExclusaoTabela !== tabelaParaExcluir.nomeTabela
                   }
                   onClick={() => handleExcluirTabela(tabelaParaExcluir.id)}
                 >
-                  <i className="fi-rr-trash-check icon-modal" />
+                  <i className="fi fi-rr-trash" /> Excluir tabela
                 </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* ══════════════════════ MODAL RENOMEAR ════════════════════════════ */}
+      <AnimatePresence mode="wait">
+        {renomearOpen && (
+          <div className="modal-overlay">
+            <motion.div
+              key="modal-renomear-tabela"
+              className="modal-styled modal-styled--sm"
+              variants={fadeOutVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <div className="modal-styled-header">
+                <div className="modal-styled-icon modal-styled-icon--neutral">
+                  <i className="fi fi-sr-pencil" />
+                </div>
+                <div>
+                  <h2 className="modal-styled-title">Renomear tabela</h2>
+                  <p className="modal-styled-subtitle">
+                    "{activeTabData?.name}"
+                  </p>
+                </div>
+                <button
+                  className="modal-styled-close"
+                  onClick={() => setRenomearOpen(false)}
+                >
+                  <i className="fi fi-rr-cross" />
+                </button>
+              </div>
+
+              <div className="modal-styled-body">
+                <div className="modal-styled-field">
+                  <label>Novo nome</label>
+                  <div className="modal-input-wrapper">
+                    <input
+                      type="text"
+                      value={novoNomeTabela}
+                      onChange={(e) => {
+                        setNovoNomeTabela(e.target.value);
+                        setErroRenomear("");
+                      }}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleConfirmarRenomear()
+                      }
+                      maxLength={NOME_MAX}
+                      autoFocus
+                      className={erroRenomear ? "input-error" : ""}
+                      placeholder="ex: clientes, produtos..."
+                    />
+                    <span
+                      className={`modal-char-counter ${novoNomeTabela.length >= NOME_MAX ? "over" : ""}`}
+                    >
+                      {novoNomeTabela.length}/{NOME_MAX}
+                    </span>
+                  </div>
+                  {erroRenomear && (
+                    <span className="modal-field-error">
+                      <i className="fi fi-rr-exclamation" /> {erroRenomear}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-styled-footer">
+                <button
+                  className="btn-secondary"
+                  onClick={() => setRenomearOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleConfirmarRenomear}
+                  disabled={
+                    loading ||
+                    !novoNomeTabela.trim() ||
+                    novoNomeTabela.trim() === activeTabData?.name
+                  }
+                >
+                  {loading ? (
+                    <span className="btn-spinner" />
+                  ) : (
+                    <>
+                      <i className="fi fi-rr-check" /> Salvar
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ══════════════════════ MODAL INSERIR DADOS ════════════════════════ */}
+      <AnimatePresence mode="wait">
+        {inserirOpen && (
+          <div className="modal-overlay">
+            <motion.div
+              key="modal-inserir"
+              className="modal-styled modal-styled--insert"
+              variants={fadeOutVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <div className="modal-styled-header">
+                <div className="modal-styled-icon modal-styled-icon--primary">
+                  <i className="fi fi-sr-add-document" />
+                </div>
+                <div>
+                  <h2 className="modal-styled-title">Inserir registro</h2>
+                  <p className="modal-styled-subtitle">
+                    Tabela: {activeTabData?.name}
+                  </p>
+                </div>
+                <button
+                  className="modal-styled-close"
+                  onClick={() => setInserirOpen(false)}
+                >
+                  <i className="fi fi-rr-cross" />
+                </button>
+              </div>
+
+              <div className="modal-styled-body modal-insert-body">
+                {colsParaInserir.length === 0 ? (
+                  <p className="modal-insert-empty">
+                    Esta tabela não possui colunas editáveis.
+                  </p>
+                ) : (
+                  <div className="modal-insert-fields">
+                    {colsParaInserir.map((col) => {
+                      const temErro = !!inserirErros[col.nome];
+                      const valor = inserirValores[col.nome] ?? "";
+                      const isBoleano = col.tipoDado === "Boleano";
+                      const isLista = col.tipoDado === "Lista";
+                      const opcoes = col.config?.opcoes || [];
+
+                      return (
+                        <div
+                          key={col.id}
+                          className={`insert-field ${temErro ? "insert-field--error" : valor ? "insert-field--ok" : ""}`}
+                        >
+                          <div className="insert-field-header">
+                            <label className="insert-field-label">
+                              {col.nome}
+                              {col.config?.naoVazio && (
+                                <span className="insert-required">*</span>
+                              )}
+                            </label>
+                            <span className="insert-field-tipo">
+                              {col.tipoDado}
+                            </span>
+                          </div>
+
+                          {isBoleano ? (
+                            <div className="insert-bool-group">
+                              {["sim", "não"].map((v) => (
+                                <button
+                                  key={v}
+                                  type="button"
+                                  className={`insert-bool-btn ${valor === v ? "insert-bool-btn--active" : ""}`}
+                                  onClick={() =>
+                                    handleInserirChange(col.nome, v)
+                                  }
+                                >
+                                  {v === "sim" ? (
+                                    <i className="fi fi-rr-check" />
+                                  ) : (
+                                    <i className="fi fi-rr-cross" />
+                                  )}
+                                  {v}
+                                </button>
+                              ))}
+                            </div>
+                          ) : isLista && opcoes.length > 0 ? (
+                            <select
+                              className={`insert-select ${temErro ? "insert-input--error" : ""}`}
+                              value={valor}
+                              onChange={(e) =>
+                                handleInserirChange(col.nome, e.target.value)
+                              }
+                            >
+                              <option value="">Selecione...</option>
+                              {opcoes.map((op) => (
+                                <option key={op} value={op}>
+                                  {op}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <div className="insert-input-wrapper">
+                              <input
+                                type={
+                                  col.tipoDado === "Data"
+                                    ? "date"
+                                    : col.tipoDado === "Hora"
+                                      ? "time"
+                                      : col.tipoDado === "Data / Hora"
+                                        ? "datetime-local"
+                                        : "text"
+                                }
+                                className={`insert-input ${temErro ? "insert-input--error" : valor ? "insert-input--ok" : ""}`}
+                                value={valor}
+                                onChange={(e) =>
+                                  handleInserirChange(col.nome, e.target.value)
+                                }
+                                placeholder={getPlaceholderPorTipo(col)}
+                              />
+                              {valor && !temErro && (
+                                <i className="fi fi-rr-check insert-input-check" />
+                              )}
+                            </div>
+                          )}
+
+                          {temErro && (
+                            <span className="insert-field-error">
+                              <i className="fi fi-rr-exclamation" />{" "}
+                              {inserirErros[col.nome]}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <p className="insert-required-note">
+                      * campos obrigatórios
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-styled-footer">
+                <button
+                  className="btn-secondary"
+                  onClick={() => setInserirOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleInserirSubmit}
+                  disabled={!inserirFormValido || loadingInserir}
+                >
+                  {loadingInserir ? (
+                    <span className="btn-spinner" />
+                  ) : (
+                    <>
+                      <i className="fi fi-rr-check" /> Inserir registro
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── OpcoesInput local ───────────────────────────────────────────────────────
+function OpcoesInputLocal({ opcoes, onChange }) {
+  const [inputVal, setInputVal] = useState("");
+  const add = () => {
+    const v = inputVal.trim();
+    if (v && !opcoes.includes(v)) {
+      onChange([...opcoes, v]);
+      setInputVal("");
+    }
+  };
+  return (
+    <div className="opcoes-input">
+      <div className="opcoes-tags">
+        {opcoes.length === 0 && (
+          <span className="opcoes-placeholder">Nenhuma opção adicionada</span>
+        )}
+        {opcoes.map((op, i) => (
+          <span key={i} className="opcao-tag">
+            {op}
+            <button
+              type="button"
+              onClick={() => onChange(opcoes.filter((_, j) => j !== i))}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="opcoes-add">
+        <input
+          type="text"
+          value={inputVal}
+          onChange={(e) => setInputVal(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+          placeholder="Nova opção... (Enter para adicionar)"
+        />
+        <button type="button" className="opcoes-add-btn" onClick={add}>
+          +
+        </button>
+      </div>
     </div>
   );
 }
