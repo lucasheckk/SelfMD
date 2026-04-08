@@ -776,18 +776,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 }
 .btn-gerar {
-  background: linear-gradient(
-    135deg,
-    v.$cor-primaria 0%,
-    darken(v.$cor-primaria, 10%) 100%
-  );
+  background: v.$cor-primaria;
   padding: 10px 22px;
   font-size: 15px;
   gap: 8px;
+
   i {
     font-size: 14px;
   }
 }
+
 .btn-spinner {
   display: inline-block;
   width: 15px;
@@ -796,6 +794,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
@@ -2116,4 +2115,168 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   color: #bbb;
   margin: 0;
   padding-top: 4px;
+}
+
+// ── Tabs do modal inserir ──────────────────────────────────────────────────
+.modal-tabs-bar {
+  display: flex;
+  border-bottom: 2px solid #f0f0f0;
+  background: #fafafa;
+  flex-shrink: 0;
+  .modal-tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-family: v.$jakarta;
+    transition: v.$transicao-rapida;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    i {
+      font-size: 13px;
+    }
+    &.active {
+      color: v.$cor-primaria;
+      border-bottom-color: v.$cor-primaria;
+      background: #fff;
+    }
+    &:hover:not(.active) {
+      color: #333;
+      background: #f5f5f5;
+    }
+  }
+}
+
+// ── Área de importação ─────────────────────────────────────────────────────
+.import-drop-area {
+  border: 2px dashed #d0d0d0;
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: v.$transicao-rapida;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  &.drag-over,
+  &:hover {
+    border-color: v.$cor-primaria;
+    background: rgba(v.$cor-primaria, 0.04);
+  }
+  .import-area-icon {
+    width: 48px;
+    height: 48px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    i {
+      font-size: 22px;
+      color: #888;
+    }
+  }
+  .import-area-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  .import-area-sub {
+    font-size: 12px;
+    color: #aaa;
+  }
+}
+.import-formats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.import-fmt-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1.5px solid #e0e0e0;
+  color: #777;
+  background: #fff;
+  &.xlsx {
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
+  }
+  &.csv {
+    border-color: #3b82f6;
+    color: #1d4ed8;
+  }
+  &.json {
+    border-color: #f59e0b;
+    color: #b45309;
+  }
+  &.xml {
+    border-color: #8b5cf6;
+    color: #6d28d9;
+  }
+}
+
+// ── Múltiplas linhas ───────────────────────────────────────────────────────
+.insert-row-card {
+  border: 1.5px solid #efefef;
+  border-radius: 12px;
+  background: #fafafa;
+  overflow: hidden;
+  animation: v.$transicao-fadeIn;
+  .insert-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fff;
+    border-bottom: 1px solid #f5f5f5;
+    .row-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: #c7c7c7;
+      background: #f5f5f5;
+      border-radius: 5px;
+      padding: 2px 8px;
+    }
+    .row-remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ccc;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: v.$jakarta;
+      transition: v.$transicao-rapida;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      &:hover {
+        color: #e74c3c;
+        background: #fff5f5;
+      }
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+    }
+  }
+  .insert-row-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
 }

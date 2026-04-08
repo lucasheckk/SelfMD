@@ -182,12 +182,12 @@ const COLUNA_VAZIA = () => ({
 const validarCampo = (valor, col) => {
   const v = String(valor ?? "").trim();
 
-  if (col.identificacao === "pk") return null; 
+  if (col.identificacao === "pk") return null;
 
   if (col.config?.naoVazio && v === "") {
     return `O campo "${col.nome}" é obrigatório.`;
   }
-  if (v === "") return null; 
+  if (v === "") return null;
 
   switch (col.tipoDado) {
     case "Email":
@@ -317,6 +317,13 @@ export function System() {
 
   const tabsRef = useRef({});
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  const [inserirRows, setInserirRows] = useState([
+    { id: Date.now(), data: {} },
+  ]);
+  const [inserirTab, setInserirTab] = useState("manual");
+  const [importFile, setImportFile] = useState(null);
+  const [importDragOver, setImportDragOver] = useState(false);
 
   const activeTabData = tabs.find((t) => t.id === activeTab);
   const rows = activeTabData?.rows || [];
@@ -824,8 +831,10 @@ export function System() {
 
   // ── Inserir dados ─────────────────────────────────────────────────────────
   const openInserir = () => {
-    setInserirValores({});
+    setInserirRows([{ id: Date.now(), data: {} }]);
     setInserirErros({});
+    setInserirTab("manual");
+    setImportFile(null);
     setInserirOpen(true);
   };
 
@@ -843,38 +852,36 @@ export function System() {
   };
 
   const handleInserirSubmit = () => {
-    // Valida todos os campos
-    const novosErros = {};
-    let temErro = false;
-    colsParaInserir.forEach((col) => {
-      const erro = validarCampo(inserirValores[col.nome] ?? "", col);
-      if (erro) {
-        novosErros[col.nome] = erro;
-        temErro = true;
-      }
+    if (inserirTab === "import") {
+      // lógica de importação de arquivo
+      pushNotification(
+        "success",
+        "Importado!",
+        `Arquivo "${importFile?.name}" importado.`,
+      );
+      setInserirOpen(false);
+      return;
+    }
+    const novosRows = inserirRows.map((row) => {
+      const novoRow = { id: Date.now() + Math.random() };
+      colsParaInserir.forEach((col) => {
+        novoRow[col.nome] = row.data[col.nome] ?? "";
+      });
+      return novoRow;
     });
-    setInserirErros(novosErros);
-    if (temErro) return;
-
-    // Insere o registro localmente (em produção faria API call)
-    const novoRow = { id: Date.now() };
-    colsParaInserir.forEach((col) => {
-      novoRow[col.nome] = inserirValores[col.nome] ?? "";
-    });
-
     setTabs((prev) =>
       prev.map((tab) =>
-        tab.id === activeTab ? { ...tab, rows: [...tab.rows, novoRow] } : tab,
+        tab.id === activeTab
+          ? { ...tab, rows: [...tab.rows, ...novosRows] }
+          : tab,
       ),
     );
     pushNotification(
       "success",
-      "Registro inserido!",
-      "Os dados foram adicionados à tabela.",
+      "Registros inseridos!",
+      `${novosRows.length} registro(s) adicionados.`,
     );
     setInserirOpen(false);
-    setInserirValores({});
-    setInserirErros({});
   };
 
   const inserirFormValido =
@@ -1803,7 +1810,7 @@ export function System() {
                       <span className="btn-spinner" />
                     ) : (
                       <>
-                        <i className="fi fi-rr-magic-wand" /> Gerar tabela
+                        Gerar tabela <i className="fi fi-sr-rocket-lunch" />
                       </>
                     )}
                   </button>
