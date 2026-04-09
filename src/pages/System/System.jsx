@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import ExcelJS from "exceljs";
 import "./System.scss";
 import { SegundoMenu } from "../../components/SegundoMenu/SegundoMenu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
@@ -311,19 +312,18 @@ export function System() {
 
   // ── Estado de inserir dados ───────────────────────────────────────────────
   const [inserirOpen, setInserirOpen] = useState(false);
-  const [inserirValores, setInserirValores] = useState({});
-  const [inserirErros, setInserirErros] = useState({});
-  const [loadingInserir, setLoadingInserir] = useState(false);
-
-  const tabsRef = useRef({});
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
   const [inserirRows, setInserirRows] = useState([
     { id: Date.now(), data: {} },
   ]);
+  const [inserirErros, setInserirErros] = useState({});
+  const [loadingInserir, setLoadingInserir] = useState(false);
   const [inserirTab, setInserirTab] = useState("manual");
   const [importFile, setImportFile] = useState(null);
   const [importDragOver, setImportDragOver] = useState(false);
+  const [importPreview, setImportPreview] = useState([]);
+
+  const tabsRef = useRef({});
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
   const activeTabData = tabs.find((t) => t.id === activeTab);
   const rows = activeTabData?.rows || [];
@@ -835,66 +835,249 @@ export function System() {
     setInserirErros({});
     setInserirTab("manual");
     setImportFile(null);
+    setImportPreview([]);
     setInserirOpen(true);
   };
 
   const colsParaInserir =
     activeTabData?.cols?.filter((c) => c.identificacao !== "pk") || [];
 
-  const handleInserirChange = (colNome, valor) => {
-    setInserirValores((prev) => ({ ...prev, [colNome]: valor }));
-    // Validação em tempo real
+  const handleInserirRowChange = (rowId, colNome, valor) => {
+    setInserirRows((prev) =>
+      prev.map((r) =>
+        r.id === rowId ? { ...r, data: { ...r.data, [colNome]: valor } } : r,
+      ),
+    );
     const col = colsParaInserir.find((c) => c.nome === colNome);
     if (col) {
       const erro = validarCampo(valor, col);
-      setInserirErros((prev) => ({ ...prev, [colNome]: erro }));
+      setInserirErros((prev) => ({
+        ...prev,
+        [rowId]: { ...(prev[rowId] || {}), [colNome]: erro },
+      }));
     }
   };
 
-  const handleInserirSubmit = () => {
+  const addInserirRow = () => {
+    setInserirRows((prev) => [
+      ...prev,
+      { id: Date.now() + Math.random(), data: {} },
+    ]);
+  };
+
+  const removeInserirRow = (rowId) => {
+    if (inserirRows.length <= 1) return;
+    setInserirRows((prev) => prev.filter((r) => r.id !== rowId));
+    setInserirErros((prev) => {
+      const next = { ...prev };
+      delete next[rowId];
+      return next;
+    });
+  };
+
+  const handleFileImport = async (file) => {
+    if (!file) return;
+    const ext = file.name.split(".").pop().toLowerCase();
+    const suportados = ["json", "csv", "xlsx", "xls"];
+
+    if (!suportados.includes(ext)) {
+      pushNotification(
+        "warning",
+        "Formato inválido",
+        "Use arquivos .json, .csv, .xlsx ou .xls.",
+      );
+      return;
+    }
+    try {
+      let rows = [];
+
+      if (ext === "json") {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        rows = Array.isArray(parsed) ? parsed : [parsed];
+      } else if (ext === "csv") {
+        const text = await file.text();
+        const lines = text.split("\n").filter((l) => l.trim());
+        const headers = lines[0]
+          .split(",")
+          .map((h) => h.trim().replace(/"/g, ""));
+        rows = lines.slice(1).map((line) => {
+          const vals = line.split(",").map((v) => v.trim().replace(/"/g, ""));
+          return Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? ""]));
+        });
+      } else {
+        // --- REFATORADO PARA EXCELJS ---
+        const buf = await file.arrayBuffer();
+        const workbook = new ExcelJS.Workbook();
+
+        // No ExcelJS, usamos load para ler o arrayBuffer
+        await workbook.xlsx.load(buf);
+
+        const worksheet = workbook.getWorksheet(1); // Pega a primeira aba
+        const headers = [];
+
+        // 1. Capturar cabeçalhos (primeira linha)
+        const firstRow = worksheet.getRow(1);
+        firstRow.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.text;
+        });
+
+        // 2. Iterar sobre as linhas de dados (a partir da linha 2)
+        worksheet.eachRow((row, rowNumber) => {
+          if (rowNumber > 1) {
+            const rowData = {};
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+              const header = headers[colNumber];
+              if (header) {
+                // Pegamos o valor real ou o resultado da fórmula
+                rowData[header] =
+                  cell.result !== undefined ? cell.result : cell.value;
+              }
+            });
+            rows.push(rowData);
+          }
+        });
+        // -------------------------------
+      }
+
+      if (rows.length === 0) {
+        pushNotification(
+          "warning",
+          "Arquivo vazio",
+          "Nenhuma linha encontrada no arquivo.",
+        );
+        return;
+      }
+
+      setImportFile(file);
+      setImportPreview(rows);
+      pushNotification(
+        "success",
+        "Arquivo carregado!",
+        `${rows.length} linha(s) detectada(s) em "${file.name}".`,
+      );
+    } catch (err) {
+      console.error("Erro ExcelJS:", err);
+      pushNotification(
+        "error",
+        "Erro ao ler arquivo",
+        "Falha ao processar planilha Excel.",
+      );
+      setImportFile(null);
+      setImportPreview([]);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setImportDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileImport(file);
+  };
+
+  const handleInserirSubmit = async () => {
     if (inserirTab === "import") {
-      // lógica de importação de arquivo
+      if (importPreview.length === 0) {
+        pushNotification(
+          "warning",
+          "Sem dados",
+          "Importe um arquivo com dados válidos.",
+        );
+        return;
+      }
+      const novosRows = importPreview.map((row) => {
+        const novoRow = { id: Date.now() + Math.random() };
+        colsParaInserir.forEach((col) => {
+          novoRow[col.nome] =
+            row[col.nome] ?? row[col.nome.toLowerCase()] ?? "";
+        });
+        return novoRow;
+      });
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === activeTab
+            ? { ...tab, rows: [...tab.rows, ...novosRows] }
+            : tab,
+        ),
+      );
       pushNotification(
         "success",
         "Importado!",
-        `Arquivo "${importFile?.name}" importado.`,
+        `${novosRows.length} registro(s) importados de "${importFile?.name}".`,
       );
       setInserirOpen(false);
       return;
     }
-    const novosRows = inserirRows.map((row) => {
-      const novoRow = { id: Date.now() + Math.random() };
+
+    // Validação de todas as linhas antes de submeter
+    let hasError = false;
+    const novosErros = {};
+
+    inserirRows.forEach((row) => {
+      const rowErros = {};
       colsParaInserir.forEach((col) => {
-        novoRow[col.nome] = row.data[col.nome] ?? "";
+        const valor = row.data[col.nome] ?? "";
+        const erro = validarCampo(valor, col);
+        if (erro) {
+          rowErros[col.nome] = erro;
+          hasError = true;
+        }
       });
-      return novoRow;
+      if (Object.keys(rowErros).length > 0) novosErros[row.id] = rowErros;
     });
-    setTabs((prev) =>
-      prev.map((tab) =>
-        tab.id === activeTab
-          ? { ...tab, rows: [...tab.rows, ...novosRows] }
-          : tab,
-      ),
-    );
-    pushNotification(
-      "success",
-      "Registros inseridos!",
-      `${novosRows.length} registro(s) adicionados.`,
-    );
-    setInserirOpen(false);
+
+    if (hasError) {
+      setInserirErros(novosErros);
+      pushNotification(
+        "warning",
+        "Campos inválidos",
+        "Corrija os erros destacados antes de inserir.",
+      );
+      return;
+    }
+
+    setLoadingInserir(true);
+    try {
+      // TODO: substituir por chamada à API quando o endpoint estiver disponível
+      const novosRows = inserirRows.map((row) => {
+        const novoRow = { id: Date.now() + Math.random() };
+        colsParaInserir.forEach((col) => {
+          novoRow[col.nome] = row.data[col.nome] ?? "";
+        });
+        return novoRow;
+      });
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === activeTab
+            ? { ...tab, rows: [...tab.rows, ...novosRows] }
+            : tab,
+        ),
+      );
+      pushNotification(
+        "success",
+        "Registros inseridos!",
+        `${novosRows.length} registro(s) adicionado(s) com sucesso.`,
+      );
+      setInserirOpen(false);
+    } catch (err) {
+      pushNotification("error", "Erro ao inserir", err.message);
+    } finally {
+      setLoadingInserir(false);
+    }
   };
 
   const inserirFormValido =
-    colsParaInserir.length > 0 &&
-    Object.values(inserirErros).every((e) => !e) &&
-    colsParaInserir
-      .filter((c) => c.config?.naoVazio)
-      .every((c) => inserirValores[c.nome]?.trim());
-
-  const handleFinishTour = useCallback(() => {
-    setTourActive(false);
-    localStorage.setItem(TOUR_SEEN_KEY, "1");
-  }, []);
+    inserirTab === "import"
+      ? importPreview.length > 0
+      : inserirRows.length > 0 &&
+        colsParaInserir
+          .filter((c) => c.config?.naoVazio)
+          .every((c) =>
+            inserirRows.every((row) => (row.data[c.nome] ?? "").trim() !== ""),
+          ) &&
+        Object.values(inserirErros).every((rowErros) =>
+          Object.values(rowErros).every((e) => !e),
+        );
 
   const wizardCardClass = [
     "wizard-card",
@@ -969,7 +1152,7 @@ export function System() {
             onClick={openWizard}
             title="Nova tabela"
           >
-            <i className="fi fi-rr-plus" />
+            <i className="fi-rr-plus" />
           </button>
         </div>
 
@@ -1847,8 +2030,8 @@ export function System() {
 
               <div className="modal-styled-body">
                 <p className="modal-styled-desc">
-                  Esta ação é irreversível. Todos os registros vinculados serão
-                  permanentemente apagados.
+                  Aviso! Todos os registros vinculados a esta tabela serão
+                  permanentemente apagados. Siga os passos para continuar.
                 </p>
                 <div className="modal-styled-field">
                   <label>
@@ -1916,12 +2099,6 @@ export function System() {
                     "{activeTabData?.name}"
                   </p>
                 </div>
-                <button
-                  className="modal-styled-close"
-                  onClick={() => setRenomearOpen(false)}
-                >
-                  <i className="fi fi-rr-cross" />
-                </button>
               </div>
 
               <div className="modal-styled-body">
@@ -1999,6 +2176,7 @@ export function System() {
               animate="visible"
               exit="exit"
             >
+              {/* Cabeçalho */}
               <div className="modal-styled-header">
                 <div className="modal-styled-icon modal-styled-icon--primary">
                   <i className="fi fi-sr-add-document" />
@@ -2009,121 +2187,278 @@ export function System() {
                     Tabela: {activeTabData?.name}
                   </p>
                 </div>
+              </div>
+
+              {/* Tabs */}
+              <div className="modal-tabs-bar">
                 <button
-                  className="modal-styled-close"
-                  onClick={() => setInserirOpen(false)}
+                  className={`modal-tab-btn ${inserirTab === "manual" ? "active" : ""}`}
+                  onClick={() => setInserirTab("manual")}
                 >
-                  <i className="fi fi-rr-cross" />
+                  <i className="fi fi-rr-pencil" /> Inserção manual
+                </button>
+                <button
+                  className={`modal-tab-btn ${inserirTab === "import" ? "active" : ""}`}
+                  onClick={() => setInserirTab("import")}
+                >
+                  <i className="fi fi-rr-cloud-upload" /> Importar arquivo
                 </button>
               </div>
 
+              {/* Corpo */}
               <div className="modal-styled-body modal-insert-body">
                 {colsParaInserir.length === 0 ? (
                   <p className="modal-insert-empty">
                     Esta tabela não possui colunas editáveis.
                   </p>
+                ) : inserirTab === "manual" ? (
+                  /* ── Aba Manual ── */
+                  <div className="insert-manual-container">
+                    {inserirRows.map((row, rowIdx) => (
+                      <div key={row.id} className="insert-row-card">
+                        <div className="insert-row-header">
+                          <span className="row-num">Linha #{rowIdx + 1}</span>
+                          <button
+                            className="row-remove-btn"
+                            onClick={() => removeInserirRow(row.id)}
+                            disabled={inserirRows.length <= 1}
+                          >
+                            <i className="fi fi-rr-trash" /> Remover
+                          </button>
+                        </div>
+                        <div className="insert-row-fields">
+                          {colsParaInserir.map((col) => {
+                            const valor = row.data[col.nome] ?? "";
+                            const erro = inserirErros[row.id]?.[col.nome];
+                            const temErro = !!erro;
+                            const isBoleano = col.tipoDado === "Boleano";
+                            const isLista = col.tipoDado === "Lista";
+                            const opcoes = col.config?.opcoes || [];
+
+                            return (
+                              <div
+                                key={col.id}
+                                className={`insert-field ${temErro ? "insert-field--error" : valor ? "insert-field--ok" : ""}`}
+                              >
+                                <div className="insert-field-header">
+                                  <div className="insert-field-label-group">
+                                    <label className="insert-field-label">
+                                      {col.nome}
+                                    </label>
+                                    {col.config?.naoVazio && (
+                                      <span className="insert-required">*</span>
+                                    )}
+                                  </div>
+                                  <span className="insert-field-tipo">
+                                    {col.tipoDado}
+                                  </span>
+                                </div>
+
+                                {isBoleano ? (
+                                  <div className="insert-bool-group">
+                                    {["sim", "não"].map((v) => (
+                                      <button
+                                        key={v}
+                                        type="button"
+                                        className={`insert-bool-btn ${valor === v ? "insert-bool-btn--active" : ""}`}
+                                        onClick={() =>
+                                          handleInserirRowChange(
+                                            row.id,
+                                            col.nome,
+                                            v,
+                                          )
+                                        }
+                                      >
+                                        {v === "sim" ? (
+                                          <i className="fi fi-rr-check" />
+                                        ) : (
+                                          <i className="fi fi-rr-cross" />
+                                        )}
+                                        {v}
+                                      </button>
+                                    ))}
+                                  </div>
+                                ) : isLista && opcoes.length > 0 ? (
+                                  <select
+                                    className={`insert-select ${temErro ? "insert-input--error" : ""}`}
+                                    value={valor}
+                                    onChange={(e) =>
+                                      handleInserirRowChange(
+                                        row.id,
+                                        col.nome,
+                                        e.target.value,
+                                      )
+                                    }
+                                  >
+                                    <option value="">Selecione...</option>
+                                    {opcoes.map((op) => (
+                                      <option key={op} value={op}>
+                                        {op}
+                                      </option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <div className="insert-input-wrapper">
+                                    <input
+                                      type={
+                                        col.tipoDado === "Data"
+                                          ? "date"
+                                          : col.tipoDado === "Hora"
+                                            ? "time"
+                                            : col.tipoDado === "Data / Hora"
+                                              ? "datetime-local"
+                                              : "text"
+                                      }
+                                      className={`insert-input ${temErro ? "insert-input--error" : valor ? "insert-input--ok" : ""}`}
+                                      value={valor}
+                                      onChange={(e) =>
+                                        handleInserirRowChange(
+                                          row.id,
+                                          col.nome,
+                                          e.target.value,
+                                        )
+                                      }
+                                      placeholder={getPlaceholderPorTipo(col)}
+                                      maxLength={
+                                        col.config?.alcanceMaximo || undefined
+                                      }
+                                    />
+                                    {valor && !temErro && (
+                                      <i className="fi fi-rr-check insert-input-check" />
+                                    )}
+                                  </div>
+                                )}
+
+                                {temErro && (
+                                  <span className="insert-field-error">
+                                    <i className="fi fi-rr-exclamation" />{" "}
+                                    {erro}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+
+                    <button className="btn-add-row" onClick={addInserirRow}>
+                      <i className="fi fi-rr-plus" /> Adicionar linha
+                    </button>
+                  </div>
                 ) : (
-                  <div className="modal-insert-fields">
-                    {colsParaInserir.map((col) => {
-                      const temErro = !!inserirErros[col.nome];
-                      const valor = inserirValores[col.nome] ?? "";
-                      const isBoleano = col.tipoDado === "Boleano";
-                      const isLista = col.tipoDado === "Lista";
-                      const opcoes = col.config?.opcoes || [];
-
-                      return (
-                        <div
-                          key={col.id}
-                          className={`insert-field ${temErro ? "insert-field--error" : valor ? "insert-field--ok" : ""}`}
-                        >
-                          <div className="insert-field-header">
-                            <label className="insert-field-label">
-                              {col.nome}
-                              {col.config?.naoVazio && (
-                                <span className="insert-required">*</span>
-                              )}
-                            </label>
-                            <span className="insert-field-tipo">
-                              {col.tipoDado}
-                            </span>
+                  /* ── Aba Importar ── */
+                  <div className="import-container">
+                    <div
+                      className={`import-drop-area ${importDragOver ? "drag-over" : ""} ${importFile ? "import-drop-area--done" : ""}`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setImportDragOver(true);
+                      }}
+                      onDragLeave={() => setImportDragOver(false)}
+                      onDrop={handleDrop}
+                      onClick={() =>
+                        document.getElementById("import-file-input").click()
+                      }
+                    >
+                      <input
+                        id="import-file-input"
+                        type="file"
+                        accept=".xlsx,.xls,.csv,.json"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleFileImport(e.target.files[0])}
+                      />
+                      {importFile ? (
+                        <>
+                          <div className="import-area-icon import-area-icon--done">
+                            <i className="fi fi-sr-check-circle" />
                           </div>
+                          <p className="import-area-title">{importFile.name}</p>
+                          <p className="import-area-sub">
+                            {importPreview.length} linha(s) detectada(s) —
+                            clique para trocar
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="import-area-icon">
+                            <i className="fi fi-rr-cloud-upload" />
+                          </div>
+                          <p className="import-area-title">
+                            Arraste o arquivo ou clique para selecionar
+                          </p>
+                          <p className="import-area-sub">
+                            Formatos suportados:
+                          </p>
+                          <div className="import-formats">
+                            {[".xlsx", ".xls", ".csv", ".json"].map((f) => (
+                              <span
+                                key={f}
+                                className={`import-fmt-tag ${f.replace(".", "")}`}
+                              >
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
 
-                          {isBoleano ? (
-                            <div className="insert-bool-group">
-                              {["sim", "não"].map((v) => (
-                                <button
-                                  key={v}
-                                  type="button"
-                                  className={`insert-bool-btn ${valor === v ? "insert-bool-btn--active" : ""}`}
-                                  onClick={() =>
-                                    handleInserirChange(col.nome, v)
-                                  }
-                                >
-                                  {v === "sim" ? (
-                                    <i className="fi fi-rr-check" />
-                                  ) : (
-                                    <i className="fi fi-rr-cross" />
-                                  )}
-                                  {v}
-                                </button>
+                    {importPreview.length > 0 && (
+                      <div className="import-preview">
+                        <div className="import-preview-header">
+                          <p className="import-preview-title">
+                            <i className="fi fi-rr-table" /> Pré-visualização (
+                            {importPreview.length} linha
+                            {importPreview.length !== 1 ? "s" : ""})
+                          </p>
+                          <button
+                            className="import-clear-btn"
+                            onClick={() => {
+                              setImportFile(null);
+                              setImportPreview([]);
+                            }}
+                          >
+                            <i className="fi fi-rr-trash" /> Remover
+                          </button>
+                        </div>
+                        <div className="import-preview-table-wrap">
+                          <table className="import-preview-table">
+                            <thead>
+                              <tr>
+                                {colsParaInserir.map((col) => (
+                                  <th key={col.id}>{col.nome}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {importPreview.slice(0, 5).map((row, i) => (
+                                <tr key={i}>
+                                  {colsParaInserir.map((col) => (
+                                    <td key={col.id}>
+                                      {row[col.nome] ??
+                                        row[col.nome.toLowerCase()] ??
+                                        "—"}
+                                    </td>
+                                  ))}
+                                </tr>
                               ))}
-                            </div>
-                          ) : isLista && opcoes.length > 0 ? (
-                            <select
-                              className={`insert-select ${temErro ? "insert-input--error" : ""}`}
-                              value={valor}
-                              onChange={(e) =>
-                                handleInserirChange(col.nome, e.target.value)
-                              }
-                            >
-                              <option value="">Selecione...</option>
-                              {opcoes.map((op) => (
-                                <option key={op} value={op}>
-                                  {op}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <div className="insert-input-wrapper">
-                              <input
-                                type={
-                                  col.tipoDado === "Data"
-                                    ? "date"
-                                    : col.tipoDado === "Hora"
-                                      ? "time"
-                                      : col.tipoDado === "Data / Hora"
-                                        ? "datetime-local"
-                                        : "text"
-                                }
-                                className={`insert-input ${temErro ? "insert-input--error" : valor ? "insert-input--ok" : ""}`}
-                                value={valor}
-                                onChange={(e) =>
-                                  handleInserirChange(col.nome, e.target.value)
-                                }
-                                placeholder={getPlaceholderPorTipo(col)}
-                              />
-                              {valor && !temErro && (
-                                <i className="fi fi-rr-check insert-input-check" />
-                              )}
-                            </div>
-                          )}
-
-                          {temErro && (
-                            <span className="insert-field-error">
-                              <i className="fi fi-rr-exclamation" />{" "}
-                              {inserirErros[col.nome]}
-                            </span>
+                            </tbody>
+                          </table>
+                          {importPreview.length > 5 && (
+                            <p className="import-preview-more">
+                              +{importPreview.length - 5} linha(s) não exibidas
+                              na pré-visualização
+                            </p>
                           )}
                         </div>
-                      );
-                    })}
-                    <p className="insert-required-note">
-                      * campos obrigatórios
-                    </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
+              {/* Rodapé */}
               <div className="modal-styled-footer">
                 <button
                   className="btn-secondary"
@@ -2140,7 +2475,12 @@ export function System() {
                     <span className="btn-spinner" />
                   ) : (
                     <>
-                      <i className="fi fi-rr-check" /> Inserir registro
+                      <i className="fi fi-rr-check" />
+                      {inserirTab === "import"
+                        ? "Importar dados"
+                        : inserirRows.length > 1
+                          ? `Inserir ${inserirRows.length} registros`
+                          : "Inserir registro"}
                     </>
                   )}
                 </button>

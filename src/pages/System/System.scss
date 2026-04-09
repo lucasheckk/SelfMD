@@ -76,12 +76,12 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         color: #333;
         i {
           padding-top: 5px;
-          font-size: 16px;
+          font-size: 15px;
           color: #333;
           transition: v.$transicao-rapida;
+
           &:hover {
-            transform: translateY(-1px);
-            will-change: transform;
+            color: black;
           }
         }
       }
@@ -1832,6 +1832,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   }
 
   .modal-styled-desc {
+    display: flex;
+    align-items: center;
+    text-align: center;
     font-size: 14px;
     color: #666;
     margin: 0;
@@ -1855,6 +1858,20 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         color: v.$cor-primaria;
       }
     }
+
+    input {
+      background-color: transparent;
+      border: solid 1.5px #e0e0e0;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 15px;
+      transition: v.$transicao-rapida;
+
+      &:focus {
+        outline: none;
+        border-color: v.$cor-primaria;
+      }
+    }
   }
 }
 
@@ -1876,7 +1893,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   padding: 30px 0;
 }
 
-// ── Input wrapper do modal ────────────────────────────────────────────────────
+// ── Input wrapper do modal de renomear ────────────────────────────────────────────────────
 .modal-input-wrapper {
   position: relative;
   display: flex;
@@ -1941,221 +1958,206 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   justify-content: flex-end;
   gap: 10px;
   padding: 14px 22px;
-  border-top: 2px solid #f0f0f0;
   flex-shrink: 0;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── INSERIR DADOS — Campos individuais
+// ─── MODAL INSERIR — Multi-linha + Importação
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.insert-field {
-  border: 1.5px solid #efefef;
-  border-radius: 10px;
-  background: #fafafa;
-  padding: 12px 14px;
+.insert-manual-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: v.$transicao-rapida;
-
-  &.insert-field--error {
-    border-color: rgba(#e74c3c, 0.4);
-    background: rgba(#e74c3c, 0.02);
-  }
-  &.insert-field--ok {
-    border-color: rgba(#2ecc71, 0.4);
-    background: rgba(#2ecc71, 0.02);
-  }
+  gap: 10px;
 }
 
-.insert-field-header {
+.modal-tabs-bar {
   display: flex;
+  flex-direction: row;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 
-.insert-field-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  font-family: v.$jakarta;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  button {
+    background-color: transparent;
+    border: none;
+    font-size: 17px;
+    font-weight: 400;
+    color: #333;
+    cursor: pointer;
+    transition: v.$transicao-rapida;
 
-  .insert-required {
-    color: #e74c3c;
-    font-size: 14px;
-    line-height: 1;
+    &:hover {
+      color: black;
+      transition: v.$transicao-rapida;
+      transform: translatey(-1px);
+    }
+
+    i {
+      padding-right: 5px;
+    }
   }
 }
 
-.insert-field-tipo {
-  font-size: 10px;
-  color: #aaa;
-  background: #f0f0f0;
-  border-radius: 5px;
-  padding: 2px 7px;
-  font-weight: 500;
+.insert-row-card {
+  border: 1.5px solid #efefef;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: v.$transicao-fadeIn;
+
+  .insert-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fff;
+    border-bottom: 1.5px solid #f5f5f5;
+
+    .row-num {
+      font-size: 12px;
+      font-weight: 500;
+      color: #c7c7c7;
+    }
+
+    .row-remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ccc;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: v.$jakarta;
+      transition: v.$transicao-rapida;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      &:hover:not(:disabled) {
+        color: #e74c3c;
+      }
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .insert-row-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 12px;
+    font-size: 18px;
+
+    .insert-field-header {
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 8px; 
+      width: 100%;
+
+      .insert-field-label-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        text-transform: uppercase;
+
+        .insert-field-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+          margin: 0;
+        }
+
+        .insert-required {
+          color: #c7c7c7;
+          font-weight: bold;
+        }
+      }
+
+      .insert-field-tipo {
+        font-size: 12px;
+        color: #c7c7c7;
+        text-transform: uppercase;
+        font-weight: 500;
+        text-align: center;
+      }
+    }
+
+    .insert-input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      border: 1.5px solid #eee;
+      border-radius: 8px;
+      transition: v.$transicao-rapida;
+
+      &:focus {
+        border-color: v.$cor-primaria; 
+        outline: none;
+        transition: v.$transicao-rapida;  
+      }
+
+      &:hover {
+        border-color: v.$cor-primaria;
+      }
+    }
+
+    input {
+      background-color: transparent;
+      font-size: 16px;
+      border: none;
+      color: #333;
+
+      &::placeholder {
+        color: #bbb;
+        opacity: 1;
+        font-size: 16px;
+      }
+    }
+  }
 }
 
-.insert-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.insert-input {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 9px 36px 9px 12px;
-  font-size: 13px;
-  font-family: v.$jakarta;
-  color: #333;
-  background: #fff;
-  outline: none;
-  transition: v.$transicao-rapida;
-  &::placeholder {
-    color: #ccc;
-  }
-  &:focus {
-    border-color: v.$cor-primaria;
-  }
-  &.insert-input--error {
-    border-color: #e74c3c;
-  }
-  &.insert-input--ok {
-    border-color: rgba(#2ecc71, 0.5);
-  }
-}
-
-.insert-input-check {
-  position: absolute;
-  right: 10px;
-  font-size: 13px;
-  color: #2ecc71;
-  pointer-events: none;
-}
-
-.insert-select {
-  width: 100%;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-family: v.$jakarta;
-  color: #333;
-  background: #fff;
-  outline: none;
-  cursor: pointer;
-  transition: v.$transicao-rapida;
-  &:focus {
-    border-color: v.$cor-primaria;
-  }
-  &.insert-input--error {
-    border-color: #e74c3c;
-  }
-}
-
-.insert-bool-group {
-  display: flex;
-  gap: 8px;
-}
-
-.insert-bool-btn {
-  flex: 1;
+.btn-add-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 8px 12px;
+  width: 100%;
+  background: transparent;
+  border: 2px dashed #d9d9d9;
+  border-radius: 10px;
+  padding: 10px;
   font-size: 13px;
   font-family: v.$jakarta;
-  color: #888;
-  background: #fff;
+  font-weight: 500;
+  color: #c7c7c7;
   cursor: pointer;
   transition: v.$transicao-rapida;
-  text-transform: capitalize;
+
   i {
     font-size: 12px;
+    margin-right: 4px;
+    margin-top: 2px;
   }
+
   &:hover {
-    border-color: #c7c7c7;
-    color: #555;
-  }
-  &.insert-bool-btn--active {
     border-color: v.$cor-primaria;
-    background: rgba(v.$cor-primaria, 0.08);
     color: v.$cor-primaria;
-    font-weight: 600;
   }
 }
 
-.insert-field-error {
+// ── Importação ────────────────────────────────────────────────────────────────
+
+.import-container {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: #e74c3c;
-  font-family: v.$jakarta;
-  i {
-    font-size: 11px;
-    flex-shrink: 0;
-  }
+  flex-direction: column;
+  gap: 14px;
 }
 
-.insert-required-note {
-  font-size: 11px;
-  color: #bbb;
-  margin: 0;
-  padding-top: 4px;
-}
-
-// ── Tabs do modal inserir ──────────────────────────────────────────────────
-.modal-tabs-bar {
-  display: flex;
-  border-bottom: 2px solid #f0f0f0;
-  background: #fafafa;
-  flex-shrink: 0;
-  .modal-tab-btn {
-    flex: 1;
-    padding: 12px 8px;
-    font-size: 13px;
-    font-weight: 500;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #888;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    font-family: v.$jakarta;
-    transition: v.$transicao-rapida;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    i {
-      font-size: 13px;
-    }
-    &.active {
-      color: v.$cor-primaria;
-      border-bottom-color: v.$cor-primaria;
-      background: #fff;
-    }
-    &:hover:not(.active) {
-      color: #333;
-      background: #f5f5f5;
-    }
-  }
-}
-
-// ── Área de importação ─────────────────────────────────────────────────────
 .import-drop-area {
   border: 2px dashed #d0d0d0;
   border-radius: 12px;
@@ -2167,12 +2169,25 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  &.drag-over,
-  &:hover {
+  gap: 8px;
+
+  &.drag-over {
+    border-color: v.$cor-primaria;
+    background: rgba(v.$cor-primaria, 0.05);
+    transform: scale(1.01);
+  }
+
+  &:hover:not(.import-drop-area--done) {
+    border-color: #aaa;
+    background: #f5f5f5;
+  }
+
+  &.import-drop-area--done {
     border-color: v.$cor-primaria;
     background: rgba(v.$cor-primaria, 0.04);
+    border-style: solid;
   }
+
   .import-area-icon {
     width: 48px;
     height: 48px;
@@ -2181,27 +2196,45 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 4px;
+
     i {
       font-size: 22px;
       color: #888;
     }
+
+    &.import-area-icon--done {
+      background: rgba(v.$cor-primaria, 0.1);
+
+      i {
+        color: v.$cor-primaria;
+        font-size: 24px;
+      }
+    }
   }
+
   .import-area-title {
     font-size: 14px;
     font-weight: 600;
     color: #333;
+    margin: 0;
   }
+
   .import-area-sub {
     font-size: 12px;
     color: #aaa;
+    margin: 0;
   }
 }
+
 .import-formats {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 2px;
 }
+
 .import-fmt-tag {
   font-size: 11px;
   font-weight: 600;
@@ -2210,9 +2243,14 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   border: 1.5px solid #e0e0e0;
   color: #777;
   background: #fff;
+
   &.xlsx {
     border-color: v.$cor-primaria;
     color: v.$cor-primaria;
+  }
+  &.xls {
+    border-color: darken(v.$cor-primaria, 10%);
+    color: darken(v.$cor-primaria, 10%);
   }
   &.csv {
     border-color: #3b82f6;
@@ -2222,61 +2260,122 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     border-color: #f59e0b;
     color: #b45309;
   }
-  &.xml {
-    border-color: #8b5cf6;
-    color: #6d28d9;
+}
+
+// ── Pré-visualização da importação ────────────────────────────────────────────
+
+.import-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: v.$transicao-fadeIn;
+}
+
+.import-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.import-preview-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: v.$jakarta;
+
+  i {
+    font-size: 12px;
+    color: #c7c7c7;
   }
 }
 
-// ── Múltiplas linhas ───────────────────────────────────────────────────────
-.insert-row-card {
+.import-clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1.5px solid #f0d0d0;
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: v.$jakarta;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: v.$transicao-rapida;
+
+  i {
+    font-size: 11px;
+  }
+
+  &:hover {
+    background: #fff5f5;
+    border-color: #e74c3c;
+  }
+}
+
+.import-preview-table-wrap {
   border: 1.5px solid #efefef;
-  border-radius: 12px;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 180px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 6px;
+  }
+}
+
+.import-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: v.$jakarta;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    padding: 7px 12px;
+    text-align: left;
+    font-weight: 700;
+    color: #555;
+    border-bottom: 1.5px solid #efefef;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    &:nth-child(even) {
+      background: #fafafa;
+    }
+
+    td {
+      padding: 6px 12px;
+      color: #444;
+      border-bottom: 1px solid #f5f5f5;
+      white-space: nowrap;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.import-preview-more {
+  font-size: 11px;
+  color: #bbb;
+  text-align: center;
+  padding: 6px;
+  margin: 0;
   background: #fafafa;
-  overflow: hidden;
-  animation: v.$transicao-fadeIn;
-  .insert-row-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    background: #fff;
-    border-bottom: 1px solid #f5f5f5;
-    .row-num {
-      font-size: 11px;
-      font-weight: 700;
-      color: #c7c7c7;
-      background: #f5f5f5;
-      border-radius: 5px;
-      padding: 2px 8px;
-    }
-    .row-remove-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #ccc;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-family: v.$jakarta;
-      transition: v.$transicao-rapida;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      &:hover {
-        color: #e74c3c;
-        background: #fff5f5;
-      }
-      &:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-    }
-  }
-  .insert-row-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 12px;
-  }
+  border-top: 1px solid #f0f0f0;
+  font-family: v.$jakarta;
 }
