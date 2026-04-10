@@ -54,6 +54,10 @@ const MAPA_TIPOS_API = {
   Cálculo: "calculo",
 };
 
+const MAPA_API_PARA_TIPO = Object.fromEntries(
+  Object.entries(MAPA_TIPOS_API).map(([label, api]) => [api, label]),
+);
+
 const GRUPO_ICONS = {
   Texto: "fi-sr-text",
   Numérico: "fi-sr-calculator",
@@ -310,6 +314,16 @@ export function System() {
   const [novoNomeTabela, setNovoNomeTabela] = useState("");
   const [erroRenomear, setErroRenomear] = useState("");
 
+  // ── Excluir coluna ────────────────────────────────────────────────────────────
+  const [colunaParaExcluir, setColunaParaExcluir] = useState(null);
+  const [confirmacaoExclusaoColuna, setConfirmacaoExclusaoColuna] =
+    useState("");
+
+  // ── Configurar coluna ─────────────────────────────────────────────────────────
+  const [colunaParaConfigurar, setColunaParaConfigurar] = useState(null);
+  const [configEdicao, setConfigEdicao] = useState(null);
+  const [loadingSalvarConfig, setLoadingSalvarConfig] = useState(false);
+
   // ── Estado de inserir dados ───────────────────────────────────────────────
   const [inserirOpen, setInserirOpen] = useState(false);
   const [inserirRows, setInserirRows] = useState([
@@ -322,6 +336,12 @@ export function System() {
   const [importDragOver, setImportDragOver] = useState(false);
   const [importPreview, setImportPreview] = useState([]);
 
+  // ── Dropdown do cabeçalho de coluna ──────────────────────────────────────────
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+
+  const [headerMenuAberto, setHeaderMenuAberto] = useState(null);
+
+  // ── Referência para as abas ───────────────────────────────────────────────
   const tabsRef = useRef({});
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
@@ -332,6 +352,20 @@ export function System() {
     CHECKBOX_WIDTH +
     resizableCols.reduce((acc, col) => acc + (colWidths[col] || 150), 0) +
     ACTIONS_WIDTH;
+
+  // ── Grupo do tipo dado ─────────────────────────────────────────────────────────────
+  const getGrupoPorTipo = (tipoDado) => {
+    for (const [grupo, tipos] of Object.entries(GRUPOS_TIPOS)) {
+      if (tipos.includes(tipoDado)) return grupo;
+    }
+    return null;
+  };
+
+  // ── Finaliza o tour ─────────────────────────────────────────
+  const handleFinishTour = useCallback(() => {
+    setTourActive(false);
+    localStorage.setItem(TOUR_SEEN_KEY, "1");
+  }, []);
 
   // ── Segurança ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -358,6 +392,14 @@ export function System() {
         width: `${el.offsetWidth}px`,
       });
   }, [activeTab, tabs]);
+
+  // ── Fechar dropdown do cabeçalho ao clicar fora ─────────────────────────────
+  useEffect(() => {
+    if (!headerMenuAberto) return;
+    const fechar = () => setHeaderMenuAberto(null);
+    document.addEventListener("click", fechar);
+    return () => document.removeEventListener("click", fechar);
+  }, [headerMenuAberto]);
 
   // ── Carregar tabelas ──────────────────────────────────────────────────────
   const carregarDados = useCallback(async () => {
@@ -433,21 +475,24 @@ export function System() {
   };
 
   // ── Resize coluna ─────────────────────────────────────────────────────────
+  const getMinColWidth = (colName) => {
+    const charsVisiveis = Math.ceil(colName.length * 0.3);
+    return Math.max(50, charsVisiveis * 9 + 28);
+  };
+
   const handleMouseDown = (e, colName) => {
     e.preventDefault();
-    const startX = e.pageX,
-      startWidth = colWidths[colName] || 150;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+    const startX = e.pageX;
+    const startWidth = colWidths[colName] || 150;
+    const minWidth = getMinColWidth(colName);
+    document.body.style.cursor = "normal";
     const onMove = (ev) => {
-      const w = Math.max(MIN_COL_WIDTH, startWidth + (ev.pageX - startX));
+      const w = Math.max(minWidth, startWidth + (ev.pageX - startX));
       setColWidths((prev) => ({ ...prev, [colName]: w }));
     };
     const onUp = () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
-      document.body.style.cursor = "default";
-      document.body.style.userSelect = "";
     };
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
@@ -827,6 +872,222 @@ export function System() {
     setErroRenomear("");
     await handleEditarTabela(activeTab, nome);
     setRenomearOpen(false);
+  };
+
+  // ── Coluna: verificar se tem dados ────────────────────────────────────────────
+  const colunaTemDados = (colNome) =>
+    rows.some((row) => {
+      const val = row[colNome];
+      return val !== "" && val !== null && val !== undefined;
+    });
+
+  // ── Coluna: abrir modal de exclusão ──────────────────────────────────────────
+  const abrirExcluirColuna = (col) => {
+    setHeaderMenuAberto(null);
+    setColunaParaExcluir(col);
+    setConfirmacaoExclusaoColuna("");
+  };
+
+  // ── Coluna: confirmar exclusão ────────────────────────────────────────────────
+  const handleExcluirColuna = async () => {
+    try {
+      await API.delete(COLUNA_CRUD_ROUTES.EXCLUIR(colunaParaExcluir.id));
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === activeTab
+            ? {
+                ...tab,
+                cols: tab.cols.filter((c) => c.id !== colunaParaExcluir.id),
+              }
+            : tab,
+        ),
+      );
+      pushNotification(
+        "success",
+        "Coluna excluída!",
+        `"${colunaParaExcluir.nome}" foi removida da tabela.`,
+      );
+      setColunaParaExcluir(null);
+      setConfirmacaoExclusaoColuna("");
+    } catch (err) {
+      pushNotification(
+        "error",
+        "Erro ao excluir",
+        err.response?.data?.message || "Não foi possível excluir a coluna.",
+      );
+    }
+  };
+
+  // ── Coluna: abrir modal de configuração ───────────────────────────────────────
+  const abrirConfigurarColuna = (col) => {
+    setHeaderMenuAberto(null);
+    // Converte o tipo da API ("texto") para o formato de display ("Texto")
+    const tipoDadoDisplay = MAPA_API_PARA_TIPO[col.tipoDado] || col.tipoDado;
+    setConfigEdicao({
+      nome: col.nome,
+      grupo: getGrupoPorTipo(tipoDadoDisplay),
+      tipoDado: tipoDadoDisplay,
+      identificacao: col.identificacao, // "pk" | "fk" | null
+      fkTabela: col.fkTabela || null,
+      fkColunaId: col.fkColunaId || null,
+      config: { ...CONFIG_PADRAO, ...col.config },
+    });
+    setColunaParaConfigurar(col);
+  };
+
+  // ── Coluna: handlers internos do modal de configuração ────────────────────────
+  const handleConfigEdicaoGrupo = (grupo) =>
+    setConfigEdicao((prev) => ({ ...prev, grupo, tipoDado: null }));
+
+  const handleConfigEdicaoTipo = (tipo) => {
+    setConfigEdicao((prev) => {
+      const newConfig = { ...prev.config };
+      if (MASCARA_AUTO[tipo]) newConfig.mascara = MASCARA_AUTO[tipo];
+      else if (tipo !== "Moeda") {
+        newConfig.mascara = "";
+        newConfig.moeda = null;
+      }
+      if (tipo === "Moeda") {
+        newConfig.mascara = "";
+        newConfig.moeda = null;
+      }
+      return { ...prev, tipoDado: tipo, config: newConfig };
+    });
+  };
+
+  const handleConfigEdicaoMoeda = (moedaId) => {
+    const moeda = MOEDAS.find((m) => m.id === moedaId);
+    if (!moeda) return;
+    setConfigEdicao((prev) => ({
+      ...prev,
+      config: { ...prev.config, moeda: moedaId, mascara: moeda.mascara },
+    }));
+  };
+
+  const handleConfigEdicaoFKTabela = (tabelaId) => {
+    const idNum = parseInt(tabelaId, 10);
+    setConfigEdicao((prev) => ({
+      ...prev,
+      fkTabela: idNum,
+      fkColunaId: null,
+      grupo: null,
+      tipoDado: null,
+    }));
+  };
+
+  const handleConfigEdicaoRemoverFK = () =>
+    setConfigEdicao((prev) => ({
+      ...prev,
+      identificacao: null,
+      fkTabela: null,
+      fkColunaId: null,
+      grupo: null,
+      tipoDado: null,
+    }));
+
+  const updateConfigEdicaoConfig = (key, value) =>
+    setConfigEdicao((prev) => ({
+      ...prev,
+      config: { ...prev.config, [key]: value },
+    }));
+
+  // ── Coluna: salvar configurações ──────────────────────────────────────────────
+  const handleSalvarConfiguracao = async () => {
+    if (!configEdicao.nome.trim()) {
+      pushNotification(
+        "warning",
+        "Nome obrigatório",
+        "A coluna precisa ter um nome.",
+      );
+      return;
+    }
+    if (configEdicao.nome.length > NOME_MAX) {
+      pushNotification(
+        "error",
+        "Nome muito longo",
+        `Máximo de ${NOME_MAX} caracteres.`,
+      );
+      return;
+    }
+    const nomeJaExiste = activeTabData.cols.some(
+      (c) =>
+        c.id !== colunaParaConfigurar.id &&
+        c.nome.toLowerCase() === configEdicao.nome.trim().toLowerCase(),
+    );
+    if (nomeJaExiste) {
+      pushNotification(
+        "warning",
+        "Nome duplicado",
+        "Já existe outra coluna com este nome.",
+      );
+      return;
+    }
+    if (!configEdicao.tipoDado) {
+      pushNotification(
+        "warning",
+        "Tipo obrigatório",
+        "Selecione um tipo de dado para a coluna.",
+      );
+      return;
+    }
+
+    setLoadingSalvarConfig(true);
+    try {
+      const tipoDadoApi =
+        MAPA_TIPOS_API[configEdicao.tipoDado] || configEdicao.tipoDado;
+      const payload = {
+        nomeColuna: configEdicao.nome.trim(),
+        tipoDado: tipoDadoApi,
+        isForeignKey: configEdicao.identificacao === "fk",
+        fkTabelaId: configEdicao.fkTabela || null,
+        fkColunaId: configEdicao.fkColunaId || null,
+        config: mapConfigParaApi(configEdicao.config, tipoDadoApi),
+      };
+
+      await API.put(
+        COLUNA_CRUD_ROUTES.ATUALIZAR(colunaParaConfigurar.id),
+        payload,
+      );
+
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id !== activeTab
+            ? tab
+            : {
+                ...tab,
+                cols: tab.cols.map((c) =>
+                  c.id !== colunaParaConfigurar.id
+                    ? c
+                    : {
+                        ...c,
+                        nome: configEdicao.nome.trim(),
+                        tipoDado: tipoDadoApi,
+                        identificacao: configEdicao.identificacao,
+                        fkTabela: configEdicao.fkTabela,
+                        fkColunaId: configEdicao.fkColunaId,
+                        config: configEdicao.config,
+                      },
+                ),
+              },
+        ),
+      );
+
+      pushNotification(
+        "success",
+        "Configurações salvas!",
+        `Coluna "${configEdicao.nome}" atualizada.`,
+      );
+      setColunaParaConfigurar(null);
+      setConfigEdicao(null);
+    } catch (err) {
+      pushNotification(
+        "error",
+        "Erro ao salvar",
+        err.response?.data?.message || "Não foi possível salvar as alterações.",
+      );
+    } finally {
+      setLoadingSalvarConfig(false);
+    }
   };
 
   // ── Inserir dados ─────────────────────────────────────────────────────────
@@ -1253,32 +1514,70 @@ export function System() {
                             onClick={toggleSelectAll}
                           >
                             <i
-                              className={`fi ${selectedRows.length === rows.length && rows.length > 0 ? "fi-rr-square-minus" : "fi-rr-square-plus"}`}
+                              className={`fi ${
+                                selectedRows.length === rows.length &&
+                                rows.length > 0
+                                  ? "fi-rr-square-minus"
+                                  : "fi-rr-square-plus"
+                              }`}
                             />
                           </button>
                         </th>
-                        {resizableCols.map((col) => (
-                          <th key={col} className="resizable-col">
+
+                        {(activeTabData?.cols || []).map((col) => (
+                          <th key={col.nome} className="resizable-col">
                             <div className="cell-content">
-                              <span className="col-label">
-                                {col.toUpperCase()}
-                              </span>
+                              <div className="col-label-group">
+                                <span className="col-label">
+                                  {col.nome.toUpperCase()}
+                                </span>
+
+                                {/* Só o botão fica no th — o dropdown é renderizado fora da tabela */}
+                                <div
+                                  className="col-header-menu"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <button
+                                    className="col-header-menu-btn"
+                                    title="Opções da coluna"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const rect =
+                                        e.currentTarget.getBoundingClientRect();
+                                      setDropdownPos({
+                                        top: rect.bottom + 6,
+                                        right: window.innerWidth - rect.right,
+                                      });
+                                      setHeaderMenuAberto((prev) =>
+                                        prev === col.nome ? null : col.nome,
+                                      );
+                                    }}
+                                  >
+                                    <i className="fi fi-rr-menu-dots-vertical" />
+                                  </button>
+                                </div>
+                              </div>
+
                               <button
                                 className="resizer-handle"
-                                onMouseDown={(e) => handleMouseDown(e, col)}
+                                onMouseDown={(e) =>
+                                  handleMouseDown(e, col.nome)
+                                }
                               >
-                                <div className="resizer-line" />
+                                <i className="fi-sr-arrows-from-line" />
                               </button>
                             </div>
                           </th>
                         ))}
+
                         <th className="actions-header sticky-col sticky-actions">
                           <div className="actions-cell-content">
-                            <button title="Configurar Colunas">
-                              <i className="fi fi-rr-settings" />
-                            </button>
-                            <button title="Excluir Colunas">
-                              <i className="fi fi-rr-cross-circle" />
+                            {/* Botões globais mantidos, mas agora os individuais ficam no dropdown acima */}
+                            <button
+                              title="Recarregar colunas"
+                              onClick={carregarDados}
+                            >
+                              <i className="fi fi-rr-refresh" />
                             </button>
                           </div>
                         </th>
@@ -2004,7 +2303,7 @@ export function System() {
         </div>
       )}
 
-      {/* ══════════════════════ MODAL EXCLUSÃO ════════════════════════════ */}
+      {/* ═════════════════ MODAL EXCLUSÃO DE TABELA ═════════════════════════ */}
       <AnimatePresence mode="wait">
         {tabelaParaExcluir && (
           <div className="modal-overlay">
@@ -2030,8 +2329,8 @@ export function System() {
 
               <div className="modal-styled-body">
                 <p className="modal-styled-desc">
-                  Aviso! Todos os registros vinculados a esta tabela serão
-                  permanentemente apagados. Siga os passos para continuar.
+                  Todas as colunas e seus registros vinculados a esta tabela serão
+                  permanentemente apagados.
                 </p>
                 <div className="modal-styled-field">
                   <label>
@@ -2077,7 +2376,7 @@ export function System() {
         )}
       </AnimatePresence>
 
-      {/* ══════════════════════ MODAL RENOMEAR ════════════════════════════ */}
+      {/* ═══════════════════ MODAL RENOMEAR TABELA ══════════════════════════ */}
       <AnimatePresence mode="wait">
         {renomearOpen && (
           <div className="modal-overlay">
@@ -2481,6 +2780,519 @@ export function System() {
                         : inserirRows.length > 1
                           ? `Inserir ${inserirRows.length} registros`
                           : "Inserir registro"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* ─── Dropdown flutuante de coluna (portal manual — fora da tabela) ─── */}
+      <AnimatePresence mode="wait">
+      {headerMenuAberto &&
+        (() => {
+          const colAberta = activeTabData?.cols?.find(
+            (c) => c.nome === headerMenuAberto,
+          );
+          if (!colAberta) return null;
+          return (
+            <motion.div
+              key="col-header-dropdown"
+              className="col-header-dropdown col-header-dropdown--portal"
+              style={{ top: dropdownPos.top, right: dropdownPos.right }}
+              onClick={(e) => e.stopPropagation()} 
+              variants={fadeOutVariants}
+              exit={"exit"}
+            >
+              {colAberta.identificacao !== "pk" ? (
+                <>
+                  <button
+                    className="col-dropdown-item"
+                    onClick={() => abrirConfigurarColuna(colAberta)}
+                  >
+                    <i className="fi fi-sr-settings" /> Configurar
+                  </button>
+                  <button
+                    className="col-dropdown-item col-dropdown-item--danger"
+                    onClick={() => abrirExcluirColuna(colAberta)}
+                  >
+                    <i className="fi fi-sr-trash" /> Excluir
+                  </button>
+                </>
+              ) : (
+                <span className="col-dropdown-locked">
+                  <i className="fi fi-rr-lock" /> Chave primária — bloqueada
+                </span>
+              )}
+            </motion.div>
+          );
+        })()}
+        </AnimatePresence >
+
+      {/* ═══════════════════ MODAL EXCLUIR COLUNA ══════════════════════════ */}
+      <AnimatePresence mode="wait">
+        {colunaParaExcluir &&
+          (() => {
+            const temDados = colunaTemDados(colunaParaExcluir.nome);
+            return (
+              <div className="modal-overlay">
+                <motion.div
+                  key="modal-excluir-coluna"
+                  className="modal-styled modal-styled--sm"
+                  variants={fadeOutVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <div className="modal-styled-header modal-styled-header--danger">
+                    <div className="modal-styled-icon">
+                      <i className="fi-sr-trash"></i>
+                    </div>
+                    <div>
+                      <h2 className="modal-styled-title">Excluir coluna</h2>
+                      <p className="modal-styled-subtitle">
+                        "{colunaParaExcluir.nome}"
+                      </p>
+                    </div>
+                    <button
+                      className="modal-styled-close"
+                      onClick={() => setColunaParaExcluir(null)}
+                    >
+                      <i className="fi fi-rr-cross" />
+                    </button>
+                  </div>
+
+                  <div className="modal-styled-body">
+                    {temDados ? (
+                      /* ── Coluna tem dados: bloqueio ── */
+                      <div className="col-excluir-bloqueado">
+                        <div className="col-excluir-bloqueado-icon">
+                          <i className="fi fi-sr-shield-exclamation" />
+                        </div>
+                        <p className="col-excluir-bloqueado-title">
+                          Exclusão bloqueada
+                        </p>
+                        <p className="col-excluir-bloqueado-desc">
+                          A coluna <strong>"{colunaParaExcluir.nome}"</strong>{" "}
+                          possui registros cadastrados. Remova todos os dados
+                          desta coluna antes de excluí-la.
+                        </p>
+                        <div className="col-excluir-contagem">
+                          <i className="fi fi-rr-database" />
+                          <span>
+                            {
+                              rows.filter((r) => {
+                                const v = r[colunaParaExcluir.nome];
+                                return (
+                                  v !== "" && v !== null && v !== undefined
+                                );
+                              }).length
+                            }{" "}
+                            registro(s) com dados nesta coluna
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      /* ── Coluna vazia: pedir confirmação ── */
+                      <>
+                        <p className="modal-styled-desc">
+                          Esta ação é irreversível. A coluna será apagada
+                          permanentemente da tabela!
+                        </p>
+                        <div className="modal-styled-field">
+                          <label>
+                            Digite <strong>{colunaParaExcluir.nome}</strong>{" "}
+                            para confirmar
+                          </label>
+                          <input
+                            type="text"
+                            value={confirmacaoExclusaoColuna}
+                            onChange={(e) =>
+                              setConfirmacaoExclusaoColuna(e.target.value)
+                            }
+                            placeholder={colunaParaExcluir.nome}
+                            autoFocus
+                            className={
+                              confirmacaoExclusaoColuna ===
+                              colunaParaExcluir.nome
+                                ? "input-match"
+                                : ""
+                            }
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="modal-styled-footer">
+                    <button
+                      className="btn-secondary"
+                      onClick={() => setColunaParaExcluir(null)}
+                    >
+                      Cancelar
+                    </button>
+                    {!temDados && (
+                      <button
+                        className="btn-danger"
+                        disabled={
+                          confirmacaoExclusaoColuna !== colunaParaExcluir.nome
+                        }
+                        onClick={handleExcluirColuna}
+                      >
+                        <i className="fi fi-rr-trash" /> Excluir coluna
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })()}
+      </AnimatePresence>
+
+      {/* ═══════════════════ MODAL CONFIGURAR COLUNA ════════════════════════ */}
+      <AnimatePresence mode="wait">
+        {colunaParaConfigurar && configEdicao && (
+          <div className="modal-overlay">
+            <motion.div
+              key="modal-configurar-coluna"
+              className="modal-styled modal-styled--config-col"
+              variants={fadeOutVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {/* Cabeçalho */}
+              <div className="modal-styled-header">
+                <div className="modal-styled-icon modal-styled-icon--neutral">
+                  <i className="fi fi-sr-settings" />
+                </div>
+                <div>
+                  <h2 className="modal-styled-title">Configurar coluna</h2>
+                  <p className="modal-styled-subtitle">
+                    "{colunaParaConfigurar.nome}"
+                  </p>
+                </div>
+                <button
+                  className="modal-styled-close"
+                  onClick={() => {
+                    setColunaParaConfigurar(null);
+                    setConfigEdicao(null);
+                  }}
+                >
+                  <i className="fi fi-rr-cross" />
+                </button>
+              </div>
+
+              {/* Corpo */}
+              <div className="modal-styled-body config-col-body">
+                {/* ── Seção: Nome ── */}
+                <div className="config-col-section">
+                  <span className="config-col-section-label">
+                    Nome da coluna
+                  </span>
+                  <div className="col-nome-input-wrapper">
+                    <input
+                      type="text"
+                      className="col-nome-input"
+                      value={configEdicao.nome}
+                      maxLength={NOME_MAX}
+                      onChange={(e) =>
+                        setConfigEdicao((prev) => ({
+                          ...prev,
+                          nome: e.target.value,
+                        }))
+                      }
+                      placeholder="Ex: nome, email, valor..."
+                    />
+                    <span
+                      className={`col-nome-counter-inline ${
+                        configEdicao.nome.length >= NOME_MAX
+                          ? "col-nome-counter--over"
+                          : ""
+                      }`}
+                    >
+                      {configEdicao.nome.length}/{NOME_MAX}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ── Seção: Relacionamento FK (se for FK) ── */}
+                {configEdicao.identificacao === "fk" && (
+                  <div className="config-col-section">
+                    <div className="config-col-section-header">
+                      <span className="config-col-section-label">
+                        <i className="fi fi-sr-share" /> Chave estrangeira
+                      </span>
+                      <button
+                        className="config-col-remover-fk"
+                        onClick={handleConfigEdicaoRemoverFK}
+                      >
+                        <i className="fi fi-rr-unlink" /> Remover relacionamento
+                      </button>
+                    </div>
+                    <div className="col-fk-panel" style={{ padding: 0 }}>
+                      <select
+                        className="fk-select"
+                        value={configEdicao.fkTabela || ""}
+                        onChange={(e) =>
+                          handleConfigEdicaoFKTabela(e.target.value)
+                        }
+                      >
+                        <option value="">Selecione a tabela...</option>
+                        {tabs
+                          .filter((t) => t.id !== activeTab)
+                          .map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
+                          ))}
+                      </select>
+                      {configEdicao.fkTabela && (
+                        <select
+                          className="fk-select"
+                          value={configEdicao.fkColunaId || ""}
+                          onChange={(e) =>
+                            handleConfigEdicaoFKColuna(parseInt(e.target.value))
+                          }
+                        >
+                          <option value="">
+                            Selecione a chave primária...
+                          </option>
+                          {getPKsDeTabela(configEdicao.fkTabela).map((pk) => (
+                            <option key={pk.id} value={pk.id}>
+                              {pk.nome}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    {configEdicao.tipoDado && (
+                      <div
+                        className="col-tipo-auto"
+                        style={{ padding: "6px 0 0" }}
+                      >
+                        <i className="fi fi-rr-magic-wand fk" />
+                        <span>
+                          Tipo herdado: <strong>{configEdicao.tipoDado}</strong>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Seção: Tipo de dado (só se não for FK) ── */}
+                {configEdicao.identificacao !== "fk" && (
+                  <div className="config-col-section">
+                    <span className="config-col-section-label">
+                      Tipo de dado
+                    </span>
+                    <div className="grupo-tabs">
+                      {Object.keys(GRUPOS_TIPOS).map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          className={`grupo-tab ${configEdicao.grupo === g ? "grupo-tab--active" : ""}`}
+                          onClick={() => handleConfigEdicaoGrupo(g)}
+                        >
+                          <i className={`fi ${GRUPO_ICONS[g]}`} /> {g}
+                        </button>
+                      ))}
+                    </div>
+                    {configEdicao.grupo && (
+                      <div className="tipo-pills">
+                        {GRUPOS_TIPOS[configEdicao.grupo].map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            className={`tipo-pill ${configEdicao.tipoDado === t ? "tipo-pill--active" : ""}`}
+                            onClick={() => handleConfigEdicaoTipo(t)}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {configEdicao.tipoDado === "Moeda" && (
+                      <div className="moeda-picker">
+                        <span className="moeda-picker-label">
+                          Tipo de moeda
+                        </span>
+                        <div className="moeda-pills">
+                          {MOEDAS.map((m) => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              className={`moeda-pill ${configEdicao.config.moeda === m.id ? "moeda-pill--active" : ""}`}
+                              onClick={() => handleConfigEdicaoMoeda(m.id)}
+                            >
+                              <span className="moeda-simbolo">{m.simbolo}</span>
+                              <span className="moeda-label">{m.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Seção: Opções de configuração ── */}
+                {configEdicao.tipoDado &&
+                  (() => {
+                    const cat = getTipoCategoria(configEdicao.tipoDado);
+                    const cfgs = cat ? CONFIGS_POR_CATEGORIA[cat] : [];
+                    const toggles = cfgs.filter(
+                      (k) => CONFIG_META[k]?.tipo === "toggle",
+                    );
+                    const inputs = cfgs.filter((k) =>
+                      ["text", "number"].includes(CONFIG_META[k]?.tipo),
+                    );
+
+                    if (cfgs.length === 0) return null;
+
+                    return (
+                      <div className="config-col-section">
+                        <span className="config-col-section-label">Opções</span>
+                        <div className="cfg-body" style={{ padding: 0 }}>
+                          {toggles.length > 0 && (
+                            <div className="cfg-toggles">
+                              {toggles.map((key) => (
+                                <label
+                                  key={key}
+                                  className={`cfg-toggle ${configEdicao.config[key] ? "cfg-toggle--on" : ""}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={!!configEdicao.config[key]}
+                                    onChange={(e) =>
+                                      updateConfigEdicaoConfig(
+                                        key,
+                                        e.target.checked,
+                                      )
+                                    }
+                                  />
+                                  <span className="cfg-toggle-dot" />
+                                  <span className="cfg-toggle-label">
+                                    {CONFIG_META[key].label}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                          {inputs.length > 0 && (
+                            <div className="cfg-inputs">
+                              {inputs.map((key) => {
+                                const mascaraAuto =
+                                  key === "mascara" &&
+                                  !!MASCARA_AUTO[configEdicao.tipoDado];
+                                const bloqueado = mascaraAuto;
+                                if (key === "alcanceMaximo") {
+                                  return (
+                                    <div key={key} className="cfg-input-field">
+                                      <label>
+                                        {CONFIG_META.alcanceMaximo.label}
+                                        <span className="cfg-max-hint">
+                                          máx. 255
+                                        </span>
+                                      </label>
+                                      <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={
+                                          configEdicao.config.alcanceMaximo ??
+                                          ""
+                                        }
+                                        onChange={(e) => {
+                                          const raw = e.target.value.replace(
+                                            /\D/g,
+                                            "",
+                                          );
+                                          if (raw === "") {
+                                            updateConfigEdicaoConfig(
+                                              "alcanceMaximo",
+                                              "",
+                                            );
+                                            return;
+                                          }
+                                          updateConfigEdicaoConfig(
+                                            "alcanceMaximo",
+                                            String(
+                                              Math.min(parseInt(raw, 10), 255),
+                                            ),
+                                          );
+                                        }}
+                                        placeholder="1 – 255"
+                                      />
+                                    </div>
+                                  );
+                                }
+                                return (
+                                  <div
+                                    key={key}
+                                    className={`cfg-input-field ${bloqueado ? "cfg-input-field--locked" : ""}`}
+                                  >
+                                    <label>
+                                      {CONFIG_META[key].label}
+                                      {mascaraAuto && (
+                                        <span className="cfg-auto-badge">
+                                          auto
+                                        </span>
+                                      )}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={configEdicao.config[key] ?? ""}
+                                      disabled={bloqueado}
+                                      onChange={(e) =>
+                                        !bloqueado &&
+                                        updateConfigEdicaoConfig(
+                                          key,
+                                          e.target.value,
+                                        )
+                                      }
+                                      placeholder={
+                                        bloqueado
+                                          ? configEdicao.config[key] || "—"
+                                          : `Defina ${CONFIG_META[key].label.toLowerCase()}`
+                                      }
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+              </div>
+
+              {/* Rodapé */}
+              <div className="modal-styled-footer">
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    setColunaParaConfigurar(null);
+                    setConfigEdicao(null);
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleSalvarConfiguracao}
+                  disabled={
+                    loadingSalvarConfig ||
+                    !configEdicao.nome.trim() ||
+                    !configEdicao.tipoDado
+                  }
+                >
+                  {loadingSalvarConfig ? (
+                    <span className="btn-spinner" />
+                  ) : (
+                    <>
+                      <i className="fi fi-rr-check" /> Salvar alterações
                     </>
                   )}
                 </button>

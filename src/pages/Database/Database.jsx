@@ -1,6 +1,6 @@
 import "./Database.scss";
 import { useState, useEffect, useCallback } from "react";
-import { Menu } from "../../components/Menu/Menu";
+import { Menu } from "../../components/Menu/Menu.jsx";
 import { useNavigate } from "react-router-dom";
 import { API, DATABASE_CRUD_ROUTES } from "../../../constants/api_rest.js";
 import { motion, AnimatePresence } from "framer-motion";
@@ -332,8 +332,14 @@ export function Database() {
                             </button>
                             <button
                               className="acessar"
-                              onClick={() => navigate("/system", 
-                                { state: { dbId: db.id, dbNome: db.nomeDatabase }})}
+                              onClick={() =>
+                                navigate("/system", {
+                                  state: {
+                                    dbId: db.id,
+                                    dbNome: db.nomeDatabase,
+                                  },
+                                })
+                              }
                             >
                               <i className="fi fi-sr-server-key"></i>
                             </button>
@@ -348,26 +354,31 @@ export function Database() {
                       ))}
 
                       {/* BOTÃO DE ADICIONAR DATABASE */}
-                      <div
-                        className={`criar-database-icone ${isLimiteAtingido ? "desabilitado" : ""}`}
-                        onClick={() => {
-                          if (!isLimiteAtingido) {
-                            setIsCriando(true);
-                          } else {
-                            mostrarAviso(
-                              "warning",
-                              "Limite Atingido",
-                              "Seu plano (${planoUsuario}) permite apenas ${limiteDatabases} database(s).",
-                            );
-                          }
-                        }}
-                        style={{
-                          cursor: isLimiteAtingido ? "not-allowed" : "pointer",
-                          opacity: isLimiteAtingido ? 0.5 : 1,
-                        }}
-                      >
-                        <i className="fi fi-sr-layer-plus"></i>
-                      </div>
+                      {!(planoUsuario === "ULTRA" && isLimiteAtingido) && (
+                        <div
+                          className={`criar-database-icone ${isLimiteAtingido ? "desabilitado" : ""}`}
+                          onClick={() => {
+                            if (!isLimiteAtingido) {
+                              setIsCriando(true);
+                            } else {
+                              mostrarAviso(
+                                "warning",
+                                "Limite Atingido",
+                                `Seu plano (${planoUsuario}) permite apenas ${limiteDatabases} database(s).`,
+                              );
+                            }
+                          }}
+                          style={{
+                            cursor: isLimiteAtingido
+                              ? "not-allowed"
+                              : "pointer",
+                            opacity: isLimiteAtingido ? 0.5 : 1,
+                            display: "flex", 
+                          }}
+                        >
+                          <i className="fi fi-sr-layer-plus"></i>
+                        </div>
+                      )}
                     </motion.div>
                   )}
               </AnimatePresence>

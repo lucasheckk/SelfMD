@@ -1,134 +1,22 @@
-import "./styles/App.scss";
-import ScrollFloat from "./ReactBitsCodes/ScrollFloat/ScrollFloat.jsx";
-import SplitText from "./ReactBitsCodes/SplitText/SplitText.jsx";
-import Lenis from "@studio-freight/lenis";
-import { useEffect } from "react";
-import { Link } from 'react-router-dom';
-import { LoadingAnimation } from './components/Animation/LoadingAnimation.jsx'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/Landing/LandingPage';
+import Login from './pages/Login/Login'; 
+import System from './pages/Database/Database'; 
 
 function App() {
-  useEffect(() => {
-    const lenis = new Lenis();
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-  }, []);
-
-  const handleAnimationComplete = () => {
-    console.log("All letters have animated!");
-  };
-
   return (
-    <>
-      <main>
-        <div className="app-container">
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <SplitText
-            text="Seja bem vindo ao"
-            className="text-2xl font-semibold text-center"
-            delay={30}
-            duration={1}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 40 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={1}
-            rootMargin="-100px"
-            textAlign="center"
-            onLetterAnimationComplete={handleAnimationComplete}
-            tag="h1"
-          />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <Link to="/login">
-            <button style={{ cursor: "pointer" }}>Login</button>
-          </Link>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <ScrollFloat
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-          >
-            Self MD
-          </ScrollFloat>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-        </div>
-      </main>
-    </>
+    <Router>
+      <Routes>
+        {/* Quando a URL for "/", mostra a Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+        
+        {/* Quando a URL for "/login", mostra o Login */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Quando a URL for "/database", mostra o Sistema */}
+        <Route path="/database" element={<System />} />
+      </Routes>
+    </Router>
   );
 }
 

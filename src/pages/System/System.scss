@@ -153,7 +153,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           font-size: 15px;
           font-weight: 500;
           font-family: v.$jakarta;
-          color: #aaa;
+          color: #333;
           cursor: pointer;
           transition: v.$transicao-rapida;
           i {
@@ -161,7 +161,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
             padding-top: 2px;
           }
           &:hover {
-            color: #777;
+            color: v.$cor-primaria;
           }
         }
         .apagar-tabela-btn {
@@ -173,7 +173,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           font-size: 15px;
           font-weight: 500;
           font-family: v.$jakarta;
-          color: #aaa;
+          color: #333;
           cursor: pointer;
           transition: v.$transicao-rapida;
           i {
@@ -356,45 +356,63 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               }
             }
           }
+
           .resizable-col {
             overflow: visible !important;
             position: relative;
+
             .cell-content {
               display: flex;
               align-items: center;
               justify-content: space-between;
               width: 100%;
               height: 100%;
-              padding: 12px 8px;
+              padding: 4px 8px;
               box-sizing: border-box;
-              .col-label {
+              gap: 4px;
+
+              // ── Agrupa nome + menu: some junto ao redimensionar ──────────────────────
+              .col-label-group {
+                display: flex;
+                align-items: center;
                 flex: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
+                min-width: 0; 
+                overflow: hidden; 
+                gap: 4px;
+
+                .col-label {
+                  flex: 1;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  min-width: 0;
+                  font-size: 13px;
+                }
               }
+
               .resizer-handle {
                 flex-shrink: 0;
                 background: none;
                 border: none;
-                cursor: col-resize;
-                padding: 0 4px;
+                cursor: move;
+                padding: 0 2px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                .resizer-line {
-                  width: 3px;
-                  height: 18px;
-                  border-radius: 2px;
-                  background: #c7c7c7;
-                  &:hover {
-                    background-color: #333;
-                  }
+
+                i {
+                  font-size: 14px;
+                  color: #c7c7c7;
+                  transform: rotate(90deg);
+                  pointer-events: none;
+                }
+
+                &:hover i {
+                  color: #777;
                 }
               }
             }
           }
+
           .actions-header {
             width: $actions-width;
             min-width: $actions-width;
@@ -880,7 +898,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       .col-nome-input {
         border: 1.5px solid #e0e0e0;
         border-radius: 7px;
-        padding: 8px 46px 8px 11px; // padding-right dá espaço pro contador
+        padding: 8px 46px 8px 11px; 
         font-size: 13px;
         font-family: v.$jakarta;
         color: #333;
@@ -1089,6 +1107,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+
   .grupo-tab {
     display: flex;
     align-items: center;
@@ -1104,14 +1123,17 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     transition: v.$transicao-rapida;
     white-space: nowrap;
     font-weight: 500;
+
     i {
       font-size: 12px;
       margin-top: 3.5px;
     }
+
     &:hover {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
     }
+
     &.grupo-tab--active {
       background: v.$cor-primaria;
       border-color: v.$cor-primaria;
@@ -1125,6 +1147,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   gap: 5px;
   flex-wrap: wrap;
   padding: 2px 0;
+
   .tipo-pill {
     background: #fff;
     border: 1.5px solid #e8e8e8;
@@ -1136,14 +1159,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     cursor: pointer;
     transition: v.$transicao-rapida;
     white-space: nowrap;
+
     &:hover {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
     }
+
     &.tipo-pill--active {
       border-color: v.$cor-primaria;
       color: v.$cor-primaria;
-      font-weight: 600;
+      font-weight: 400;
     }
   }
 }
@@ -2055,9 +2080,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 
     .insert-field-header {
       display: flex;
-      justify-content: space-between; 
+      justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px; 
+      margin-bottom: 8px;
       width: 100%;
 
       .insert-field-label-group {
@@ -2096,9 +2121,9 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       transition: v.$transicao-rapida;
 
       &:focus {
-        border-color: v.$cor-primaria; 
+        border-color: v.$cor-primaria;
         outline: none;
-        transition: v.$transicao-rapida;  
+        transition: v.$transicao-rapida;
       }
 
       &:hover {
@@ -2378,4 +2403,246 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   background: #fafafa;
   border-top: 1px solid #f0f0f0;
   font-family: v.$jakarta;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── DROPDOWN DO CABEÇALHO DE COLUNA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.col-header-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.col-header-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 5px;
+  color: #bbb;
+  font-size: 13px;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  transition: v.$transicao-rapida;
+
+  &:hover {
+    color: #555;
+    background: #f0f0f0;
+  }
+}
+
+.col-header-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 160px;
+  overflow: hidden;
+  animation: v.$transicao-fadeIn;
+
+  .col-header-dropdown--portal {
+  position: fixed;
+  z-index: 9000; // acima de tudo, inclusive modais de tabela
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
+  overflow: hidden;
+  animation: v.$transicao-fadeIn;
+}
+}
+
+.col-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: v.$jakarta;
+  font-weight: 500;
+  color: #444;
+  text-align: left;
+  transition: v.$transicao-rapida;
+
+  i {
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
+    line-height: 0;
+  }
+
+  &:hover {
+    background: #f7f7f7;
+    color: black;
+  }
+
+  &.col-dropdown-item--danger {
+    border-top: 1.5px solid #f5f5f5;
+
+    &:hover {
+      background: #fff5f5;
+    }
+  }
+}
+
+.col-dropdown-locked {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #bbb;
+  font-family: v.$jakarta;
+  cursor: default;
+
+  i {
+    font-size: 12px;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── MODAL EXCLUIR COLUNA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.col-excluir-bloqueado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  text-align: center;
+
+  .col-excluir-bloqueado-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(#f59e0b, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 24px;
+      color: #f59e0b;
+    }
+  }
+
+  .col-excluir-bloqueado-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+  }
+
+  .col-excluir-bloqueado-desc {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 320px;
+
+    strong {
+      color: #555;
+    }
+  }
+}
+
+.col-excluir-contagem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(#f59e0b, 0.06);
+  border: 1.5px solid rgba(#f59e0b, 0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #b45309;
+  font-family: v.$jakarta;
+  font-weight: 500;
+
+  i {
+    font-size: 14px;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── MODAL CONFIGURAR COLUNA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.modal-styled--config-col {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 60px);
+}
+
+.config-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 22px;
+}
+
+.config-col-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-col-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #aaa;
+  font-family: v.$jakarta;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    font-size: 11px;
+  }
+}
+
+.config-col-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-col-remover-fk {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1.5px solid #fde0e0;
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: v.$jakarta;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: v.$transicao-rapida;
+
+  i {
+    font-size: 11px;
+  }
+
+  &:hover {
+    background: #fff5f5;
+    border-color: #e74c3c;
+  }
 }

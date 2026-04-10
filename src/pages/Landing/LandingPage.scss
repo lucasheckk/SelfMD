@@ -1,0 +1,225 @@
+@use '../../styles/variables' as v; // Certifique-se de que o caminho aponta para o seu arquivo de variáveis
+
+.landing-page {
+  font-family: v.$jakarta; // Assumindo que você usa aquela fonte dos seus outros prints
+  color: #333;
+  background-color: #fafafa;
+  overflow-x: hidden;
+
+  // ─── Botão Padrão ───
+  .btn-primario {
+    display: inline-block;
+    background-color: v.$cor-primaria; // Substitua pela sua cor verde/azul principal
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(0.9);
+      transform: translateY(-2px);
+    }
+
+    &.btn-grande {
+      padding: 18px 40px;
+      font-size: 18px;
+    }
+  }
+
+  // ─── Hero Section ───
+  .hero-section {
+    min-height: 100vh; // Ocupa a tela inteira do navegador
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #fafafa 0%, #eaeaea 100%); // Fundo leve
+
+    .hero-content {
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px; // Espaço consistente entre título, texto e botão
+    }
+
+    .hero-title {
+      font-size: 4rem; // Tamanho grande para desktop
+      color: #111;
+      margin: 0;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+  }
+
+  // ─── Features Section ───
+  .features-section {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); // Responsivo automático!
+      gap: 2rem;
+
+      .feature-card {
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        border: 1px solid #efefef;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+        }
+
+        .feature-icon {
+          font-size: 3rem;
+          color: v.$cor-primaria;
+          margin-bottom: 1rem;
+          display: inline-block;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: #777;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+
+  // ─── Showcase (Mockup) ───
+  .showcase-section {
+    padding: 6rem 2rem;
+    background-color: #111; // Fundo escuro para destacar a UI
+    color: #fff;
+    text-align: center;
+    overflow: hidden;
+
+    .showcase-header {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 4rem;
+    }
+
+    .mockup-window {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fafafa;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: left;
+      color: #333;
+
+      .mockup-header {
+        background: #e0e0e0;
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+
+        .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          &.dot-red { background: #ff5f56; }
+          &.dot-yellow { background: #ffbd2e; }
+          &.dot-green { background: #27c93f; }
+        }
+      }
+
+      .mockup-body {
+        display: flex;
+        min-height: 300px;
+
+        .mockup-sidebar {
+          width: 20%;
+          background: #f4f4f4;
+          border-right: 1px solid #ddd;
+        }
+
+        .mockup-content {
+          padding: 2rem;
+          flex: 1;
+
+          .mockup-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+          }
+
+          .mockup-fields {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+
+            .mockup-input {
+              flex: 1;
+              border: 1px solid #ccc;
+              padding: 10px;
+              border-radius: 6px;
+              color: #888;
+              background: #fff;
+            }
+          }
+
+          .mockup-btn {
+            background: v.$cor-primaria;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+
+  // ─── CTA & Footer ───
+  .cta-section {
+    padding: 6rem 2rem;
+    text-align: center;
+    background: #fff;
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .landing-footer {
+    text-align: center;
+    padding: 2rem;
+    background: #f9f9f9;
+    color: #666;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+  }
+}
