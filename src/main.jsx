@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RoutesConfig } from '../constants/routes.jsx'
+import  App  from '../src/App'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RoutesConfig />
+    <App />
   </StrictMode>,
 )

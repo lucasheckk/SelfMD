@@ -32,7 +32,7 @@ const fadeOutVariants = {
 
 const GRUPOS_TIPOS = {
   Texto: ["Texto", "Lista"],
-  Numérico: ["Número Decimal", "Número Inteiro"],
+  Numérico: ["Decimal", "Inteiro"],
   Tempo: ["Hora", "Data", "Data / Hora"],
   Avançado: ["Cálculo", "Boleano"],
   Pre_definido: ["Email", "CPF", "Telefone", "Moeda"],
@@ -41,8 +41,8 @@ const GRUPOS_TIPOS = {
 const MAPA_TIPOS_API = {
   Texto: "texto",
   Email: "email",
-  "Número Decimal": "numero_dec",
-  "Número Inteiro": "numero_int",
+  Decimal: "numero_dec",
+  Inteiro: "numero_int",
   CPF: "cpf",
   Telefone: "telefone",
   Moeda: "moeda",
@@ -82,8 +82,7 @@ const MASCARA_AUTO = {
 // ─── Categoria de config por tipo ─────────────────────────────────────────
 const getTipoCategoria = (tipo) => {
   if (["Texto", "Email", "CPF", "Telefone"].includes(tipo)) return "texto";
-  if (["Número Inteiro", "Número Decimal", "Moeda"].includes(tipo))
-    return "numerico";
+  if (["Inteiro", "Decimal", "Moeda"].includes(tipo)) return "numerico";
   if (["Hora", "Data", "Data / Hora"].includes(tipo)) return "temporal";
   if (["Email", "CPF", "Telefone", "Moeda"].includes(tipo))
     return "pre_definido";
@@ -95,13 +94,7 @@ const getTipoCategoria = (tipo) => {
 
 const CONFIGS_POR_CATEGORIA = {
   texto: ["naoVazio", "alcanceMaximo", "unico"],
-  numerico: [
-    "naoVazio",
-    "indice",
-    "autoIncremento",
-    "valorPadrao",
-    "alcanceMaximo",
-  ],
+  numerico: ["naoVazio", "indice", "unico", "alcanceMaximo"],
   temporal: ["naoVazio", "indice", "mascaraData"],
   boleano: ["naoVazio", "mascara"],
   calculo: ["naoVazio", "indice"],
@@ -113,7 +106,6 @@ const CONFIG_META = {
   unico: { label: "Único", tipo: "toggle" },
   autoIncremento: { label: "Auto-incremento", tipo: "toggle" },
   indice: { label: "Índice", tipo: "toggle" },
-  valorPadrao: { label: "Valor padrão", tipo: "text" },
   alcanceMaximo: { label: "Alcance máximo", tipo: "number" },
   mascara: { label: "Máscara", tipo: "text" },
   mascaraLista: { label: "Máscara de itens", tipo: "select" },
@@ -123,7 +115,6 @@ const CONFIG_META = {
 const CONFIG_PADRAO = {
   naoVazio: false,
   unico: false,
-  valorPadrao: "",
   alcanceMaximo: "",
   autoIncremento: false,
   indice: false,
@@ -160,7 +151,7 @@ const PRIMEIRA_COLUNA_PK = () => ({
   fkTabela: null,
   fkColunaId: null,
   grupo: "Numérico",
-  tipoDado: "Número Inteiro",
+  tipoDado: "Inteiro",
   config: {
     ...CONFIG_PADRAO,
     naoVazio: true,
@@ -207,7 +198,7 @@ const validarCampo = (valor, col) => {
       if (!/^\+\d{2} \(\d{2}\) \d{4,5}-\d{4}$/.test(v))
         return `"${col.nome}" deve seguir o formato +55 (99) 99999-9999.`;
       break;
-    case "Número Inteiro":
+    case "Inteiro":
       if (!/^-?\d+$/.test(v))
         return `"${col.nome}" deve ser um número inteiro.`;
       if (
@@ -216,7 +207,7 @@ const validarCampo = (valor, col) => {
       )
         return `"${col.nome}" excede o alcance máximo de ${col.config.alcanceMaximo} caracteres.`;
       break;
-    case "Número Decimal":
+    case "Decimal":
       if (!/^-?\d+([.,]\d+)?$/.test(v))
         return `"${col.nome}" deve ser um número decimal (ex: 3,14).`;
       break;
@@ -258,9 +249,9 @@ const getPlaceholderPorTipo = (col) => {
       return "000.000.000-00";
     case "Telefone":
       return "+55 (99) 99999-9999";
-    case "Número Inteiro":
+    case "Inteiro":
       return "0";
-    case "Número Decimal":
+    case "Decimal":
       return "0,00";
     case "Moeda":
       return "0,00";
@@ -612,7 +603,7 @@ export function System() {
           fkTabela: null,
           fkColunaId: null,
           grupo: "Numérico",
-          tipoDado: "Número Inteiro",
+          tipoDado: "Inteiro",
           config: {
             ...CONFIG_PADRAO,
             naoVazio: true,
@@ -736,6 +727,32 @@ export function System() {
 
   // ── Criar tabela + colunas ────────────────────────────────────────────────
   const handleCriarTabela = async () => {
+    const sanitizarNome = (str) => {
+      if (!str) return "";
+      return str
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9_]/g, "")
+        .toLowerCase();
+    };
+
+    const nomeTabelaLimpo = sanitizarNome(nomeTabela);
+
+    const tabelaJaExiste = tabs.some(
+      (t) => t.name && sanitizarNome(t.name) === nomeTabelaLimpo
+    );
+
+    if (tabelaJaExiste) {
+      pushNotification(
+        "warning",
+        "Nome duplicado",
+        `Já existe uma tabela chamada "${nomeTabelaLimpo}" neste database.`,
+      );
+      return;
+    }
+
     const colsValidas = colunas.filter((c) => c.nome.trim() && c.tipoDado);
     if (colsValidas.length === 0) {
       pushNotification(
@@ -745,52 +762,73 @@ export function System() {
       );
       return;
     }
+
     if (!idDoDatabaseAtual) {
       pushNotification("error", "Erro", "Database não identificada.");
       return;
     }
 
     setLoadingCreate(true);
+    let idTabelaCriada = null;
     try {
       const resTabela = await API.post(
         TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
-        { nomeTabela: nomeTabela.trim() },
+        { nomeTabela: nomeTabelaLimpo },
       );
-      const idTabelaCriada = resTabela.data.id;
+
+      idTabelaCriada = resTabela.data.id;
       if (!idTabelaCriada)
         throw new Error("ID da tabela não retornado pelo servidor.");
 
-      const payloadColunas = colsValidas.map((col) => ({
-        nomeColuna: col.nome.trim(),
-        tipoDado: MAPA_TIPOS_API[col.tipoDado] || col.tipoDado,
-        isPrimaryKey: col.identificacao === "pk",
-        isForeignKey: col.identificacao === "fk",
-        fkTabelaId: col.fkTabela || null,
-        fkColunaId: col.fkColunaId || null,
-        tabelaId: idTabelaCriada,
-        config: mapConfigParaApi(col.config, MAPA_TIPOS_API[col.tipoDado]),
-      }));
+      const payloadColunas = colsValidas.map((col) => {
+        const tipoMapeado = MAPA_TIPOS_API[col.tipoDado];
+
+        if (!tipoMapeado) {
+          console.warn(`Tipo não encontrado no mapa: ${col.tipoDado}`);
+        }
+
+        return {
+          nomeColuna: sanitizarNome(col.nome),
+          tipoDado: tipoMapeado || "texto",
+          isPrimaryKey: col.identificacao === "pk",
+          isForeignKey: col.identificacao === "fk",
+          fkTabelaId: col.fkTabela || null,
+          fkColunaId: col.fkColunaId || null,
+          tabelaId: idTabelaCriada,
+          config: mapConfigParaApi(col.config, tipoMapeado),
+        };
+      });
 
       await API.post(COLUNA_CRUD_ROUTES.CRIAR, payloadColunas);
+      await API.post(TABELA_CRUD_ROUTES.SINCRONIZAR(idTabelaCriada));
+
       await carregarDados();
       setActiveTab(idTabelaCriada);
       closeWizard();
+
       pushNotification(
         "success",
         "Sucesso!",
         `Tabela "${nomeTabela}" criada com suas colunas.`,
       );
     } catch (err) {
-      const errorData = err.response?.data;
-      pushNotification(
-        "error",
-        "Erro ao salvar",
-        errorData?.message || err.message,
-      );
-    } finally {
-      setLoadingCreate(false);
+    if (idTabelaCriada) {
+      try {
+
+        await API.delete(TABELA_CRUD_ROUTES.DELETAR(idTabelaCriada));
+        console.log(`Tabela ${idTabelaCriada} deletada após falha na sincronização.`);
+      } catch (cleanupErr) {
+        console.error("Falha ao limpar metadados da tabela após erro:", cleanupErr);
+      }
     }
-  };
+
+    const errorData = err.response?.data;
+    pushNotification("error", "Erro ao salvar", errorData?.message || err.message);
+    
+  } finally {
+    setLoadingCreate(false);
+  }
+};
 
   // ── Excluir tabela ────────────────────────────────────────────────────────
   const handleExcluirTabela = async (idTabela) => {
@@ -1183,14 +1221,12 @@ export function System() {
           headers[colNumber] = cell.text;
         });
 
-        // 2. Iterar sobre as linhas de dados (a partir da linha 2)
         worksheet.eachRow((row, rowNumber) => {
           if (rowNumber > 1) {
             const rowData = {};
             row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
               const header = headers[colNumber];
               if (header) {
-                // Pegamos o valor real ou o resultado da fórmula
                 rowData[header] =
                   cell.result !== undefined ? cell.result : cell.value;
               }
@@ -1198,7 +1234,6 @@ export function System() {
             rows.push(rowData);
           }
         });
-        // -------------------------------
       }
 
       if (rows.length === 0) {
@@ -1447,9 +1482,6 @@ export function System() {
                   <button className="action-header-btn" onClick={openInserir}>
                     <i className="fi fi-sr-add-document" /> Inserir registro
                   </button>
-                  <button className="action-header-btn">
-                    <i className="fi fi-sr-refresh" /> Recarregar dados
-                  </button>
                   <button className="action-header-btn" onClick={openRenomear}>
                     <i className="fi fi-sr-pencil" /> Renomear tabela
                   </button>
@@ -1572,7 +1604,6 @@ export function System() {
 
                         <th className="actions-header sticky-col sticky-actions">
                           <div className="actions-cell-content">
-                            {/* Botões globais mantidos, mas agora os individuais ficam no dropdown acima */}
                             <button
                               title="Recarregar colunas"
                               onClick={carregarDados}
@@ -1621,14 +1652,7 @@ export function System() {
                               </td>
                             ))}
                             <td className="actions-cell sticky-col sticky-actions">
-                              <div className="actions-container">
-                                <button>
-                                  <i className="fi fi-rr-file-edit editar" />
-                                </button>
-                                <button>
-                                  <i className="fi fi-rr-delete-document remover" />
-                                </button>
-                              </div>
+                              <div className="actions-container"></div>
                             </td>
                           </tr>
                         ))
@@ -2034,7 +2058,6 @@ export function System() {
                               <i className="fi fi-rr-lock" />
                               <span>
                                 As configurações desta coluna são automáticas.
-                                Apenas o valor padrão pode ser editado.
                               </span>
                             </div>
                           )}
@@ -2329,8 +2352,8 @@ export function System() {
 
               <div className="modal-styled-body">
                 <p className="modal-styled-desc">
-                  Todas as colunas e seus registros vinculados a esta tabela serão
-                  permanentemente apagados.
+                  Todas as colunas e seus registros vinculados a esta tabela
+                  serão permanentemente apagados.
                 </p>
                 <div className="modal-styled-field">
                   <label>
@@ -2788,48 +2811,48 @@ export function System() {
           </div>
         )}
       </AnimatePresence>
-      
+
       {/* ─── Dropdown flutuante de coluna (portal manual — fora da tabela) ─── */}
       <AnimatePresence mode="wait">
-      {headerMenuAberto &&
-        (() => {
-          const colAberta = activeTabData?.cols?.find(
-            (c) => c.nome === headerMenuAberto,
-          );
-          if (!colAberta) return null;
-          return (
-            <motion.div
-              key="col-header-dropdown"
-              className="col-header-dropdown col-header-dropdown--portal"
-              style={{ top: dropdownPos.top, right: dropdownPos.right }}
-              onClick={(e) => e.stopPropagation()} 
-              variants={fadeOutVariants}
-              exit={"exit"}
-            >
-              {colAberta.identificacao !== "pk" ? (
-                <>
-                  <button
-                    className="col-dropdown-item"
-                    onClick={() => abrirConfigurarColuna(colAberta)}
-                  >
-                    <i className="fi fi-sr-settings" /> Configurar
-                  </button>
-                  <button
-                    className="col-dropdown-item col-dropdown-item--danger"
-                    onClick={() => abrirExcluirColuna(colAberta)}
-                  >
-                    <i className="fi fi-sr-trash" /> Excluir
-                  </button>
-                </>
-              ) : (
-                <span className="col-dropdown-locked">
-                  <i className="fi fi-rr-lock" /> Chave primária — bloqueada
-                </span>
-              )}
-            </motion.div>
-          );
-        })()}
-        </AnimatePresence >
+        {headerMenuAberto &&
+          (() => {
+            const colAberta = activeTabData?.cols?.find(
+              (c) => c.nome === headerMenuAberto,
+            );
+            if (!colAberta) return null;
+            return (
+              <motion.div
+                key="col-header-dropdown"
+                className="col-header-dropdown col-header-dropdown--portal"
+                style={{ top: dropdownPos.top, right: dropdownPos.right }}
+                onClick={(e) => e.stopPropagation()}
+                variants={fadeOutVariants}
+                exit={"exit"}
+              >
+                {colAberta.identificacao !== "pk" ? (
+                  <>
+                    <button
+                      className="col-dropdown-item"
+                      onClick={() => abrirConfigurarColuna(colAberta)}
+                    >
+                      <i className="fi fi-sr-settings" /> Configurar
+                    </button>
+                    <button
+                      className="col-dropdown-item col-dropdown-item--danger"
+                      onClick={() => abrirExcluirColuna(colAberta)}
+                    >
+                      <i className="fi fi-sr-trash" /> Excluir
+                    </button>
+                  </>
+                ) : (
+                  <span className="col-dropdown-locked">
+                    <i className="fi fi-rr-lock" /> Chave primária — bloqueada
+                  </span>
+                )}
+              </motion.div>
+            );
+          })()}
+      </AnimatePresence>
 
       {/* ═══════════════════ MODAL EXCLUIR COLUNA ══════════════════════════ */}
       <AnimatePresence mode="wait">

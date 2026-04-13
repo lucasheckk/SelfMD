@@ -21,7 +21,7 @@ export function SegundoMenu() {
         </div>
         <div className="smenu-center">
           <div className="smenu-search">
-            <input className="search-bar" type="text" placeholder="Filtre por aqui..." />
+            <input className="search-bar" type="text" placeholder="Busque por aqui..." />
           <button className="search-icon">
             <i className="fi fi-rr-search lupa"></i>
           </button>
@@ -35,12 +35,12 @@ export function SegundoMenu() {
             <i className="fi fi-rr-bell"></i>
           </button>
           <i className="fi fi-sr-bell-notification-social-media"></i>
-          <i className="fi fi-rr-folder-link"></i>
+          <i className="fi fi-rr-share"></i>
           <button>
-            <i className="fi fi-rr-it-alt"></i>
+            <i className="fi fi-rr-bolt"></i>
           </button>
           <button>
-            <i className="fi fi-rr-users"></i>
+            <i className="fi fi-rr-settings"></i>
           </button>
         </div>
       </div>
