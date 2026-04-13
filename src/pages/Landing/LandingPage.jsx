@@ -6,6 +6,8 @@ import Lenis from "@studio-freight/lenis";
 import SplitText from "../../ReactBitsCodes/SplitText/SplitText.jsx";
 import MagicRings from "../../ReactBitsCodes/MagicRings/MagicRings.jsx";
 import StarBorder from "../../ReactBitsCodes/StarBorder/StarBorder.jsx";
+import BorderGlow from "../../ReactBitsCodes/BorderGlow/BorderGlow.jsx";
+import CardSwap, { Card } from "../../ReactBitsCodes/CardSwap/CardSwap.jsx";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── Dados fictícios para a Demo da tabela ao vivo
@@ -83,6 +85,29 @@ const STEPS = [
     title: "Gerencie seus Dados",
     desc: "Insira, edite, filtre e exporte registros. Importe planilhas .xlsx, .csv ou .json.",
     preview: <StepPreviewTable />,
+  },
+];
+
+const SOBRE_FEATURES = [
+  {
+    icon: "fi-sr-eye",
+    title: "Sem SQL",
+    desc: "Nunca escreva uma query manualmente. A interface faz tudo por você.",
+  },
+  {
+    icon: "fi-sr-shield-check",
+    title: "Banco Real",
+    desc: "Suas tabelas existem de verdade em MySQL — não é simulação.",
+  },
+  {
+    icon: "fi-sr-bolt",
+    title: "Rápido",
+    desc: "Do zero a uma tabela funcional em menos de 60 segundos.",
+  },
+  {
+    icon: "fi-sr-users",
+    title: "Para Todos",
+    desc: "Funciona para quem conhece SQL e para quem nunca viu uma query.",
   },
 ];
 
@@ -426,67 +451,76 @@ function DemoSandbox() {
             </div>
 
             {/* Tabela dos registros */}
-            <div className="sandbox-table-wrap">
-              <table className="sandbox-table">
-                <thead>
-                  <tr>
-                    <th className="sandbox-th-check" />
-                    <th>ID</th>
-                    <th>{nomeColuna.toUpperCase()}</th>
-                    <th className="sandbox-th-type">{tipoColuna}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence>
-                    {registros.map((reg, i) => {
-                      const sel = selecionados.includes(reg.id);
-                      return (
-                        <motion.tr
-                          key={reg.id}
-                          className={sel ? "sandbox-row-selected" : ""}
-                          initial={{
-                            opacity: 0,
-                            backgroundColor: "rgba(11,205,95,0.15)",
-                          }}
-                          animate={{
-                            opacity: 1,
-                            backgroundColor: sel
-                              ? "rgba(11,205,95,0.15)"
-                              : "rgba(11,205,95,0)",
-                          }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ duration: 0.4 }}
-                          onClick={() => toggleSelecionado(reg.id)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <td className="sandbox-td-check">
-                            <span
-                              className={`sandbox-checkbox ${sel ? "checked" : ""}`}
-                            >
-                              {sel && <i className="fi fi-sr-check" />}
-                            </span>
-                          </td>
-                          <td>{i + 1}</td>
-                          <td>{reg[nomeColuna]}</td>
-                          <td className="sandbox-td-type">
-                            <span className="sandbox-type-badge">
-                              {tipoColuna}
-                            </span>
-                          </td>
-                        </motion.tr>
-                      );
-                    })}
-                  </AnimatePresence>
-                  {registros.length === 0 && (
+            {/* Tabela dos registros — envolvida em StarBorder */}
+            <StarBorder
+              as="div"
+              color="#0bcd5f"
+              speed="7s"
+              thickness={1.5}
+              className="sandbox-table-star"
+            >
+              <div className="sandbox-table-wrap">
+                <table className="sandbox-table">
+                  <thead>
                     <tr>
-                      <td colSpan={4} className="sandbox-empty">
-                        Nenhum registro ainda — insira o primeiro acima!
-                      </td>
+                      <th className="sandbox-th-check" />
+                      <th>ID</th>
+                      <th>{nomeColuna.toUpperCase()}</th>
+                      <th className="sandbox-th-type">{tipoColuna}</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    <AnimatePresence>
+                      {registros.map((reg, i) => {
+                        const sel = selecionados.includes(reg.id);
+                        return (
+                          <motion.tr
+                            key={reg.id}
+                            className={sel ? "sandbox-row-selected" : ""}
+                            initial={{
+                              opacity: 0,
+                              backgroundColor: "rgba(11,205,95,0.15)",
+                            }}
+                            animate={{
+                              opacity: 1,
+                              backgroundColor: sel
+                                ? "rgba(11,205,95,0.15)"
+                                : "rgba(11,205,95,0)",
+                            }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.4 }}
+                            onClick={() => toggleSelecionado(reg.id)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <td className="sandbox-td-check">
+                              <span
+                                className={`sandbox-checkbox ${sel ? "checked" : ""}`}
+                              >
+                                {sel && <i className="fi fi-sr-check" />}
+                              </span>
+                            </td>
+                            <td>{i + 1}</td>
+                            <td>{reg[nomeColuna]}</td>
+                            <td className="sandbox-td-type">
+                              <span className="sandbox-type-badge">
+                                {tipoColuna}
+                              </span>
+                            </td>
+                          </motion.tr>
+                        );
+                      })}
+                    </AnimatePresence>
+                    {registros.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="sandbox-empty">
+                          Nenhum registro ainda — insira o primeiro acima!
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </StarBorder>
 
             <button
               className="sandbox-btn-ghost sandbox-reset"
@@ -521,117 +555,125 @@ function LiveTableDemo() {
   }, []);
 
   return (
-    <motion.div
-      className="demo-system-card"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+    <StarBorder
+      as="div"
+      color="#0bcd5f"
+      speed="9s"
+      thickness={2}
+      className="demo-star-border"
     >
-      <div className="demo-tab-bar">
-        {["clientes", "produtos", "pedidos"].map((t, i) => (
-          <span key={t} className={`demo-tab ${i === 0 ? "active" : ""}`}>
-            {t}
+      <motion.div
+        className="demo-system-card"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="demo-tab-bar">
+          {["clientes", "produtos", "pedidos"].map((t, i) => (
+            <span key={t} className={`demo-tab ${i === 0 ? "active" : ""}`}>
+              {t}
+            </span>
+          ))}
+          <span className="demo-tab-plus">
+            <i className="fi fi-rr-plus" />
           </span>
-        ))}
-        <span className="demo-tab-plus">
-          <i className="fi fi-rr-plus" />
-        </span>
-      </div>
-
-      <div className="demo-table-header">
-        <span className="demo-reg-label">Registros</span>
-        <span className="demo-reg-count">{rows.length}</span>
-        <div className="demo-header-actions">
-          <button className="demo-action-btn">
-            <i className="fi fi-sr-add-document" /> Inserir registro
-          </button>
-          <button className="demo-action-btn">
-            <i className="fi fi-sr-pencil" /> Renomear tabela
-          </button>
-          <button className="demo-action-btn demo-action-btn--danger">
-            <i className="fi fi-sr-remove-folder" /> Excluir tabela
-          </button>
         </div>
-      </div>
 
-      <div className="demo-selection-bar">
-        <span>Nenhum item selecionado</span>
-      </div>
+        <div className="demo-table-header">
+          <span className="demo-reg-label">Registros</span>
+          <span className="demo-reg-count">{rows.length}</span>
+          <div className="demo-header-actions">
+            <button className="demo-action-btn">
+              <i className="fi fi-sr-add-document" /> Inserir registro
+            </button>
+            <button className="demo-action-btn">
+              <i className="fi fi-sr-pencil" /> Renomear tabela
+            </button>
+            <button className="demo-action-btn demo-action-btn--danger">
+              <i className="fi fi-sr-remove-folder" /> Excluir tabela
+            </button>
+          </div>
+        </div>
 
-      <div className="demo-table-wrap">
-        <table className="demo-table">
-          <thead>
-            <tr>
-              <th className="demo-check-col" />
-              {DEMO_COLUNAS.map((c) => (
-                <th key={c}>
-                  <div className="demo-th-content">
-                    <span>{c.toUpperCase()}</span>
-                    <i className="fi fi-rr-menu-dots-vertical demo-th-dots" />
-                  </div>
-                </th>
-              ))}
-              <th className="demo-actions-col">
-                <i className="fi fi-rr-refresh" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <AnimatePresence>
-              {rows &&
-                rows.map((row) => {
-                  // Verificação de segurança: se row for undefined, não tenta ler .id
-                  if (!row?.id) return null;
+        <div className="demo-selection-bar">
+          <span>Nenhum item selecionado</span>
+        </div>
 
-                  return (
-                    <motion.tr
-                      key={row.id} // Agora o 'id' só é lido se 'row' existir
-                      initial={{
-                        opacity: 0,
-                        backgroundColor: "rgba(11,205,95,0.12)",
-                      }}
-                      animate={{
-                        opacity: 1,
-                        backgroundColor: "rgba(11,205,95,0)",
-                      }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <td className="demo-check-col">
-                        <span className="demo-checkbox" />
-                      </td>
-                      <td>{row.id}</td>
-                      <td>{row.nome || "---"}</td>
-                      <td className="demo-td-clip">{row.email || "---"}</td>
-                      <td>
-                        <span
-                          className={`demo-badge demo-badge--${row.status || "default"}`}
-                        >
-                          {row.status || "N/A"}
-                        </span>
-                      </td>
-                      <td>{row.criado_em || "---"}</td>
-                      <td className="demo-actions-col">
-                        <div className="demo-row-actions">
-                          <i className="fi fi-rr-file-edit" />
-                          <i className="fi fi-rr-delete-document" />
-                        </div>
-                      </td>
-                    </motion.tr>
-                  );
-                })}
-            </AnimatePresence>
-            {rows.length === 0 && (
+        <div className="demo-table-wrap">
+          <table className="demo-table">
+            <thead>
               <tr>
-                <td colSpan={7} className="demo-empty-cell">
-                  Carregando registros...
-                </td>
+                <th className="demo-check-col" />
+                {DEMO_COLUNAS.map((c) => (
+                  <th key={c}>
+                    <div className="demo-th-content">
+                      <span>{c.toUpperCase()}</span>
+                      <i className="fi fi-rr-menu-dots-vertical demo-th-dots" />
+                    </div>
+                  </th>
+                ))}
+                <th className="demo-actions-col">
+                  <i className="fi fi-rr-refresh" />
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </motion.div>
+            </thead>
+            <tbody>
+              <AnimatePresence>
+                {rows &&
+                  rows.map((row) => {
+                    // Verificação de segurança: se row for undefined, não tenta ler .id
+                    if (!row?.id) return null;
+
+                    return (
+                      <motion.tr
+                        key={row.id} // Agora o 'id' só é lido se 'row' existir
+                        initial={{
+                          opacity: 0,
+                          backgroundColor: "rgba(11,205,95,0.12)",
+                        }}
+                        animate={{
+                          opacity: 1,
+                          backgroundColor: "rgba(11,205,95,0)",
+                        }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <td className="demo-check-col">
+                          <span className="demo-checkbox" />
+                        </td>
+                        <td>{row.id}</td>
+                        <td>{row.nome || "---"}</td>
+                        <td className="demo-td-clip">{row.email || "---"}</td>
+                        <td>
+                          <span
+                            className={`demo-badge demo-badge--${row.status || "default"}`}
+                          >
+                            {row.status || "N/A"}
+                          </span>
+                        </td>
+                        <td>{row.criado_em || "---"}</td>
+                        <td className="demo-actions-col">
+                          <div className="demo-row-actions">
+                            <i className="fi fi-rr-file-edit" />
+                            <i className="fi fi-rr-delete-document" />
+                          </div>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+              </AnimatePresence>
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="demo-empty-cell">
+                    Carregando registros...
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+    </StarBorder>
   );
 }
 
@@ -640,6 +682,10 @@ function LiveTableDemo() {
 // ═══════════════════════════════════════════════════════════════════════════
 export function LandingPage() {
   const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
 
   useEffect(() => {
     const lenis = new Lenis();
@@ -660,7 +706,11 @@ export function LandingPage() {
       {/* ── NAVBAR ──────────────────────────────────────────────────────── */}
       <nav className="lp-nav">
         <span className="lp-nav-brand">
-          <i className="fi fi-sr-database" /> Self MD
+          <img
+            src="../../../public/Self_md-logo-removebg-preview.png"
+            alt="Logo da Self MD"
+          />{" "}
+          Self MD
         </span>
         <div className="lp-nav-links">
           <a href="#sobre">O que é Self MD?</a>
@@ -768,77 +818,73 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── SEÇÃO 2: O QUE É SELF MD (Sobre) ──────────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── SEÇÃO 2: O QUE É SELF MD ────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
       <section className="lp-sobre" id="sobre">
-        <motion.div
-          className="lp-section-label"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          O que é Self MD?
-        </motion.div>
-        <motion.h2
-          className="lp-section-title"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          Gerenciamento de banco de dados para humanos
-        </motion.h2>
-        <motion.p
-          className="lp-sobre-desc"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ delay: 0.2 }}
-        >
-          O <strong>Self MD</strong> (Self Management Database) é um sistema
-          No-Code que abstrai toda a complexidade do MySQL. Você cria databases,
-          tabelas e colunas através de uma interface visual intuitiva — e o
-          sistema gera as estruturas físicas reais no banco, incluindo triggers
-          e procedures automaticamente.
-        </motion.p>
-
-        <div className="lp-sobre-grid">
-          {[
-            {
-              icon: "fi-sr-eye",
-              title: "Sem SQL",
-              desc: "Nunca escreva uma query manualmente. A interface faz isso por você.",
-            },
-            {
-              icon: "fi-sr-shield-check",
-              title: "Banco Real",
-              desc: "Suas tabelas existem de verdade em MySQL — não é uma simulação.",
-            },
-            {
-              icon: "fi-sr-bolt",
-              title: "Rápido",
-              desc: "Do zero a uma tabela funcional em menos de 60 segundos.",
-            },
-            {
-              icon: "fi-sr-users",
-              title: "Para Todos",
-              desc: "Desenvolvido para quem conhece ou não SQL — funciona para ambos.",
-            },
-          ].map((item, i) => (
+        <div className="lp-sobre-inner">
+          {/* ── Lado esquerdo: copy ─────────────────────────────────────── */}
+          <div className="lp-sobre-text">
             <motion.div
-              key={item.title}
-              className="lp-sobre-card"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
+              className="lp-section-label lp-section-label--left"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
             >
-              <i className={`fi ${item.icon} lp-sobre-icon`} />
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
+              O que é Self MD?
             </motion.div>
-          ))}
+
+            <motion.h2
+              className="lp-section-title lp-section-title--left"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              Gerenciamento de banco de dados para humanos
+            </motion.h2>
+
+            <motion.p
+              className="lp-sobre-desc lp-sobre-desc--left"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: 0.2 }}
+            >
+              O <strong>Self MD</strong> (Self Management Database) é um sistema
+              No-Code que abstrai toda a complexidade do MySQL. Você cria
+              databases, tabelas e colunas através de uma interface visual
+              intuitiva — e o sistema gera as estruturas físicas reais no banco,
+              incluindo triggers e procedures automaticamente.
+            </motion.p>
+          </div>
+
+          {/* ── Lado direito: CardSwap ──────────────────────────────────── */}
+          <motion.div
+            className="lp-sobre-swap"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+          >
+            <CardSwap
+              width={340}
+              height={240}
+              cardDistance={50}
+              verticalDistance={65}
+              delay={4000}
+              easing="elastic"
+              pauseOnHover
+            >
+              {SOBRE_FEATURES.map((item, i) => (
+                <Card key={i} customClass="lp-sobre-swap-card">
+                  <i className={`fi ${item.icon} lp-sobre-swap-icon`} />
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                </Card>
+              ))}
+            </CardSwap>
+          </motion.div>
         </div>
       </section>
 
@@ -868,21 +914,33 @@ export function LandingPage() {
 
             <div className="lp-steps-list">
               {STEPS.map((step, i) => (
-                <motion.button
+                <motion.div
                   key={step.num}
-                  className={`lp-step-item ${activeStep === i ? "active" : ""}`}
+                  className={`lp-step-item-outer ${activeStep === i ? "active" : ""}`}
                   onClick={() => setActiveStep(i)}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
                 >
-                  <div className="lp-step-num">{step.num}</div>
-                  <div className="lp-step-text">
-                    <h3>{step.title}</h3>
-                    <p>{step.desc}</p>
-                  </div>
-                </motion.button>
+                  <BorderGlow
+                    backgroundColor={activeStep === i ? "#ffffff" : "#f9f9f9"}
+                    glowColor="130 75 47"
+                    colors={["#0bcd5f", "#c8f5dd", "#07a34c"]}
+                    borderRadius={14}
+                    glowRadius={22}
+                    glowIntensity={0.75}
+                    fillOpacity={0.22}
+                  >
+                    <div className="lp-step-item-inner">
+                      <div className="lp-step-num">{step.num}</div>
+                      <div className="lp-step-text">
+                        <h3>{step.title}</h3>
+                        <p>{step.desc}</p>
+                      </div>
+                    </div>
+                  </BorderGlow>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -1027,14 +1085,17 @@ export function LandingPage() {
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
       <footer className="lp-footer">
-        <span className="lp-nav-brand">
-          <i className="fi fi-sr-database" /> Self MD
+        <span className="lp-footer-brand">
+          <img src="../../../public/SELFMD_BAW-removebg-preview.png" alt="Logo Self MD black and white" />
         </span>
-        <p>
-          &copy; {new Date().getFullYear()} Self MD · Desenvolvido por{" "}
-          <strong>Lucas Felipe Heck</strong>
+        <p className="texto-footer">
+          &copy; {new Date().getFullYear()} Self MD · Desenvolvido por {" "}
+          <strong className="autor-nome">Lucas Felipe Heck</strong>
         </p>
       </footer>
+
+
+
     </main>
   );
 }

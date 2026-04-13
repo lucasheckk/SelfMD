@@ -1,5 +1,21 @@
 @use "../../styles/variables" as v;
 
+// ════════════════════════════════════════════════════════════════════
+// ─── @keyframes globais
+// ════════════════════════════════════════════════════════════════════
+
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(11, 205, 95, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(11, 205, 95, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(11, 205, 95, 0);
+  }
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // ─── Reset / Base
 // ════════════════════════════════════════════════════════════════════════════
@@ -122,23 +138,27 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 48px;
-  background: rgba(250, 250, 250, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
 }
 
 .lp-nav-brand {
   font-size: 18px;
   font-weight: 800;
-  color: #111;
+  color: v.$cor-secundaria;
   display: flex;
   align-items: center;
   gap: 8px;
 
-  i {
-    color: v.$cor-primaria;
-    font-size: 20px;
-    line-height: 0;
+  img {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    height: 35px;
+    width: 35px;
+    background-color: transparent;
   }
 }
 
@@ -295,19 +315,104 @@
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// ─── SEÇÃO SOBRE
-// ════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// ─── SEÇÃO SOBRE — two-column + CardSwap
+// ════════════════════════════════════════════════════════════════════
 
 .lp-sobre {
   padding: 100px 48px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  text-align: center;
 
   @media (max-width: 768px) {
     padding: 60px 20px;
   }
+}
+
+.lp-sobre-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+.lp-sobre-desc {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.8;
+  max-width: 680px;
+  margin: 0 auto 56px;
+
+  strong {
+    color: #111;
+  }
+
+  // Variante alinhada à esquerda (layout two-column)
+  &--left {
+    margin: 0;
+    max-width: 100%;
+  }
+}
+
+// ─── Wrapper do CardSwap ──────────────────────────────────────────
+
+.lp-sobre-swap {
+  position: relative;
+  height: 380px;
+  overflow: visible;
+
+  // Centraliza o container dentro do wrapper
+  .card-swap-container {
+    bottom: 50% !important;
+    right: 50% !important;
+    transform: translate(50%, 50%) !important;
+  }
+
+  @media (max-width: 900px) {
+    height: 300px;
+  }
+
+  @media (max-width: 480px) {
+    height: 260px;
+  }
+}
+
+// ─── Cards do CardSwap — override do tema escuro → tema claro ─────
+
+.lp-sobre-swap .card {
+  background: #ffffff !important;
+  border: 2px solid #ebebeb !important;
+  padding: 28px 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07) !important;
+  cursor: default;
+}
+
+.lp-sobre-swap-icon {
+  font-size: 26px;
+  color: v.$cor-primaria;
+  line-height: 0;
+}
+
+.lp-sobre-swap .card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.lp-sobre-swap .card p {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .lp-sobre-desc {
@@ -396,36 +501,68 @@
   margin-top: 32px;
 }
 
-.lp-step-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  background: none;
-  border: 2px solid transparent;
-  border-radius: 14px;
-  padding: 16px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.22s ease;
+// ════════════════════════════════════════════════════════════════════
+// ─── Steps com BorderGlow
+// ════════════════════════════════════════════════════════════════════
 
-  &:hover {
-    background: #fff;
-    border-color: #e0e0e0;
+.lp-step-item-outer {
+  cursor: pointer;
+  border-radius: 14px;
+  transition: transform 0.18s ease;
+
+  // ─ Override BorderGlow: adapta borda para tema claro
+  .border-glow-card {
+    border-color: #e8e8e8 !important;
   }
 
-  &.active {
-    background: #fff;
-    border-color: v.$cor-primaria;
+  // ─ Permite que o conteúdo respire (BorderGlow usa overflow: auto por padrão)
+  .border-glow-inner {
+    overflow: visible !important;
+  }
 
+  // ─ Estado ativo
+  &.active {
     .lp-step-num {
       background: v.$cor-primaria;
       color: #fff;
     }
-
-    h3 {
+    .lp-step-text h3 {
       color: v.$cor-primaria;
     }
+    .border-glow-card {
+      border-color: rgba(11, 205, 95, 0.35) !important;
+    }
   }
+}
+
+.lp-step-item-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px; // espaçamento interno que antes estava no button
+}
+
+// ─── lp-step-num e lp-step-text permanecem iguais, apenas ajuste de transição
+
+.lp-step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e8e8e8;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease; // era all 0.22s
+}
+
+.lp-step-text {
+  flex: 1;
 
   h3 {
     font-size: 15px;
@@ -434,7 +571,6 @@
     margin: 0 0 4px;
     transition: color 0.2s;
   }
-
   p {
     font-size: 13px;
     color: #888;
@@ -771,6 +907,10 @@
     border-color: v.$cor-primaria;
     color: #fff;
   }
+
+  &.active .sandbox-step-dot {
+    animation: dot-pulse 1.4s ease-out infinite;
+  }
 }
 
 .sandbox-step-dot {
@@ -1005,11 +1145,34 @@
 
 // ── Tabela do sandbox ─────────────────────────────────────────────────────
 
-.sandbox-table-wrap {
-  border: 1.5px solid #efefef;
-  border-radius: 10px;
-  overflow: hidden;
+// ════════════════════════════════════════════════════════════════════
+// ─── StarBorder — tabela Sandbox
+// ════════════════════════════════════════════════════════════════════
+
+.sandbox-table-star {
+  display: block !important;
+  width: 100%;
   margin-top: 4px;
+  border-radius: 10px !important;
+
+  // Override do inner-content para fundo transparente + borda suave
+  .inner-content {
+    background: transparent !important;
+    border: 1.5px solid #efefef !important;
+    border-radius: 9px !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    text-align: left !important;
+    color: inherit !important;
+    overflow: hidden;
+  }
+
+  // Remove a borda original (agora gerenciada pelo StarBorder)
+  .sandbox-table-wrap {
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
 }
 
 .sandbox-table {
@@ -1106,6 +1269,22 @@
 // ════════════════════════════════════════════════════════════════════════════
 // ─── LIVE TABLE DEMO (showcase do sistema real)
 // ════════════════════════════════════════════════════════════════════════════
+
+.demo-star-border {
+  display: block !important;
+  width: 100%;
+  border-radius: 16px !important;
+
+  .inner-content {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-size: inherit !important;
+    text-align: inherit !important;
+    color: inherit !important;
+  }
+}
 
 .demo-system-card {
   background: #fff;
@@ -1239,6 +1418,10 @@
 
   tbody tr {
     border-bottom: 1px solid #f0f0f0;
+
+    &:last-child td {
+      border-bottom: none;
+    }
 
     td {
       padding: 9px 12px;
@@ -1421,18 +1604,31 @@
   padding: 24px 48px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
 
+  .lp-footer-brand {
+    display: flex;
+    align-items: center;
+
+    img {
+      display: flex;
+      padding: 0;
+      margin: 0;
+      height: 40px;
+      width: 40px;
+    }
+  }
+
   p {
     font-size: 13px;
-    color: #666;
+    color: #999;
     margin: 0;
   }
 
-  strong {
-    color: #aaa;
+  .autor-nome {
+    color: white;
   }
 }
 

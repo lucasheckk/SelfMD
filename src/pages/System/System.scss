@@ -2274,16 +2274,16 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     color: v.$cor-primaria;
   }
   &.xls {
-    border-color: darken(v.$cor-primaria, 10%);
-    color: darken(v.$cor-primaria, 10%);
+    border-color: v.$cor-primaria;
+    color:v.$cor-primaria;
   }
   &.csv {
-    border-color: #3b82f6;
-    color: #1d4ed8;
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
   }
   &.json {
-    border-color: #f59e0b;
-    color: #b45309;
+    border-color: v.$cor-primaria;
+    color: v.$cor-primaria;
   }
 }
 
