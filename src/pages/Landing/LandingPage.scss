@@ -1,8 +1,8 @@
 @use "../../styles/variables" as v;
 
-// ════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
 // ─── @keyframes globais
-// ════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
 
 @keyframes dot-pulse {
   0% {
@@ -13,6 +13,15 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(11, 205, 95, 0);
+  }
+}
+
+@keyframes tech-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
@@ -53,7 +62,6 @@
   justify-content: center;
   gap: 6px;
 
-  // Variante alinhada à esquerda (usada na seção "Como funciona")
   &--left {
     justify-content: flex-start;
   }
@@ -193,8 +201,7 @@
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ─── HERO — Magic Rings + SplitText
-//     Layout centralizado; MagicRings fica no fundo como decoração.
+// ─── HERO
 // ════════════════════════════════════════════════════════════════════════════
 
 .lp-hero {
@@ -212,12 +219,12 @@
   }
 }
 
-// O MagicRings fica no fundo, sutil
 .lp-hero-rings {
   position: absolute;
   inset: 0;
   z-index: 0;
   opacity: 0.45;
+  background-color: transparent;
 
   .magic-rings-container {
     width: 100%;
@@ -225,7 +232,6 @@
   }
 }
 
-// Todo o conteúdo fica acima dos anéis
 .lp-hero-inner {
   position: relative;
   z-index: 1;
@@ -257,12 +263,11 @@
   }
 }
 
-// SplitText injeta o wrapper — garantimos o estilo correto aqui
 .lp-hero-title {
   font-size: clamp(2.2rem, 5vw, 3.8rem) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   line-height: 1.1 !important;
-  color: #111 !important;
+  color: #333 !important;
   margin: 0 !important;
 
   .split-char {
@@ -288,9 +293,9 @@
 
 .lp-hero-stats {
   display: flex;
+  align-items: center;
   gap: 36px;
-  padding-top: 20px;
-  border-top: 1px solid #e8e8e8;
+  padding-top: 10px;
 
   @media (max-width: 480px) {
     gap: 20px;
@@ -352,21 +357,17 @@
     color: #111;
   }
 
-  // Variante alinhada à esquerda (layout two-column)
   &--left {
     margin: 0;
     max-width: 100%;
   }
 }
 
-// ─── Wrapper do CardSwap ──────────────────────────────────────────
-
 .lp-sobre-swap {
   position: relative;
   height: 380px;
   overflow: visible;
 
-  // Centraliza o container dentro do wrapper
   .card-swap-container {
     bottom: 50% !important;
     right: 50% !important;
@@ -382,10 +383,9 @@
   }
 }
 
-// ─── Cards do CardSwap — override do tema escuro → tema claro ─────
-
 .lp-sobre-swap .card {
-  background: #ffffff !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px) !important;
   border: 2px solid #ebebeb !important;
   padding: 28px 24px !important;
   display: flex !important;
@@ -413,18 +413,6 @@
   color: #777;
   line-height: 1.6;
   margin: 0;
-}
-
-.lp-sobre-desc {
-  font-size: 16px;
-  color: #666;
-  line-height: 1.8;
-  max-width: 680px;
-  margin: 0 auto 56px;
-
-  strong {
-    color: #111;
-  }
 }
 
 .lp-sobre-grid {
@@ -472,7 +460,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 .lp-steps {
-  background: #f5f5f5;
+  background: #fafafa;
   padding: 100px 48px;
 }
 
@@ -510,17 +498,14 @@
   border-radius: 14px;
   transition: transform 0.18s ease;
 
-  // ─ Override BorderGlow: adapta borda para tema claro
   .border-glow-card {
     border-color: #e8e8e8 !important;
   }
 
-  // ─ Permite que o conteúdo respire (BorderGlow usa overflow: auto por padrão)
   .border-glow-inner {
     overflow: visible !important;
   }
 
-  // ─ Estado ativo
   &.active {
     .lp-step-num {
       background: v.$cor-primaria;
@@ -539,10 +524,8 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding: 16px; // espaçamento interno que antes estava no button
+  padding: 16px;
 }
-
-// ─── lp-step-num e lp-step-text permanecem iguais, apenas ajuste de transição
 
 .lp-step-num {
   flex-shrink: 0;
@@ -558,7 +541,7 @@
   font-weight: 800;
   transition:
     background 0.22s ease,
-    color 0.22s ease; // era all 0.22s
+    color 0.22s ease;
 }
 
 .lp-step-text {
@@ -578,27 +561,6 @@
     line-height: 1.5;
   }
 }
-
-.lp-step-num {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #e8e8e8;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 800;
-  transition: all 0.22s ease;
-}
-
-.lp-step-text {
-  flex: 1;
-}
-
-// ─── Step Preview Card ────────────────────────────────────────────────────
 
 .lp-step-preview-card {
   background: #fff;
@@ -864,18 +826,35 @@
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ─── DEMO SANDBOX (Test Drive)
+// ─── SANDBOX STAR OUTER
+// ─── StarBorder agora envolve o card INTEIRO.
+// ─── O inner-content recebe o estilo visual do card (borda, sombra, raio).
 // ════════════════════════════════════════════════════════════════════════════
 
-.sandbox-card {
-  background: #fff;
-  border: 2px solid #e0e0e0;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
-  text-align: left;
+.sandbox-star-outer {
+  display: block !important;
   max-width: 780px;
   margin: 0 auto;
+  border-radius: 18px !important;
+
+  .inner-content {
+    background: #fff !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 18px !important;
+    padding: 0 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07) !important;
+    overflow: hidden;
+    font-size: inherit !important;
+    text-align: left !important;
+    color: inherit !important;
+  }
+}
+
+// ── O sandbox-card é apenas um container interno (sem borda própria) ───────
+
+.sandbox-card {
+  background: transparent;
+  text-align: left;
 }
 
 // ── Barra de passos ───────────────────────────────────────────────────────
@@ -900,16 +879,13 @@
     border-color: v.$cor-primaria;
     color: #fff;
     box-shadow: 0 0 0 4px rgba(11, 205, 95, 0.15);
+    animation: dot-pulse 1.4s ease-out infinite;
   }
 
   &.done .sandbox-step-dot {
     background: v.$cor-primaria;
     border-color: v.$cor-primaria;
     color: #fff;
-  }
-
-  &.active .sandbox-step-dot {
-    animation: dot-pulse 1.4s ease-out infinite;
   }
 }
 
@@ -989,12 +965,6 @@
 
 .sandbox-highlight {
   color: v.$cor-primaria;
-}
-
-.sandbox-aviso {
-  font-size: 12px;
-  color: #f59e0b;
-  font-weight: 600;
 }
 
 .sandbox-input-row {
@@ -1143,36 +1113,13 @@
   }
 }
 
-// ── Tabela do sandbox ─────────────────────────────────────────────────────
+// ── Tabela do sandbox (sem StarBorder interno — o outer já cobre o card) ──
 
-// ════════════════════════════════════════════════════════════════════
-// ─── StarBorder — tabela Sandbox
-// ════════════════════════════════════════════════════════════════════
-
-.sandbox-table-star {
-  display: block !important;
-  width: 100%;
+.sandbox-table-wrap {
+  border: 1.5px solid #efefef;
+  border-radius: 9px;
+  overflow: hidden;
   margin-top: 4px;
-  border-radius: 10px !important;
-
-  // Override do inner-content para fundo transparente + borda suave
-  .inner-content {
-    background: transparent !important;
-    border: 1.5px solid #efefef !important;
-    border-radius: 9px !important;
-    padding: 0 !important;
-    font-size: inherit !important;
-    text-align: left !important;
-    color: inherit !important;
-    overflow: hidden;
-  }
-
-  // Remove a borda original (agora gerenciada pelo StarBorder)
-  .sandbox-table-wrap {
-    border: none !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-  }
 }
 
 .sandbox-table {
@@ -1267,7 +1214,9 @@
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ─── LIVE TABLE DEMO (showcase do sistema real)
+// ─── LIVE TABLE DEMO — StarBorder corrigido
+// ─── Padrão igual ao sandbox: inner-content recebe a borda visual,
+// ─── demo-system-card não tem borda própria para não cobrir as estrelas.
 // ════════════════════════════════════════════════════════════════════════════
 
 .demo-star-border {
@@ -1277,21 +1226,27 @@
 
   .inner-content {
     background: transparent !important;
-    border: none !important;
+    border: 2px solid #c7c7c7 !important;
+    border-radius: 16px !important;
     padding: 0 !important;
-    border-radius: 0 !important;
+    overflow: hidden;
     font-size: inherit !important;
     text-align: inherit !important;
     color: inherit !important;
+  }
+
+  // Remove a borda do card interno — inner-content já gerencia
+  .demo-system-card {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 }
 
 .demo-system-card {
   background: #fff;
-  border: 2px solid #c7c7c7;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   text-align: left;
 }
 
@@ -1525,111 +1480,326 @@
   padding: 30px;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// ─── CTA FINAL — StarBorder
-// ════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── CTA FINAL — redesenhado
+// ─── Layout: gradiente verde profundo + orbs decorativos + grid sutil
+// ─── Botão: âncora simples com fundo branco (sem StarBorder)
+// ═══════════════════════════════════════════════════════════════════════════════
 
 .lp-cta {
-  background: #111;
-  padding: 100px 48px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    #022c22 0%,
+    #064e3b 30%,
+    #065f46 60%,
+    #047857 80%,
+    #059669 100%
+  );
+  padding: 130px 48px;
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  // Grade sutil de fundo
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 80px 24px;
+  }
 }
 
+// ── Orbs de luz — CSS puro ────────────────────────────────────────────────
+
+.lp-cta-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+
+  &--1 {
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(
+      circle,
+      rgba(16, 185, 129, 0.22) 0%,
+      transparent 65%
+    );
+    top: -200px;
+    right: -150px;
+  }
+
+  &--2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(
+      circle,
+      rgba(52, 211, 153, 0.18) 0%,
+      transparent 65%
+    );
+    bottom: -150px;
+    left: -80px;
+  }
+
+  &--3 {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(
+      circle,
+      rgba(110, 231, 183, 0.14) 0%,
+      transparent 70%
+    );
+    top: 35%;
+    left: 18%;
+  }
+}
+
+// ── Conteúdo central ─────────────────────────────────────────────────────
+
 .lp-cta-card {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  max-width: 600px;
+  max-width: 660px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 26px;
 
   h2 {
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-weight: 800;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 900;
     color: #fff;
     margin: 0;
-    line-height: 1.15;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
 
   p {
-    font-size: 16px;
-    color: #aaa;
-    line-height: 1.6;
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.75;
     margin: 0;
+    max-width: 500px;
   }
 }
 
-.lp-cta-icon {
-  font-size: 40px;
-  color: v.$cor-primaria;
-  line-height: 0;
-  margin-bottom: 8px;
+.lp-cta-heading-accent {
+  // Verde claro para contraste dentro do heading branco
+  color: #6ee7b7;
 }
 
-// StarBorder — sobrescreve o inner-content para identidade visual do Self MD
-.lp-cta-star-btn {
-  .inner-content {
-    background: v.$cor-primaria !important;
-    font-family: v.$jakarta !important;
-    font-size: 17px !important;
-    padding: 16px 36px !important;
-    gap: 10px !important;
-    border-radius: 11px !important;
-    transition: filter 0.2s;
+// ── Badge de status ───────────────────────────────────────────────────────
 
-    i {
-      font-size: 15px;
+.lp-cta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #d1fae5;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+
+  i {
+    font-size: 14px;
+    color: #6ee7b7;
+    line-height: 0;
+  }
+}
+
+// ── Grupo de botões ───────────────────────────────────────────────────────
+
+.lp-cta-btn-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+// ── Botão principal — branco com texto escuro, sem StarBorder ─────────────
+
+.lp-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 17px 40px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  letter-spacing: -0.01em;
+
+  i {
+    font-size: 16px;
+    line-height: 0;
+    flex-shrink: 0;
+  }
+
+  &--primary {
+    background: #fff;
+    color: #065f46;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.25),
+      0 0 0 0 rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow:
+        0 20px 52px rgba(0, 0, 0, 0.32),
+        0 0 0 4px rgba(255, 255, 255, 0.12);
+      background: #f0fdf4;
     }
   }
-
-  &:hover .inner-content {
-    filter: brightness(0.93);
-  }
 }
 
-.lp-cta-note {
-  font-size: 12px;
-  color: #555;
-  letter-spacing: 0.03em;
-}
+// ── Features abaixo do botão ──────────────────────────────────────────────
 
-// ════════════════════════════════════════════════════════════════════════════
-// ─── FOOTER
-// ════════════════════════════════════════════════════════════════════════════
-
-.lp-footer {
-  background: #0a0a0a;
-  border-top: 1px solid #222;
-  padding: 24px 48px;
+.lp-cta-features {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 28px;
   flex-wrap: wrap;
-  gap: 12px;
+  justify-content: center;
+  padding-top: 4px;
 
-  .lp-footer-brand {
-    display: flex;
-    align-items: center;
-
-    img {
-      display: flex;
-      padding: 0;
-      margin: 0;
-      height: 40px;
-      width: 40px;
-    }
+  @media (max-width: 480px) {
+    gap: 16px;
+    flex-direction: column;
   }
+}
 
-  p {
-    font-size: 13px;
-    color: #999;
-    margin: 0;
-  }
+.lp-cta-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.58);
+  font-weight: 500;
 
-  .autor-nome {
-    color: white;
+  i {
+    font-size: 12px;
+    color: #6ee7b7;
+    line-height: 0;
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── TECH STACK — agora é o FOOTER da página
+// ─── Fundo escuro, marquee de ícones + linha de copyright embaixo.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.lp-tech-stack {
+  background: #022c22;
+  padding-top: 52px;
+  overflow: hidden;
+}
+
+.lp-tech-footer-top {
+  text-align: center;
+  padding-bottom: 44px;
+}
+
+.lp-tech-label {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #777;
+  margin-bottom: 28px;
+}
+
+// ── Faixa com máscara de fade nas bordas ─────────────────────────────────
+
+.lp-tech-track-wrapper {
+  position: relative;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, #022c22, transparent);
+  }
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, #022c22, transparent);
+  }
+}
+
+.lp-tech-track {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: max-content;
+  animation: tech-marquee 28s linear infinite;
+}
+
+.lp-tech-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.lp-tech-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: grayscale(30%) brightness(0.85);
+  transition: filter 0.2s;
+
+  .lp-tech-item:hover & {
+    filter: grayscale(0%) brightness(1);
+  }
+}
+
+.lp-tech-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #444;
+  letter-spacing: 0.04em;
+}
+
+.lp-tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  height: 38px;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1647,14 +1817,16 @@
     padding: 60px 20px;
   }
   .lp-cta {
-    padding: 60px 20px;
-  }
-  .lp-footer {
-    padding: 20px;
-    flex-direction: column;
-    text-align: center;
+    padding: 80px 20px;
   }
   .demo-header-actions {
     display: none;
+  }
+  .sandbox-star-outer {
+    border-radius: 14px !important;
+
+    .inner-content {
+      border-radius: 14px !important;
+    }
   }
 }

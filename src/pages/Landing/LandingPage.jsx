@@ -90,24 +90,24 @@ const STEPS = [
 
 const SOBRE_FEATURES = [
   {
-    icon: "fi-sr-eye",
+    icon: "fi fi-sr-delete-document",
     title: "Sem SQL",
     desc: "Nunca escreva uma query manualmente. A interface faz tudo por você.",
   },
   {
-    icon: "fi-sr-shield-check",
+    icon: "fi fi-sr-badge-check",
     title: "Banco Real",
-    desc: "Suas tabelas existem de verdade em MySQL — não é simulação.",
+    desc: "Suas tabelas existem de verdade em MySQL, não é uma simulação.",
   },
   {
-    icon: "fi-sr-bolt",
+    icon: "fi fi-sr-website-speed",
     title: "Rápido",
     desc: "Do zero a uma tabela funcional em menos de 60 segundos.",
   },
   {
-    icon: "fi-sr-users",
+    icon: "fi fi-sr-heart",
     title: "Para Todos",
-    desc: "Funciona para quem conhece SQL e para quem nunca viu uma query.",
+    desc: "Funciona para quem conhece ou não o MySQL.",
   },
 ];
 
@@ -221,25 +221,107 @@ function StepPreviewTable() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ─── Tech Stack — agora funciona como FOOTER da página
+// ═══════════════════════════════════════════════════════════════════════════
+const TECH_ICONS = [
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/react/react-original.svg",
+    label: "React",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/nodejs/nodejs-original.svg",
+    label: "Node.js",
+  },
+  {
+    src: "https://img.icons8.com/external-tal-revivo-color-tal-revivo/96/external-java-is-a-general-purpose-programming-language-that-is-class-based-logo-color-tal-revivo.png",
+    label: "Java",
+  },
+  {
+    src: "https://img.icons8.com/color/48/javascript--v1.png",
+    label: "JavaScript",
+  },
+  {
+    src: "https://img.icons8.com/external-tal-revivo-shadow-tal-revivo/96/external-mysql-an-open-source-relational-database-management-system-logo-shadow-tal-revivo.png",
+    label: "MySQL",
+  },
+  { src: "https://img.icons8.com/fluency/96/docker.png", label: "Docker" },
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/sass/sass-original.svg",
+    label: "SASS",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/spring/spring-original.svg",
+    label: "Spring Boot",
+  },
+  { src: "https://img.icons8.com/color/48/vite.png", label: "Vite" },
+  {
+    src: "https://img.icons8.com/external-tal-revivo-color-tal-revivo/96/external-github-with-cat-logo-an-online-community-for-software-development-logo-color-tal-revivo.png",
+    label: "GitHub",
+  },
+  {
+    src: "https://cdn.brandfetch.io/idDJv1mfrb/w/1080/h/1080/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1753779057992",
+    label: "Framer Motion",
+  },
+  {
+    src: "https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/96/external-flaticon-social-media-tanah-basah-glyph-tanah-basah.png",
+    label: "Flaticon",
+  },
+  {
+    src: "https://img.icons8.com/color/96/icons8-new-logo.png",
+    label: "Icons8",
+  },
+];
+
+function TechStack() {
+  const items = [...TECH_ICONS, ...TECH_ICONS];
+
+  return (
+    <footer className="lp-tech-stack" aria-label="Tecnologias e rodapé">
+      {/* Marquee de ícones */}
+      <div className="lp-tech-footer-top">
+        <div className="lp-tech-label">Construído com</div>
+        <div className="lp-tech-track-wrapper">
+          <div className="lp-tech-track">
+            {items.map((tech, i) => (
+              <div className="lp-tech-item" key={i}>
+                {tech.src ? (
+                  <img
+                    src={tech.src}
+                    alt={tech.label}
+                    className="lp-tech-img"
+                  />
+                ) : (
+                  <span className="lp-tech-badge">
+                    <i className={`fi ${tech.icon}`} />
+                    {tech.text}
+                  </span>
+                )}
+                {tech.label && (
+                  <span className="lp-tech-name">{tech.label}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ─── Demo Sandbox — Fluxo de 3 passos com estado local
 // ─── ATENÇÃO: Nada aqui é salvo no banco de dados.
-// ─── Tudo reseta ao pressionar F5 (estado exclusivamente no React).
+// ─── MUDANÇA: StarBorder agora envolve o card INTEIRO (não só a tabela).
 // ═══════════════════════════════════════════════════════════════════════════
 function DemoSandbox() {
-  // Passo atual: 1 = nomear tabela, 2 = criar coluna, 3 = inserir dado
   const [passo, setPasso] = useState(1);
-
-  // Estado da "tabela fictícia" que o usuário constrói
   const [nomeTabela, setNomeTabela] = useState("");
   const [nomeColuna, setNomeColuna] = useState("");
   const [tipoColuna, setTipoColuna] = useState("Texto");
   const [valorInput, setValorInput] = useState("");
-
-  // Registros inseridos (somente em memória)
   const [registros, setRegistros] = useState([]);
   const [selecionados, setSelecionados] = useState([]);
 
-  // ── Handlers ──────────────────────────────────────────────────────────
   const confirmarNomeTabela = () => {
     if (nomeTabela.trim()) setPasso(2);
   };
@@ -276,189 +358,186 @@ function DemoSandbox() {
     setSelecionados([]);
   };
 
+  // ── StarBorder envolve o card INTEIRO agora ───────────────────────────
   return (
-    <div className="sandbox-card">
-      {/* Barra de passos */}
-      <div className="sandbox-steps-bar">
-        {[
-          { n: 1, label: "Nomear tabela" },
-          { n: 2, label: "Criar coluna" },
-          { n: 3, label: "Inserir dados" },
-        ].map(({ n, label }, i) => (
-          <div
-            key={n}
-            className={`sandbox-step ${passo >= n ? "done" : ""} ${passo === n ? "active" : ""}`}
-          >
-            <span className="sandbox-step-dot">
-              {passo > n ? <i className="fi fi-rr-check" /> : n}
-            </span>
-            <span className="sandbox-step-label">{label}</span>
-            {i < 2 && (
-              <div className={`sandbox-step-line ${passo > n ? "done" : ""}`} />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Corpo do passo */}
-      <div className="sandbox-body">
-        {/* ── PASSO 1: Nome da tabela ── */}
-        {passo === 1 && (
-          <motion.div
-            className="sandbox-pane"
-            key="p1"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-          >
-            <h3 className="sandbox-pane-title">
-              <i className="fi fi-sr-database" /> Como vamos chamar sua tabela?
-            </h3>
-            <p className="sandbox-pane-desc">
-              Dê um nome objetivo — como <em>clientes</em>, <em>produtos</em> ou{" "}
-              <em>pedidos</em>.
-            </p>
-            <div className="sandbox-input-row">
-              <input
-                className="sandbox-input"
-                type="text"
-                maxLength={15}
-                placeholder="ex: clientes"
-                value={nomeTabela}
-                onChange={(e) => setNomeTabela(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && confirmarNomeTabela()}
-                autoFocus
-              />
-              <button
-                className="sandbox-btn-primary"
-                onClick={confirmarNomeTabela}
-                disabled={!nomeTabela.trim()}
-              >
-                Próximo <i className="fi fi-rr-arrow-right" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── PASSO 2: Criar coluna ── */}
-        {passo === 2 && (
-          <motion.div
-            className="sandbox-pane"
-            key="p2"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-          >
-            <h3 className="sandbox-pane-title">
-              <i className="fi fi-sr-table-pivot" /> Defina uma coluna para{" "}
-              <strong className="sandbox-highlight">"{nomeTabela}"</strong>
-            </h3>
-            <p className="sandbox-pane-desc">
-              Escolha o nome e o tipo de dado. Você poderá adicionar mais
-              colunas dentro do sistema.
-            </p>
-            <div className="sandbox-input-row">
-              <input
-                className="sandbox-input"
-                type="text"
-                maxLength={15}
-                placeholder="ex: nome_completo"
-                value={nomeColuna}
-                onChange={(e) => setNomeColuna(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && confirmarColuna()}
-                autoFocus
-              />
-              <select
-                className="sandbox-select"
-                value={tipoColuna}
-                onChange={(e) => setTipoColuna(e.target.value)}
-              >
-                <option>Texto</option>
-                <option>Número Inteiro</option>
-                <option>Email</option>
-                <option>Data</option>
-              </select>
-              <button
-                className="sandbox-btn-primary"
-                onClick={confirmarColuna}
-                disabled={!nomeColuna.trim()}
-              >
-                Próximo <i className="fi fi-rr-arrow-right" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── PASSO 3: Inserir dados e ver tabela ── */}
-        {passo === 3 && (
-          <motion.div
-            className="sandbox-pane"
-            key="p3"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-          >
-            <h3 className="sandbox-pane-title">
-              <i className="fi fi-sr-add-document" /> Insira dados em{" "}
-              <strong className="sandbox-highlight">"{nomeTabela}"</strong>
-            </h3>
-            <p className="sandbox-pane-desc">
-              Digite um valor para a coluna <em>{nomeColuna}</em> ({tipoColuna})
-              e pressione Inserir.{" "}
-              <span className="sandbox-aviso">
-                ⚠ Nenhum dado é salvo no banco — isso é apenas uma prévia local.
-              </span>
-            </p>
-
-            {/* Formulário de inserção */}
-            <div className="sandbox-input-row">
-              <input
-                className="sandbox-input"
-                type="text"
-                placeholder={`Valor para "${nomeColuna}"...`}
-                value={valorInput}
-                onChange={(e) => setValorInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && inserirRegistro()}
-              />
-              <button
-                className="sandbox-btn-primary"
-                onClick={inserirRegistro}
-                disabled={!valorInput.trim()}
-              >
-                <i className="fi fi-rr-plus" /> Inserir
-              </button>
-            </div>
-
-            {/* Barra de seleção */}
+    <StarBorder
+      as="div"
+      color="#0bcd5f"
+      speed="7s"
+      thickness={1.5}
+      className="sandbox-star-outer"
+    >
+      <div className="sandbox-card">
+        {/* Barra de passos */}
+        <div className="sandbox-steps-bar">
+          {[
+            { n: 1, label: "Nomear tabela" },
+            { n: 2, label: "Criar coluna" },
+            { n: 3, label: "Inserir dados" },
+          ].map(({ n, label }, i) => (
             <div
-              className={`sandbox-selection-bar ${selecionados.length > 0 ? "active" : ""}`}
+              key={n}
+              className={`sandbox-step ${passo >= n ? "done" : ""} ${passo === n ? "active" : ""}`}
             >
-              {selecionados.length > 0 ? (
-                <>
-                  <span>{selecionados.length} item(s) selecionado(s)</span>
-                  <button
-                    className="sandbox-btn-danger"
-                    onClick={apagarSelecionados}
-                  >
-                    <i className="fi fi-rr-trash" /> Apagar
-                  </button>
-                </>
-              ) : (
-                <span>
-                  Nenhum item selecionado — clique na linha para selecionar
-                </span>
+              <span className="sandbox-step-dot">
+                {passo > n ? <i className="fi fi-rr-check" /> : n}
+              </span>
+              <span className="sandbox-step-label">{label}</span>
+              {i < 2 && (
+                <div
+                  className={`sandbox-step-line ${passo > n ? "done" : ""}`}
+                />
               )}
             </div>
+          ))}
+        </div>
 
-            {/* Tabela dos registros */}
-            {/* Tabela dos registros — envolvida em StarBorder */}
-            <StarBorder
-              as="div"
-              color="#0bcd5f"
-              speed="7s"
-              thickness={1.5}
-              className="sandbox-table-star"
+        {/* Corpo do passo */}
+        <div className="sandbox-body">
+          {/* ── PASSO 1: Nome da tabela ── */}
+          {passo === 1 && (
+            <motion.div
+              className="sandbox-pane"
+              key="p1"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
             >
+              <h3 className="sandbox-pane-title">
+                Como vamos chamar sua tabela?
+              </h3>
+              <p className="sandbox-pane-desc">
+                Insira abaixo e clique em próximo
+              </p>
+              <div className="sandbox-input-row">
+                <input
+                  className="sandbox-input"
+                  type="text"
+                  maxLength={15}
+                  placeholder="ex: clientes"
+                  value={nomeTabela}
+                  onChange={(e) => setNomeTabela(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && confirmarNomeTabela()}
+                  autoFocus
+                />
+                <button
+                  className="sandbox-btn-primary"
+                  onClick={confirmarNomeTabela}
+                  disabled={!nomeTabela.trim()}
+                >
+                  Próximo
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── PASSO 2: Criar coluna ── */}
+          {passo === 2 && (
+            <motion.div
+              className="sandbox-pane"
+              key="p2"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <h3 className="sandbox-pane-title">
+                Defina uma coluna para{" "}
+                <strong className="sandbox-highlight">"{nomeTabela}"</strong>
+              </h3>
+              <p className="sandbox-pane-desc">
+                Escolha o nome e o tipo de dado. Você poderá adicionar mais
+                colunas dentro do sistema.
+              </p>
+              <div className="sandbox-input-row">
+                <input
+                  className="sandbox-input"
+                  type="text"
+                  maxLength={15}
+                  placeholder="ex: nome_completo"
+                  value={nomeColuna}
+                  onChange={(e) => setNomeColuna(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && confirmarColuna()}
+                  autoFocus
+                />
+                <select
+                  className="sandbox-select"
+                  value={tipoColuna}
+                  onChange={(e) => setTipoColuna(e.target.value)}
+                >
+                  <option>Texto</option>
+                  <option>Número Inteiro</option>
+                  <option>Email</option>
+                  <option>Data</option>
+                </select>
+                <button
+                  className="sandbox-btn-primary"
+                  onClick={confirmarColuna}
+                  disabled={!nomeColuna.trim()}
+                >
+                  Próximo
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── PASSO 3: Inserir dados e ver tabela ── */}
+          {passo === 3 && (
+            <motion.div
+              className="sandbox-pane"
+              key="p3"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <h3 className="sandbox-pane-title">
+                Insira dados em{" "}
+                <strong className="sandbox-highlight">"{nomeTabela}"</strong>
+              </h3>
+              <p className="sandbox-pane-desc">
+                Digite um valor para a coluna {nomeColuna}.
+              </p>
+
+              {/* Formulário de inserção */}
+              <div className="sandbox-input-row">
+                <input
+                  className="sandbox-input"
+                  type="text"
+                  placeholder={`Valor para "${nomeColuna}"...`}
+                  value={valorInput}
+                  onChange={(e) => setValorInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && inserirRegistro()}
+                />
+                <button
+                  className="sandbox-btn-primary"
+                  onClick={inserirRegistro}
+                  disabled={!valorInput.trim()}
+                >
+                  <i className="fi fi-rr-plus" /> Inserir
+                </button>
+              </div>
+
+              {/* Barra de seleção */}
+              <div
+                className={`sandbox-selection-bar ${selecionados.length > 0 ? "active" : ""}`}
+              >
+                {selecionados.length > 0 ? (
+                  <>
+                    <span>{selecionados.length} item(s) selecionado(s)</span>
+                    <button
+                      className="sandbox-btn-danger"
+                      onClick={apagarSelecionados}
+                    >
+                      <i className="fi fi-rr-trash" /> Apagar
+                    </button>
+                  </>
+                ) : (
+                  <span>
+                    Nenhum item selecionado — clique na linha para selecionar
+                  </span>
+                )}
+              </div>
+
+              {/* ── Tabela SEM StarBorder interno — o border externo já cobre o card inteiro ── */}
               <div className="sandbox-table-wrap">
                 <table className="sandbox-table">
                   <thead>
@@ -520,18 +599,18 @@ function DemoSandbox() {
                   </tbody>
                 </table>
               </div>
-            </StarBorder>
 
-            <button
-              className="sandbox-btn-ghost sandbox-reset"
-              onClick={resetar}
-            >
-              <i className="fi fi-rr-refresh" /> Recomeçar do zero
-            </button>
-          </motion.div>
-        )}
+              <button
+                className="sandbox-btn-ghost sandbox-reset"
+                onClick={resetar}
+              >
+                <i className="fi fi-rr-refresh" /> Recomeçar do zero
+              </button>
+            </motion.div>
+          )}
+        </div>
       </div>
-    </div>
+    </StarBorder>
   );
 }
 
@@ -622,12 +701,10 @@ function LiveTableDemo() {
               <AnimatePresence>
                 {rows &&
                   rows.map((row) => {
-                    // Verificação de segurança: se row for undefined, não tenta ler .id
                     if (!row?.id) return null;
-
                     return (
                       <motion.tr
-                        key={row.id} // Agora o 'id' só é lido se 'row' existir
+                        key={row.id}
                         initial={{
                           opacity: 0,
                           backgroundColor: "rgba(11,205,95,0.12)",
@@ -713,9 +790,9 @@ export function LandingPage() {
           Self MD
         </span>
         <div className="lp-nav-links">
-          <a href="#sobre">O que é Self MD?</a>
+          <a href="#sobre">Sobre</a>
           <a href="#como-funciona">Como funciona</a>
-          <a href="#demo">Demo</a>
+          <a href="#demo">Demonstração</a>
           <Link to="/login" className="lp-nav-cta">
             Entrar
           </Link>
@@ -726,7 +803,6 @@ export function LandingPage() {
       {/* ── SEÇÃO 1: HERO ─────────────────────────────────────────────── */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <section className="lp-hero" id="hero">
-        {/* MagicRings: anel de foco ao redor do mockup — cria profundidade */}
         <div className="lp-hero-rings">
           <MagicRings
             color="#0bcd5f"
@@ -736,31 +812,25 @@ export function LandingPage() {
             attenuation={8}
             baseRadius={0.3}
             radiusStep={0.12}
-            opacity={0.9}
+            opacity={1}
             followMouse
-            mouseInfluence={0.08}
+            mouseInfluence={0.04}
             parallax={0.04}
           />
         </div>
 
         <div className="lp-hero-inner">
-          {/* Badge animado */}
           <motion.span
             className="lp-hero-badge"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <i className="fi fi-sr-bolt" /> No-Code · MySQL Físico Real
+            <i className="fi fi-sr-bolt" /> Sistema No-Code
           </motion.span>
 
-          {/*
-            SplitText: anima a headline letra por letra ao entrar na tela.
-            tag="h1" garante semântica correta.
-            splitType="chars" — cada caractere entra individualmente.
-          */}
           <SplitText
-            text="Seu banco de dados MySQL, sem escrever SQL."
+            text="Self Management Database"
             className="lp-hero-title"
             tag="h1"
             delay={18}
@@ -779,8 +849,9 @@ export function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 1.0 }}
           >
-            Uma plataforma visual que transforma cliques em tabelas, colunas e
-            registros reais no banco — sem uma linha de código SQL.
+            Uma plataforma visual que transforma necessidade em realidade, com
+            apenas alguns cliques, voce cria e gerencia sua propria base de
+            dados, sem utilizar SQL.
           </motion.p>
 
           <motion.div
@@ -790,14 +861,13 @@ export function LandingPage() {
             transition={{ duration: 0.7, delay: 1.2 }}
           >
             <Link to="/login" className="lp-btn lp-btn--primary">
-              Criar meu banco agora <i className="fi fi-rr-arrow-right" />
+              Criar meu banco agora
             </Link>
             <a href="#demo" className="lp-btn lp-btn--ghost">
-              Ver demo ao vivo
+              Ver demonstração
             </a>
           </motion.div>
 
-          {/* Stats */}
           <motion.div
             className="lp-hero-stats"
             initial={{ opacity: 0 }}
@@ -805,9 +875,9 @@ export function LandingPage() {
             transition={{ duration: 0.6, delay: 1.4 }}
           >
             {[
-              { val: "100%", label: "No-Code" },
-              { val: "MySQL", label: "Físico real" },
-              { val: "∞", label: "Tabelas" },
+              { val: "Segurança", label: "Blindado contra ameaças" },
+              { val: "Interface", label: "Moderna e responsiva" },
+              { val: "Integração", label: "com APIs" },
             ].map((s) => (
               <div className="lp-hero-stat" key={s.label}>
                 <strong>{s.val}</strong>
@@ -823,7 +893,6 @@ export function LandingPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section className="lp-sobre" id="sobre">
         <div className="lp-sobre-inner">
-          {/* ── Lado esquerdo: copy ─────────────────────────────────────── */}
           <div className="lp-sobre-text">
             <motion.div
               className="lp-section-label lp-section-label--left"
@@ -831,7 +900,7 @@ export function LandingPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, amount: 0.3 }}
             >
-              O que é Self MD?
+              O que é a Self MD?
             </motion.div>
 
             <motion.h2
@@ -841,7 +910,7 @@ export function LandingPage() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Gerenciamento de banco de dados para humanos
+              Sistema de gerenciamento de banco de dados
             </motion.h2>
 
             <motion.p
@@ -852,14 +921,13 @@ export function LandingPage() {
               transition={{ delay: 0.2 }}
             >
               O <strong>Self MD</strong> (Self Management Database) é um sistema
-              No-Code que abstrai toda a complexidade do MySQL. Você cria
-              databases, tabelas e colunas através de uma interface visual
-              intuitiva — e o sistema gera as estruturas físicas reais no banco,
-              incluindo triggers e procedures automaticamente.
+              No-Code, todas as funcionalidades presentes no MySQL você encontra
+              aqui. Você cria a sua database, tabelas, colunas, insere dados,
+              gerencia, tudo através de uma interface visual intuitiva, tudo é
+              gerado dentro do MySQL.
             </motion.p>
           </div>
 
-          {/* ── Lado direito: CardSwap ──────────────────────────────────── */}
           <motion.div
             className="lp-sobre-swap"
             initial={{ opacity: 0, x: 30 }}
@@ -1007,6 +1075,7 @@ export function LandingPage() {
           Nenhum cadastro necessário.
         </motion.p>
 
+        {/* DemoSandbox já tem o StarBorder interno envolvendo o card inteiro */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1040,62 +1109,90 @@ export function LandingPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── CTA FINAL ─────────────────────────────────────────────────── */}
+      {/* ── SEÇÃO 5: CTA FINAL — redesenhado ─────────────────────────── */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <section className="lp-cta">
+        {/* Orbs decorativos (CSS puro, sem JS) */}
+        <div className="lp-cta-orb lp-cta-orb--1" aria-hidden="true" />
+        <div className="lp-cta-orb lp-cta-orb--2" aria-hidden="true" />
+        <div className="lp-cta-orb lp-cta-orb--3" aria-hidden="true" />
+
         <motion.div
           className="lp-cta-card"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.65 }}
         >
-          <i className="fi fi-sr-rocket-lunch lp-cta-icon" />
+          <motion.div
+            className="lp-cta-badge"
+            initial={{ opacity: 0, scale: 0.85 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            <i className="fi fi-sr-rocket-lunch" />
+            Pronto para começar?
+          </motion.div>
 
-          <h2>Assuma o controle dos seus dados — agora.</h2>
-          <p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+          >
+            Assuma o controle dos seus dados{" "}
+            <span className="lp-cta-heading-accent"> agora!</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.25 }}
+          >
             Chega de planilhas espalhadas, JSON perdido ou SQL que ninguém
             entende. O Self MD organiza tudo com a interface que você viu acima,
             gerando um banco MySQL real a cada clique.
-          </p>
+          </motion.p>
 
-          {/*
-            StarBorder: o botão principal usa o efeito de borda giratória
-            para se destacar visualmente de tudo na página.
-            as="a" faz ele se comportar como link sem perder o estilo.
-          */}
-          <StarBorder
-            as={Link}
-            to="/login"
-            color="#0bcd5f"
-            speed="4s"
-            thickness={1.5}
-            className="lp-cta-star-btn"
+          <motion.div
+            className="lp-cta-btn-group"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.32 }}
           >
-            <i className="fi fi-sr-database" />
-            Comece gratuitamente
-            <i className="fi fi-rr-arrow-right" />
-          </StarBorder>
+            <Link to="/login" className="lp-cta-btn lp-cta-btn--primary">
+              <i className="fi fi-sr-database" />
+              Comece gratuitamente
+              <i className="fi fi-rr-arrow-right" />
+            </Link>
+          </motion.div>
 
-          <span className="lp-cta-note">
-            Sem gastar 1 centavo · Estrutura MySQL real · Começa em 60 segundos
-          </span>
+          <motion.div
+            className="lp-cta-features"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.42 }}
+          >
+            {[
+              "Sem gastar 1 centavo",
+              "Estrutura MySQL real",
+              "Começa em 60 segundos",
+            ].map((f) => (
+              <span key={f} className="lp-cta-feature-item">
+                <i className="fi fi-sr-check-circle" />
+                {f}
+              </span>
+            ))}
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer className="lp-footer">
-        <span className="lp-footer-brand">
-          <img src="../../../public/SELFMD_BAW-removebg-preview.png" alt="Logo Self MD black and white" />
-        </span>
-        <p className="texto-footer">
-          &copy; {new Date().getFullYear()} Self MD · Desenvolvido por {" "}
-          <strong className="autor-nome">Lucas Felipe Heck</strong>
-        </p>
-      </footer>
-
-
-
+      {/* ── TECH STACK como FOOTER — final da página ──────────────────── */}
+      <TechStack />
     </main>
   );
 }
