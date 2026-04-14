@@ -5,6 +5,7 @@ import { Database } from "../src/pages/Database/Database";
 import { Remind } from "../src/pages/Remind/Remind";
 import { PrivateRoute } from "../constants/private_routes";
 import { System } from "../src/pages/System/System";
+import { Pricing } from "../src/pages/Pricing/Pricing";
 
 export function RoutesConfig() {
   return (
@@ -15,6 +16,7 @@ export function RoutesConfig() {
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
         <Route path="/remind" element={<Remind />} />
+        <Route path="/upgrade" element={<Menu><Pricing /></Menu>} />
 
         {/* Rotas protegidas */}
         <Route

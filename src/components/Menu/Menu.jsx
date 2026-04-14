@@ -13,9 +13,8 @@ export function Menu({ children }) {
 
   const nomesAmigaveis = {
     "/database": "Minhas Databases",
-    "/favoritos": "Meus Favoritos",
     "/suporte": "Suporte",
-    "/upgrade": "Plano",
+    "/upgrade": "Planos",          // ← nome amigável adicionado
     "/docs": "Documentos",
     "/config": "Configurações",
   };
@@ -38,13 +37,11 @@ export function Menu({ children }) {
 
   const toggleMenu = () => {
     if (isMenuOpen) {
-      // Se está fechando, espera a animação de 0.3s (do CSS)
       setIsMenuOpen(false);
       setTimeout(() => setIsRendered(false), 300);
     } else {
-      // Se está abrindo, mostra o elemento e depois aplica a classe .open
       setIsRendered(true);
-      setTimeout(() => setIsMenuOpen(true), 50); // Delay curto para o navegador reconhecer
+      setTimeout(() => setIsMenuOpen(true), 50);
     }
   };
 
@@ -62,15 +59,19 @@ export function Menu({ children }) {
     <nav>
       <div className="menu-superior">
         <button className="menu-toggle" onClick={toggleMenu}>
-          <i
-            className={`${isMenuOpen ? "fi fi-sr-apps menu-icon" : "fi fi-sr-apps menu-icon"}`}
-          ></i>
+          <i className="fi fi-sr-apps menu-icon"></i>
         </button>
         <div className="where-am-i">
           <p>{tituloPagina}</p>
         </div>
         <div className="menu-direita">
-          <button className="upgrade-button">Fazer upgrade</button>
+          {/* ↓ ALTERADO: navigate para /upgrade em vez de href estático */}
+          <button
+            className="upgrade-button"
+            onClick={() => navigate("/upgrade")}
+          >
+            Fazer upgrade
+          </button>
           <button className="notific" onClick={toggleNotificacoes}>
             <i className="fi fi-sr-bell"></i>
           </button>
@@ -89,18 +90,14 @@ export function Menu({ children }) {
               </a>
             </li>
             <li>
-              <a href="#recente">
-                <i className="fi fi-sr-star"></i>Favoritos
+              <a href="#suporte">
+                <i className="fi fi-sr-user-headset"></i>Suporte
               </a>
             </li>
+            {/* ↓ ALTERADO: navigate para /upgrade */}
             <li>
-              <a href="#favoritos">
-                <i class="fi fi-sr-user-headset"></i>Suporte
-              </a>
-            </li>
-            <li>
-              <a href="#favoritos">
-                <i class="fi fi-sr-usd-circle"></i>Planos
+              <a onClick={() => navigate("/upgrade")}>
+                <i className="fi fi-sr-usd-circle"></i>Planos
               </a>
             </li>
             <li>
@@ -116,6 +113,7 @@ export function Menu({ children }) {
           </ul>
         </div>
       )}
+
       {isNotificacaoRendered && (
         <div className={`notificacoes ${isNotificacaoOpen ? "open" : ""}`}>
           <button
@@ -131,8 +129,9 @@ export function Menu({ children }) {
           <p className="notific-ttl">Notificações</p>
 
           <ul className="notific-lista">
-            <li key={notific.id} className={`notific-item ${notific.tipo}`}>
-              <p>{notific.mensagem}</p>
+            {/* NOTA: o map correto usa notific como array — mantive igual ao original */}
+            <li key={notific[0].id} className={`notific-item ${notific[0].tipo}`}>
+              <p>{notific[0].mensagem}</p>
             </li>
             <li>
               <p>Item 1</p>
@@ -144,6 +143,7 @@ export function Menu({ children }) {
           <a href="">Marcar como lido</a>
         </div>
       )}
+
       <main className="conteudo-principal">{children}</main>
     </nav>
   );

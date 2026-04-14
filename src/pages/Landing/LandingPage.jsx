@@ -793,6 +793,7 @@ export function LandingPage() {
           <a href="#sobre">Sobre</a>
           <a href="#como-funciona">Como funciona</a>
           <a href="#demo">Demonstração</a>
+          <a href="#sistema-real">Sistema real</a>
           <Link to="/login" className="lp-nav-cta">
             Entrar
           </Link>
@@ -1086,7 +1087,7 @@ export function LandingPage() {
         </motion.div>
 
         {/* Showcase da tabela ao vivo */}
-        <div className="lp-demo-showcase-header">
+        <div className="lp-demo-showcase-header" id="sistema-real">
           <motion.div
             className="lp-section-label"
             initial={{ opacity: 0 }}

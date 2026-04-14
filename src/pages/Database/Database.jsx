@@ -327,8 +327,11 @@ export function Database() {
                             >
                               <i className="fi fi-sr-trash-xmark"></i>
                             </button>
-                            <button className="favoritar">
-                              <i className="fi fi-sr-star"></i>
+                            <button
+                              className="link-convite"
+                              onClick={() => setDatabaseParaConvidar(db)}
+                            >
+                              <i className="fi fi-sr-user-link"></i>
                             </button>
                             <button
                               className="acessar"
@@ -342,12 +345,6 @@ export function Database() {
                               }
                             >
                               <i className="fi fi-sr-server-key"></i>
-                            </button>
-                            <button
-                              className="link-convite"
-                              onClick={() => setDatabaseParaConvidar(db)}
-                            >
-                              <i className="fi fi-sr-user-link"></i>
                             </button>
                           </div>
                         </div>

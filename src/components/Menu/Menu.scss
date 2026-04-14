@@ -58,6 +58,7 @@
     align-items: center;
     margin-left: 45px;
     font-weight: 400;
+    font-size: 20px;
   }
 
   .menu-direita {
@@ -78,7 +79,6 @@
         background-color: v.$cor-primaria;
         border: solid 2px v.$cor-primaria;
         transition: v.$transicao-rapida;
-        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
 
       &:hover i {
@@ -113,7 +113,6 @@
         border: solid 2px v.$cor-primaria;
         color: #ffffff;
         transition: v.$transicao-rapida;
-        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
     }
 
@@ -134,7 +133,6 @@
         color: #ffffff;
         background-color: v.$cor-primaria;
         transition: v.$transicao-rapida;
-        box-shadow: 3px 0 5px rgba(0, 0, 0, 0.236);
       }
 
       i {
@@ -172,6 +170,7 @@
   z-index: 900;
   pointer-events: none;
   opacity: 0;
+  font-family: v.$jakarta;
 
   ul {
     list-style: none;

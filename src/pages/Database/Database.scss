@@ -192,18 +192,13 @@
         transform: scale(0.9);
         will-change: transform;
       }
-      .favoritar:hover i {
-        color: #d1d800;
-        transform: scale(0.9);
-        will-change: transform;
-      }
       .acessar:hover i {
         color: v.$cor-primaria;
         transform: scale(0.9);
         will-change: transform;
       }
       .link-convite:hover i {
-        color: #0091c1;
+        color: v.$cor-secundaria;
         transform: scale(0.9);
         will-change: transform;
       }
