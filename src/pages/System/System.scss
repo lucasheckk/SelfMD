@@ -2822,6 +2822,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     justify-content: center;
     flex-shrink: 0;
     transition: opacity 0.15s;
+    line-height: 0;
 
     &:hover {
       opacity: 0.85;
@@ -3117,7 +3118,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     font-weight: 600;
     color: #333;
     font-family: "Courier New", monospace;
-    background: rgba(v.$cor-primaria, 0.08);
     padding: 2px 8px;
     border-radius: 4px;
     white-space: nowrap;
@@ -3356,4 +3356,51 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
       padding: 0 8px;
     }
   }
+
+// ─── BOTÕES BOLEANOS NO MODAL (INSERÇÃO) ─────────────────────────────────────
+
+.insert-bool-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+
+  .insert-bool-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1.5px solid #eee;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-family: v.$jakarta;
+    font-size: 14px;
+    font-weight: 500;
+    color: #777;
+    transition: v.$transicao-rapida;
+
+    i {
+      font-size: 13px;
+      margin-top: 1px;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+    }
+
+    &.insert-bool-btn--active {
+      background: rgba(v.$cor-primaria, 0.08);
+      border-color: v.$cor-primaria;
+      color: v.$cor-primaria;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
 }

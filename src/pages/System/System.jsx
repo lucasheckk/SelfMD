@@ -35,8 +35,8 @@ const sanitizarIdentificador = (str) => {
     .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-    .replace(/\s+/g, "_")            // Espaços viram underscores
-    .replace(/[^a-zA-Z0-9_]/g, "")   // Remove caracteres especiais
+    .replace(/\s+/g, "_") // Espaços viram underscores
+    .replace(/[^a-zA-Z0-9_]/g, "") // Remove caracteres especiais
     .toLowerCase();
 };
 
@@ -935,6 +935,7 @@ export function System() {
     const tabelaJaExiste = tabs.some(
       (t) => t.name && sanitizarIdentificador(t.name) === nomeTabelaLimpo,
     );
+
     if (tabelaJaExiste) {
       pushNotification(
         "warning",
@@ -958,58 +959,52 @@ export function System() {
     let idTabelaCriada = null;
 
     try {
-      // 2. CRIAR A TABELA
+      // 2. CHAMADA 1: CRIAR O REGISTRO DA TABELA
       const resTabela = await API.post(
         TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
-        {
-          nomeTabela: nomeTabelaLimpo,
-        },
+        { nomeTabela: nomeTabelaLimpo },
       );
+
       idTabelaCriada = resTabela.data.id;
 
-      // 3. CRIAR AS COLUNAS
+      // 3. PREPARAR PAYLOAD DAS COLUNAS
       const payloadColunas = colsValidas.map((col) => {
         const isPk = col.identificacao === "pk";
         const isFk = col.identificacao === "fk";
-        let configFinal = mapConfigParaApi(col.config, col.tipoDado);
+        const tipoApi = MAPA_TIPOS_API[col.tipoDado] || "texto";
 
-        if (col.tipoDado === "calculo") {
-          configFinal = {
-            ...configFinal,
-            operador: col.config.operador,
-            coluna_origem_1: col.config.coluna_origem_1,
-            coluna_origem_2: col.config.coluna_origem_2,
-          };
-        }
+        let configFinal = mapConfigParaApi(col.config, tipoApi);
 
+        // Adiciona flags específicas para PK
         if (isPk) {
           configFinal = {
             ...configFinal,
-            auto_increment: "true",
-            not_null: "true",
+            auto_increment: true,
+            not_null: true,
           };
         }
 
         return {
           nomeColuna: sanitizarIdentificador(col.nome),
-          tipoDado:
-            isPk || isFk ? "bigint" : MAPA_TIPOS_API[col.tipoDado] || "texto",
+          tipoDado: isPk || isFk ? "bigint" : tipoApi,
           isPrimaryKey: isPk,
-          tabelaId: idTabelaCriada,
+          isForeignKey: isFk,
+          tabelaId: idTabelaCriada, // Vincula ao ID retornado na Chamada 1
           config: configFinal,
         };
       });
 
+      // 4. CHAMADA 2: CRIAR AS COLUNAS
       const resColunas = await API.post(
         COLUNA_CRUD_ROUTES.CRIAR,
         payloadColunas,
       );
-      const colunasSalvasNoBanco = resColunas.data.dados;
+      const colunasSalvasNoBanco = resColunas.data.dados || resColunas.data;
 
-      // 6. SINCRONIZAR
+      // 5. SINCRONIZAR (Geração física no Banco de Dados)
       await API.post(TABELA_CRUD_ROUTES.SINCRONIZAR(idTabelaCriada));
 
-      // 5. CRIAR RELACIONAMENTOS
+      // 6. CRIAR RELACIONAMENTOS (FKs)
       const colunasFkNoWizard = colsValidas.filter(
         (c) => c.identificacao === "fk",
       );
@@ -1020,22 +1015,22 @@ export function System() {
         );
 
         if (colunaOrigemNoBanco && colFk.fkTabela && colFk.fkColunaId) {
-          const relDto = {
+          await API.post(REL_CRUD_ROUTES.CRIAR, {
             idTabelaOrigem: idTabelaCriada,
             idColunaOrigem: colunaOrigemNoBanco.id,
             idTabelaDestino: colFk.fkTabela,
             idColunaDestino: colFk.fkColunaId,
-          };
-
-          await API.post(REL_CRUD_ROUTES.CRIAR, relDto);
+          });
         }
       }
-      // 6. SUCESSO E LIMPEZA
+
+      // 7. SUCESSO E LIMPEZA
       await carregarDados();
       setActiveTab(idTabelaCriada);
       closeWizard();
       pushNotification("success", "Sucesso!", `Tabela "${nomeTabela}" criada.`);
     } catch (err) {
+      // Rollback simples: se criou a tabela mas falhou depois, tenta excluir para não deixar lixo
       if (idTabelaCriada) {
         try {
           await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabelaCriada));
@@ -1244,22 +1239,22 @@ export function System() {
   };
 
   const handleConfigEdicaoFKColuna = (pkColId) => {
-  const tab = tabs.find(
-    (t) => String(t.id) === String(configEdicao?.fkTabela),
-  );
-  const pkCol = tab?.cols?.find((c) => c.id === pkColId);
-  if (!pkCol) return;
+    const tab = tabs.find(
+      (t) => String(t.id) === String(configEdicao?.fkTabela),
+    );
+    const pkCol = tab?.cols?.find((c) => c.id === pkColId);
+    if (!pkCol) return;
 
-  const tipoDadoDisplay =
-    MAPA_API_PARA_TIPO[pkCol.tipoDado] || pkCol.tipoDado;
+    const tipoDadoDisplay =
+      MAPA_API_PARA_TIPO[pkCol.tipoDado] || pkCol.tipoDado;
 
-  setConfigEdicao((prev) => ({
-    ...prev,
-    fkColunaId: pkColId,
-    grupo: getGrupoPorTipo(tipoDadoDisplay),
-    tipoDado: tipoDadoDisplay,
-  }));
-};
+    setConfigEdicao((prev) => ({
+      ...prev,
+      fkColunaId: pkColId,
+      grupo: getGrupoPorTipo(tipoDadoDisplay),
+      tipoDado: tipoDadoDisplay,
+    }));
+  };
 
   const handleConfigEdicaoRemoverFK = () =>
     setConfigEdicao((prev) => ({
@@ -1691,17 +1686,17 @@ export function System() {
         {isBoleano ? (
           <div className="insert-bool-group">
             {[
-              { val: "true", label: col.config?.labelTrue || "Verdadeiro" },
-              { val: "false", label: col.config?.labelFalse || "Falso" }
+              { val: true, label: col.config?.labelTrue || "Verdadeiro" },
+              { val: false, label: col.config?.labelFalse || "Falso" },
             ].map((btn) => (
               <button
-                key={btn.val}
+                key={String(btn.val)}
                 type="button"
                 disabled={isCalculo}
                 className={`insert-bool-btn ${valor === btn.val ? "insert-bool-btn--active" : ""}`}
                 onClick={() => onChange(btn.val)}
               >
-                {btn.val === "true" ? (
+                {btn.val === true ? (
                   <i className="fi fi-rr-check" />
                 ) : (
                   <i className="fi fi-rr-cross" />
@@ -2411,11 +2406,9 @@ export function System() {
                       const colunasNumericasWizard = colunas.filter(
                         (c) =>
                           c.id !== col.id &&
-                          ["Inteiro", "Decimal"].includes(
-                            c.tipoDado,
-                          ) && 
-                          c.nome.trim() && 
-                          c.identificacao !== "pk" && 
+                          ["Inteiro", "Decimal"].includes(c.tipoDado) &&
+                          c.nome.trim() &&
+                          c.identificacao !== "pk" &&
                           c.identificacao !== "fk",
                       );
                       const fkTabelasWizard = colunas
@@ -2551,7 +2544,6 @@ export function System() {
                                 </div>
                               )}
                               {hasCalculoPanel && (
-
                                 <CalculoConfigPanel
                                   key={col.id}
                                   config={col.config}
@@ -3525,10 +3517,8 @@ export function System() {
                     ).filter(
                       (c) =>
                         c.id !== colunaParaConfigurar?.id &&
-                        ["numero_int", "numero_dec"].includes(
-                          c.tipoDado,
-                        ) && 
-                        c.identificacao !== "pk" && 
+                        ["numero_int", "numero_dec"].includes(c.tipoDado) &&
+                        c.identificacao !== "pk" &&
                         c.identificacao !== "fk",
                     );
                     const fkTabelasModal = (activeTabData?.cols || [])
@@ -3910,7 +3900,13 @@ const merge = (saved) => ({
   op2: { ...DEFAULT_CALCULO.op2, ...(saved?.op2 ?? {}) },
 });
 
-function CalculoConfigPanel({ config, onChange, colunasNumericas, fkTabelas, tabs }) {
+function CalculoConfigPanel({
+  config,
+  onChange,
+  colunasNumericas,
+  fkTabelas,
+  tabs,
+}) {
   const [calculo, setCalculo] = useState(() => merge(config.calculo));
 
   const [prevConfigCalculo, setPrevConfigCalculo] = useState(config.calculo);
@@ -3954,7 +3950,7 @@ function CalculoConfigPanel({ config, onChange, colunasNumericas, fkTabelas, tab
       ? tabs.find((t) => t.id === op.tabelaId)
       : null;
     const colunasExt = (tabelaExt?.cols ?? []).filter((c) =>
-      ["numero_int", "numero_dec", "moeda"].includes(c.tipoDado),
+      ["numero_int", "numero_dec"].includes(c.tipoDado),
     );
     const colsToShow = op.tipo === "local" ? colunasNumericas : colunasExt;
 
@@ -4010,9 +4006,8 @@ function CalculoConfigPanel({ config, onChange, colunasNumericas, fkTabelas, tab
         )}
 
         {/* Cards de seleção de coluna */}
-        {(op.tipo === "local" ||
-          (op.tipo === "externo" && op.tabelaId)) && (
-          colsToShow.length === 0 ? (
+        {(op.tipo === "local" || (op.tipo === "externo" && op.tabelaId)) &&
+          (colsToShow.length === 0 ? (
             <p className="calculo-empty-hint">
               <i className="fi fi-rr-info" />
               {op.tipo === "externo" && !op.tabelaId
@@ -4035,8 +4030,7 @@ function CalculoConfigPanel({ config, onChange, colunasNumericas, fkTabelas, tab
                 </button>
               ))}
             </div>
-          )
-        )}
+          ))}
       </div>
     );
   };
