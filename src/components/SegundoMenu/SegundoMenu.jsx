@@ -13,9 +13,6 @@ export function SegundoMenu() {
             <i className="fi fi-rr-arrow-left-from-line back"></i>
           </button>
           <button>
-            <i className="fi fi-rr-dashboard"></i>
-          </button>
-          <button>
             <i className="fi fi-rr-user-robot"></i>
           </button>
         </div>
@@ -32,10 +29,8 @@ export function SegundoMenu() {
         </div>
         <div className="smenu-right">
           <button>
-            <i className="fi fi-rr-bell"></i>
+            <i className="fi fi-rr-share"></i>
           </button>
-          <i className="fi fi-sr-bell-notification-social-media"></i>
-          <i className="fi fi-rr-share"></i>
           <button>
             <i className="fi fi-rr-bolt"></i>
           </button>

@@ -47,23 +47,18 @@ const sanitizarIdentificador = (str) => {
 const GRUPOS_TIPOS = {
   Texto: ["Texto", "Lista"],
   Numérico: ["Decimal", "Inteiro"],
-  Tempo: ["Hora", "Data", "Data / Hora"],
+  Tempo: ["Hora", "Data", "Data/Hora"],
   Avançado: ["Cálculo", "Boleano"],
-  Pre_definido: ["Email", "CPF", "Telefone", "Moeda"],
 };
 
 const MAPA_TIPOS_API = {
   Texto: "texto",
-  Email: "email",
   Decimal: "numero_dec",
   Inteiro: "numero_int",
   bigint: "bigint",
-  CPF: "cpf",
-  Telefone: "telefone",
-  Moeda: "moeda",
   Hora: "hora",
   Data: "data",
-  "Data / Hora": "data_hora",
+  "Data/Hora": "data_hora",
   Lista: "lista",
   Boleano: "boleano",
   Cálculo: "calculo",
@@ -76,19 +71,16 @@ const MAPA_API_PARA_TIPO = Object.fromEntries(
 // ── Nomes amigáveis para exibição ao usuário ──────────────────────────────────
 const MAPA_TIPO_AMIGAVEL = {
   texto: "Texto",
-  email: "Email",
   numero_dec: "Decimal",
   numero_int: "Inteiro",
-  cpf: "CPF",
-  telefone: "Telefone",
-  moeda: "Moeda",
   hora: "Hora",
   data: "Data",
-  data_hora: "Data / Hora",
+  data_hora: "Data e Hora",
   lista: "Lista",
   boleano: "Booleano",
   calculo: "Cálculo",
 };
+
 const getNomeTipoAmigavel = (tipo) =>
   MAPA_TIPO_AMIGAVEL[(tipo || "").toLowerCase()] || tipo;
 
@@ -97,30 +89,18 @@ const GRUPO_ICONS = {
   Numérico: "fi-sr-calculator",
   Tempo: "fi-sr-calendar",
   Avançado: "fi-sr-settings-sliders",
-  Pre_definido: "fi-sr-crown",
 };
 
-const MOEDAS = [
-  { id: "BRL", label: "Real", simbolo: "R$", mascara: "R$ #.###,##" },
-  { id: "USD", label: "Dólar", simbolo: "$", mascara: "$ #,###.##" },
-  { id: "EUR", label: "Euro", simbolo: "€", mascara: "€ #.###,##" },
-  { id: "GBP", label: "Libra", simbolo: "£", mascara: "£ #,###.##" },
-  { id: "JPY", label: "Iene / Yuan", simbolo: "¥", mascara: "¥ #,###" },
-];
-
-const MASCARA_AUTO = { CPF: "###.###.###-##", Telefone: "+## (##) #####-####" };
 const MASCARA_TEMPORAL_AUTO = {
   Data: "dMy",
   Hora: "Hms",
-  "Data / Hora": "dMy|Hms",
+  "Data/Hora": "dMy|Hms",
 };
 
 const getTipoCategoria = (tipo) => {
-  if (["Texto", "Email", "CPF", "Telefone"].includes(tipo)) return "texto";
-  if (["Inteiro", "Decimal", "Moeda"].includes(tipo)) return "numerico";
-  if (["Hora", "Data", "Data / Hora"].includes(tipo)) return "temporal";
-  if (["Email", "CPF", "Telefone", "Moeda"].includes(tipo))
-    return "pre_definido";
+  if (tipo === "Texto") return "texto";
+  if (["Inteiro", "Decimal"].includes(tipo)) return "numerico";
+  if (["Hora", "Data", "Data e Hora"].includes(tipo)) return "temporal";
   if (tipo === "Boleano") return "boleano";
   if (tipo === "Cálculo") return "calculo";
   if (tipo === "Lista") return "lista";
@@ -157,33 +137,61 @@ const CONFIG_PADRAO = {
   labelFalse: "Falso",
 };
 
-const mapConfigParaApi = (config, tipoDado) => {
-  const out = {
-    not_null: config.naoVazio || false,
-    unique: config.unico || false,
-    auto_increment: config.autoIncremento || false,
-    index: config.indice || false,
-    mask: config.mascara || "",
-  };
-  if (config.alcanceMaximo !== "" && config.alcanceMaximo != null)
-    out.max_length = Number(config.alcanceMaximo);
-  if (
-    tipoDado === "lista" &&
-    Array.isArray(config.mascaraLista) &&
-    config.mascaraLista.length > 0
-  )
-    out.mascaraLista = config.mascaraLista;
+const mapConfigParaApi = (configForm, tipoDado) => {
+  const configFinal = {};
+
+  if (configForm.naoVazio) configFinal.not_null = true;
+  if (configForm.unico) configFinal.unique = true;
+  if (configForm.indice) configFinal.index = true;
+  if (configForm.alcanceMaximo)
+    configFinal.max_length = configForm.alcanceMaximo;
+
+  if (tipoDado === "calculo") {
+    
+    configFinal.operador = configForm.operador || "+";
+
+    const nomeCol1 = configForm.op1?.coluna;
+    const nomeCol2 = configForm.op2?.coluna;
+    configFinal.colunasOrigem = [nomeCol1, nomeCol2].filter(Boolean);
+
+    configFinal.op1 = configForm.op1;
+    configFinal.op2 = configForm.op2;
+  }
+
+  if (["data", "hora", "data_hora"].includes(tipoDado)) {
+    if (tipoDado === "data") configFinal.mascaraData = "DD/MM/YYYY";
+    if (tipoDado === "hora") configFinal.mascaraData = "HH:MM:SS";
+    if (tipoDado === "data_hora")
+      configFinal.mascaraData = "DD/MM/YYYY HH:MM:SS";
+  }
+
   if (tipoDado === "boleano") {
-    out.label_true = config.labelTrue;
-    out.label_false = config.labelFalse;
+    configFinal.options = [
+      configForm.labelTrue || "Sim",
+      configForm.labelFalse || "Não",
+    ];
   }
-  if (tipoDado === "calculo" && config.calculo) {
-    out.operador = config.calculo.operador;
-    const col1 = config.calculo.op1?.coluna || config.calculo.op1;
-    const col2 = config.calculo.op2?.coluna || config.calculo.op2;
-    out.colunasOrigem = [col1, col2];
+
+  if (tipoDado === "lista") {
+    if (Array.isArray(configForm.itensLista)) {
+      configFinal.mascaraLista = configForm.itensLista.filter(
+        (i) => i.trim() !== "",
+      );
+    } else if (Array.isArray(configForm.mascaraLista)) {
+      configFinal.mascaraLista = configForm.mascaraLista;
+    } else if (
+      typeof configForm.mascaraLista === "string" &&
+      configForm.mascaraLista.trim() !== ""
+    ) {
+      configFinal.mascaraLista = configForm.mascaraLista
+        .split(";")
+        .filter((i) => i.trim() !== "");
+    } else {
+      configFinal.mascaraLista = [];
+    }
   }
-  return out;
+
+  return configFinal;
 };
 
 const NOME_MAX = 15;
@@ -227,18 +235,6 @@ const validarCampo = (valor, col) => {
     return `O campo "${col.nome}" é obrigatório.`;
   if (v === "") return null;
   switch (col.tipoDado) {
-    case "Email":
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
-        return `"${col.nome}" deve ser um e-mail válido.`;
-      break;
-    case "CPF":
-      if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v))
-        return `"${col.nome}" deve seguir o formato 000.000.000-00.`;
-      break;
-    case "Telefone":
-      if (!/^\+\d{2} \(\d{2}\) \d{4,5}-\d{4}$/.test(v))
-        return `"${col.nome}" deve seguir o formato +55 (99) 99999-9999.`;
-      break;
     case "Inteiro":
       if (!/^-?\d+$/.test(v))
         return `"${col.nome}" deve ser um número inteiro.`;
@@ -252,10 +248,6 @@ const validarCampo = (valor, col) => {
       if (!/^-?\d+([.,]\d+)?$/.test(v))
         return `"${col.nome}" deve ser um número decimal (ex: 3,14).`;
       break;
-    case "Moeda":
-      if (!/^[\d.,]+$/.test(v))
-        return `"${col.nome}" deve conter apenas dígitos.`;
-      break;
     case "Hora":
       if (!/^\d{2}:\d{2}(:\d{2})?$/.test(v))
         return `"${col.nome}" deve seguir o formato HH:MM ou HH:MM:SS.`;
@@ -264,7 +256,7 @@ const validarCampo = (valor, col) => {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(v) && !/^\d{2}\/\d{2}\/\d{4}$/.test(v))
         return `"${col.nome}" deve ser uma data válida.`;
       break;
-    case "Data / Hora":
+    case "Data e Hora":
       if (!v.includes("T") && !v.includes(" "))
         return `"${col.nome}" deve incluir data e hora.`;
       break;
@@ -284,23 +276,15 @@ const validarCampo = (valor, col) => {
 
 const getPlaceholderPorTipo = (col) => {
   switch (col.tipoDado) {
-    case "Email":
-      return "exemplo@email.com";
-    case "CPF":
-      return "000.000.000-00";
-    case "Telefone":
-      return "+55 (99) 99999-9999";
     case "Inteiro":
       return "0";
     case "Decimal":
-      return "0,00";
-    case "Moeda":
       return "0,00";
     case "Hora":
       return "HH:MM";
     case "Data":
       return "AAAA-MM-DD";
-    case "Data / Hora":
+    case "Data e Hora":
       return "AAAA-MM-DD HH:MM";
     case "Boleano":
       return "sim / não";
@@ -374,6 +358,11 @@ export function System() {
   const [atualizarRowData, setAtualizarRowData] = useState({});
   const [atualizarErros, setAtualizarErros] = useState({});
   const [loadingAtualizar, setLoadingAtualizar] = useState(false);
+
+  // ── Confirmação de exclusão de registros ──────────────────────────────────
+  const [confirmarDeletarOpen, setConfirmarDeletarOpen] = useState(false);
+  const [confirmarDeletarNome, setConfirmarDeletarNome] = useState("");
+  const [confirmarDeletarCiente, setConfirmarDeletarCiente] = useState(false);
 
   // ── Dropdown do cabeçalho de coluna ──────────────────────────────────────
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
@@ -492,7 +481,6 @@ export function System() {
         setTabs((prev) => {
           return prev.map((tab) => {
             if (tab.id === tabelaId) {
-              // Só atualiza se os dados forem realmente diferentes para evitar re-renders inúteis
               return { ...tab, rows: res.data?.rows || [] };
             }
             return tab;
@@ -538,12 +526,20 @@ export function System() {
       setSelectedRows([]);
     else setSelectedRows(rows.map((r) => r.id));
   };
+
   const toggleSelectRow = (id) =>
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
 
-  // ── Deletar selecionados via API ──────────────────────────────────────────
+  // ── Abre modal de confirmação de exclusão de registros ────────────────────
+  const openConfirmarDeletar = () => {
+    setConfirmarDeletarNome("");
+    setConfirmarDeletarCiente(false);
+    setConfirmarDeletarOpen(true);
+  };
+
+  // ── Deleta de fato (chamado só pelo modal) ────────────────────────────────
   const handleDeletarSelecionados = async () => {
     try {
       await Promise.all(
@@ -567,6 +563,7 @@ export function System() {
         `${selectedRows.length} registro(s) excluído(s) com sucesso.`,
       );
       setSelectedRows([]);
+      setConfirmarDeletarOpen(false);
     } catch (err) {
       pushNotification(
         "error",
@@ -898,13 +895,8 @@ export function System() {
       prev.map((c) => {
         if (c.id !== id) return c;
         const newConfig = { ...c.config };
-        if (MASCARA_AUTO[tipo]) newConfig.mascara = MASCARA_AUTO[tipo];
-        else if (MASCARA_TEMPORAL_AUTO[tipo])
+        if (MASCARA_TEMPORAL_AUTO[tipo])
           newConfig.mascara = MASCARA_TEMPORAL_AUTO[tipo];
-        else if (tipo !== "Moeda") {
-          newConfig.mascara = "";
-          newConfig.moeda = null;
-        }
         if (tipo !== "Cálculo") delete newConfig.calculo;
         if (tipo !== "Lista") delete newConfig.mascaraLista;
         return { ...c, tipoDado: tipo, config: newConfig };
@@ -912,26 +904,10 @@ export function System() {
     );
   };
 
-  const handleMoedaChange = (colId, moedaId) => {
-    const moeda = MOEDAS.find((m) => m.id === moedaId);
-    if (!moeda) return;
-    setColunas((prev) =>
-      prev.map((c) =>
-        c.id !== colId
-          ? c
-          : {
-              ...c,
-              config: { ...c.config, moeda: moedaId, mascara: moeda.mascara },
-            },
-      ),
-    );
-  };
-
   // ── Criar tabela + colunas ────────────────────────────────────────────────
   const handleCriarTabela = async () => {
     const nomeTabelaLimpo = sanitizarIdentificador(nomeTabela);
 
-    // 1. Validações iniciais
     const tabelaJaExiste = tabs.some(
       (t) => t.name && sanitizarIdentificador(t.name) === nomeTabelaLimpo,
     );
@@ -959,7 +935,6 @@ export function System() {
     let idTabelaCriada = null;
 
     try {
-      // 2. CHAMADA 1: CRIAR O REGISTRO DA TABELA
       const resTabela = await API.post(
         TABELA_CRUD_ROUTES.CRIAR(idDoDatabaseAtual),
         { nomeTabela: nomeTabelaLimpo },
@@ -967,7 +942,6 @@ export function System() {
 
       idTabelaCriada = resTabela.data.id;
 
-      // 3. PREPARAR PAYLOAD DAS COLUNAS
       const payloadColunas = colsValidas.map((col) => {
         const isPk = col.identificacao === "pk";
         const isFk = col.identificacao === "fk";
@@ -975,7 +949,6 @@ export function System() {
 
         let configFinal = mapConfigParaApi(col.config, tipoApi);
 
-        // Adiciona flags específicas para PK
         if (isPk) {
           configFinal = {
             ...configFinal,
@@ -989,22 +962,19 @@ export function System() {
           tipoDado: isPk || isFk ? "bigint" : tipoApi,
           isPrimaryKey: isPk,
           isForeignKey: isFk,
-          tabelaId: idTabelaCriada, // Vincula ao ID retornado na Chamada 1
+          tabelaId: idTabelaCriada,
           config: configFinal,
         };
       });
 
-      // 4. CHAMADA 2: CRIAR AS COLUNAS
       const resColunas = await API.post(
         COLUNA_CRUD_ROUTES.CRIAR,
         payloadColunas,
       );
       const colunasSalvasNoBanco = resColunas.data.dados || resColunas.data;
 
-      // 5. SINCRONIZAR (Geração física no Banco de Dados)
       await API.post(TABELA_CRUD_ROUTES.SINCRONIZAR(idTabelaCriada));
 
-      // 6. CRIAR RELACIONAMENTOS (FKs)
       const colunasFkNoWizard = colsValidas.filter(
         (c) => c.identificacao === "fk",
       );
@@ -1024,13 +994,11 @@ export function System() {
         }
       }
 
-      // 7. SUCESSO E LIMPEZA
       await carregarDados();
       setActiveTab(idTabelaCriada);
       closeWizard();
       pushNotification("success", "Sucesso!", `Tabela "${nomeTabela}" criada.`);
     } catch (err) {
-      // Rollback simples: se criou a tabela mas falhou depois, tenta excluir para não deixar lixo
       if (idTabelaCriada) {
         try {
           await API.delete(TABELA_CRUD_ROUTES.EXCLUIR(idTabelaCriada));
@@ -1205,26 +1173,12 @@ export function System() {
   const handleConfigEdicaoTipo = (tipo) => {
     setConfigEdicao((prev) => {
       const newConfig = { ...prev.config };
-      if (MASCARA_AUTO[tipo]) newConfig.mascara = MASCARA_AUTO[tipo];
-      else if (MASCARA_TEMPORAL_AUTO[tipo])
+      if (MASCARA_TEMPORAL_AUTO[tipo])
         newConfig.mascara = MASCARA_TEMPORAL_AUTO[tipo];
-      else if (tipo !== "Moeda") {
-        newConfig.mascara = "";
-        newConfig.moeda = null;
-      }
       if (tipo !== "Cálculo") delete newConfig.calculo;
       if (tipo !== "Lista") delete newConfig.mascaraLista;
       return { ...prev, tipoDado: tipo, config: newConfig };
     });
-  };
-
-  const handleConfigEdicaoMoeda = (moedaId) => {
-    const moeda = MOEDAS.find((m) => m.id === moedaId);
-    if (!moeda) return;
-    setConfigEdicao((prev) => ({
-      ...prev,
-      config: { ...prev.config, moeda: moedaId, mascara: moeda.mascara },
-    }));
   };
 
   const handleConfigEdicaoFKTabela = (tabelaId) => {
@@ -1653,7 +1607,6 @@ export function System() {
     const temErro = !!erro;
     const tipoDadoNorm = (col.tipoDado || "").toLowerCase();
     const isBoleano = tipoDadoNorm === "boleano";
-    // Lista: usa mascaraLista (definido no wizard) com fallback para opcoes
     const isLista = tipoDadoNorm === "lista";
     const opcoes = col.config?.mascaraLista || col.config?.opcoes || [];
     const isCalculo = tipoDadoNorm === "calculo";
@@ -1706,22 +1659,20 @@ export function System() {
             ))}
           </div>
         ) : isLista && opcoes.length > 0 ? (
-          // Lista com opções pré-definidas → só select, sem digitação livre
-          <select
-            className={`insert-select ${temErro ? "insert-input--error" : valor ? "insert-input--ok" : ""}`}
-            value={valor}
-            disabled={isCalculo}
-            onChange={(e) => onChange(e.target.value)}
-          >
-            <option value="">Selecione...</option>
+          <div className="insert-lista-cards">
             {opcoes.map((op) => (
-              <option key={op} value={op}>
+              <button
+                key={op}
+                type="button"
+                disabled={isCalculo}
+                className={`insert-lista-card ${valor === op ? "insert-lista-card--active" : ""}`}
+                onClick={() => onChange(op)}
+              >
                 {op}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         ) : isLista && opcoes.length === 0 ? (
-          // Lista sem opções configuradas
           <div className="insert-lista-vazia">
             <i className="fi fi-rr-info" />
             <span>Nenhum item configurado para esta lista.</span>
@@ -1876,7 +1827,6 @@ export function System() {
                 </div>
               </div>
 
-              {/* ── Barra de seleção refatorada ──────────────────────── */}
               <div
                 className={`selection-bar ${selectedRows.length > 0 ? "active-selection" : ""}`}
               >
@@ -1899,7 +1849,7 @@ export function System() {
                       <span className="selection-action-divider" />
                       <button
                         className="selection-action-btn selection-action-btn--delete"
-                        onClick={handleDeletarSelecionados}
+                        onClick={openConfirmarDeletar}
                         title="Excluir selecionados"
                       >
                         <i className="fi fi-sr-trash" /> Excluir
@@ -2051,7 +2001,7 @@ export function System() {
 
       {/* ══════════════════════ WIZARD ════════════════════════════════════ */}
       {wizardOpen && (
-        <div className="wizard-overlay" onClick={closeWizard}>
+        <div className="wizard-overlay">
           <div className={wizardCardClass} onClick={(e) => e.stopPropagation()}>
             <div className="wizard-header">
               <div className="wizard-steps">
@@ -2313,32 +2263,6 @@ export function System() {
                                 ))}
                               </div>
                             )}
-                            {col.tipoDado === "Moeda" && (
-                              <div className="moeda-picker">
-                                <span className="moeda-picker-label">
-                                  Tipo de moeda
-                                </span>
-                                <div className="moeda-pills">
-                                  {MOEDAS.map((m) => (
-                                    <button
-                                      key={m.id}
-                                      type="button"
-                                      className={`moeda-pill ${col.config.moeda === m.id ? "moeda-pill--active" : ""}`}
-                                      onClick={() =>
-                                        handleMoedaChange(col.id, m.id)
-                                      }
-                                    >
-                                      <span className="moeda-simbolo">
-                                        {m.simbolo}
-                                      </span>
-                                      <span className="moeda-label">
-                                        {m.label}
-                                      </span>
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
@@ -2487,10 +2411,7 @@ export function System() {
                               {inputs.length > 0 && (
                                 <div className="cfg-inputs">
                                   {inputs.map((key) => {
-                                    const mascaraAuto =
-                                      key === "mascara" &&
-                                      !!MASCARA_AUTO[col.tipoDado];
-                                    const bloqueado = locked || mascaraAuto;
+                                    const bloqueado = locked;
                                     if (key === "alcanceMaximo")
                                       return renderAlcanceMaximo(
                                         col,
@@ -2501,14 +2422,7 @@ export function System() {
                                         key={key}
                                         className={`cfg-input-field ${bloqueado ? "cfg-input-field--locked" : ""}`}
                                       >
-                                        <label>
-                                          {CONFIG_META[key].label}
-                                          {mascaraAuto && (
-                                            <span className="cfg-auto-badge">
-                                              auto
-                                            </span>
-                                          )}
-                                        </label>
+                                        <label>{CONFIG_META[key].label}</label>
                                         <input
                                           type="text"
                                           value={col.config[key] ?? ""}
@@ -2547,9 +2461,15 @@ export function System() {
                                 <CalculoConfigPanel
                                   key={col.id}
                                   config={col.config}
-                                  onChange={(calculoObj) =>
-                                    updateConfig(col.id, "calculo", calculoObj)
-                                  }
+                                  onChange={(calculoObj) => {
+                                    updateConfig(
+                                      col.id,
+                                      "operador",
+                                      calculoObj.operador,
+                                    );
+                                    updateConfig(col.id, "op1", calculoObj.op1);
+                                    updateConfig(col.id, "op2", calculoObj.op2);
+                                  }}
                                   colunasNumericas={colunasNumericasWizard}
                                   fkTabelas={fkTabelasWizard}
                                   tabs={tabs}
@@ -3359,9 +3279,10 @@ export function System() {
               <div className="modal-styled-body config-col-body">
                 <div className="config-col-section">
                   <span className="config-col-section-label">
-                    Nome da coluna
+                    <i className="fi fi-rr-id-badge" /> Nome da coluna
                   </span>
-                  <div className="col-nome-input-wrapper">
+                  <div className="col-nome-input-wrapper config-nome-field">
+                    <i className="fi fi-rr-pencil config-nome-icon" />
                     <input
                       type="text"
                       className="col-nome-input"
@@ -3477,26 +3398,6 @@ export function System() {
                         ))}
                       </div>
                     )}
-                    {configEdicao.tipoDado === "Moeda" && (
-                      <div className="moeda-picker">
-                        <span className="moeda-picker-label">
-                          Tipo de moeda
-                        </span>
-                        <div className="moeda-pills">
-                          {MOEDAS.map((m) => (
-                            <button
-                              key={m.id}
-                              type="button"
-                              className={`moeda-pill ${configEdicao.config.moeda === m.id ? "moeda-pill--active" : ""}`}
-                              onClick={() => handleConfigEdicaoMoeda(m.id)}
-                            >
-                              <span className="moeda-simbolo">{m.simbolo}</span>
-                              <span className="moeda-label">{m.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -3566,10 +3467,6 @@ export function System() {
                           {inputs.length > 0 && (
                             <div className="cfg-inputs">
                               {inputs.map((key) => {
-                                const mascaraAuto =
-                                  key === "mascara" &&
-                                  !!MASCARA_AUTO[configEdicao.tipoDado];
-                                const bloqueado = mascaraAuto;
                                 if (key === "alcanceMaximo") {
                                   return (
                                     <div key={key} className="cfg-input-field">
@@ -3611,34 +3508,18 @@ export function System() {
                                   );
                                 }
                                 return (
-                                  <div
-                                    key={key}
-                                    className={`cfg-input-field ${bloqueado ? "cfg-input-field--locked" : ""}`}
-                                  >
-                                    <label>
-                                      {CONFIG_META[key].label}
-                                      {mascaraAuto && (
-                                        <span className="cfg-auto-badge">
-                                          auto
-                                        </span>
-                                      )}
-                                    </label>
+                                  <div key={key} className="cfg-input-field">
+                                    <label>{CONFIG_META[key].label}</label>
                                     <input
                                       type="text"
                                       value={configEdicao.config[key] ?? ""}
-                                      disabled={bloqueado}
                                       onChange={(e) =>
-                                        !bloqueado &&
                                         updateConfigEdicaoConfig(
                                           key,
                                           e.target.value,
                                         )
                                       }
-                                      placeholder={
-                                        bloqueado
-                                          ? configEdicao.config[key] || "—"
-                                          : `Defina ${CONFIG_META[key].label.toLowerCase()}`
-                                      }
+                                      placeholder={`Defina ${CONFIG_META[key].label.toLowerCase()}`}
                                     />
                                   </div>
                                 );
@@ -3703,6 +3584,103 @@ export function System() {
                       <i className="fi fi-rr-check" /> Salvar alterações
                     </>
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* ═══════════════ MODAL CONFIRMAR EXCLUSÃO DE REGISTROS ═════════════════ */}
+      <AnimatePresence mode="wait">
+        {confirmarDeletarOpen && (
+          <div className="modal-overlay">
+            <motion.div
+              key="modal-confirmar-deletar"
+              className="modal-styled modal-styled--sm"
+              variants={fadeOutVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <div className="modal-styled-header modal-styled-header--danger">
+                <div className="modal-styled-icon">
+                  <i className="fi fi-sr-trash" />
+                </div>
+                <div>
+                  <h2 className="modal-styled-title">Excluir registros</h2>
+                  <p className="modal-styled-subtitle">
+                    {selectedRows.length} registro(s) selecionado(s)
+                  </p>
+                </div>
+                <button
+                  className="modal-styled-close"
+                  onClick={() => setConfirmarDeletarOpen(false)}
+                >
+                  <i className="fi fi-rr-cross" />
+                </button>
+              </div>
+
+              <div className="modal-styled-body">
+                <p className="modal-styled-desc">
+                  Esta ação é irreversível. Os dados serão permanentemente
+                  removidos do banco de dados.
+                </p>
+
+                <div className="modal-styled-field">
+                  <label>
+                    Digite <strong>{activeTabData?.name}</strong> para confirmar
+                  </label>
+                  <input
+                    type="text"
+                    autoFocus
+                    value={confirmarDeletarNome}
+                    onChange={(e) => setConfirmarDeletarNome(e.target.value)}
+                    placeholder={activeTabData?.name}
+                    className={
+                      confirmarDeletarNome === activeTabData?.name
+                        ? "input-match"
+                        : ""
+                    }
+                  />
+                </div>
+
+                <label className="confirmar-deletar-ciente">
+                  <div className="ciente-checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      checked={confirmarDeletarCiente}
+                      onChange={(e) =>
+                        setConfirmarDeletarCiente(e.target.checked)
+                      }
+                    />
+                    <span className="ciente-checkbox-dot" />
+                  </div>
+                  <span className="ciente-label">
+                    Estou ciente que os registros serão removidos
+                    permanentemente
+                  </span>
+                </label>
+              </div>
+
+              <div className="modal-styled-footer">
+                <button
+                  className="btn-secondary"
+                  onClick={() => setConfirmarDeletarOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn-danger"
+                  disabled={
+                    confirmarDeletarNome !== activeTabData?.name ||
+                    !confirmarDeletarCiente
+                  }
+                  onClick={handleDeletarSelecionados}
+                >
+                  <i className="fi fi-rr-trash" /> Excluir{" "}
+                  {selectedRows.length > 1
+                    ? `${selectedRows.length} registros`
+                    : "registro"}
                 </button>
               </div>
             </motion.div>
@@ -3912,7 +3890,6 @@ function CalculoConfigPanel({
   const [prevConfigCalculo, setPrevConfigCalculo] = useState(config.calculo);
 
   if (config.calculo !== prevConfigCalculo) {
-    // Se a prop mudou, atualizamos o estado imediatamente durante o render
     setPrevConfigCalculo(config.calculo);
     setCalculo(merge(config.calculo));
   }
@@ -3938,7 +3915,6 @@ function CalculoConfigPanel({
 
   const expressaoCompleta = calculo.op1?.coluna && calculo.op2?.coluna;
 
-  // ── Renderiza os cards de seleção de coluna/tabela para cada operando ────
   const renderOperandSection = (opKey, label) => {
     const op = calculo[opKey] ?? {
       tipo: "local",
@@ -3958,7 +3934,6 @@ function CalculoConfigPanel({
       <div className="calculo-operand-section">
         <span className="calculo-operand-label">{label}</span>
 
-        {/* Seletor de fonte (esta tabela vs tabela relacionada) */}
         {hasFK && (
           <div className="calculo-source-tabs">
             <button
@@ -3986,7 +3961,6 @@ function CalculoConfigPanel({
           </div>
         )}
 
-        {/* Cards de seleção de tabela FK */}
         {op.tipo === "externo" && (
           <div className="calculo-card-grid">
             {fkTabelas.map((fk) => (
@@ -4005,7 +3979,6 @@ function CalculoConfigPanel({
           </div>
         )}
 
-        {/* Cards de seleção de coluna */}
         {(op.tipo === "local" || (op.tipo === "externo" && op.tabelaId)) &&
           (colsToShow.length === 0 ? (
             <p className="calculo-empty-hint">
@@ -4037,7 +4010,6 @@ function CalculoConfigPanel({
 
   return (
     <div className="calculo-config">
-      {/* ── Operadores ──────────────────────────────────────────────────── */}
       <div>
         <span className="calculo-section-label">Operador aritmético</span>
         <div className="calculo-operadores">
@@ -4055,19 +4027,14 @@ function CalculoConfigPanel({
         </div>
       </div>
 
-      {/* ── Operandos (grid 3 colunas) ───────────────────────────────────── */}
       <div className="calculo-operandos">
         {renderOperandSection("op1", "Operando 1")}
 
-        {/* Símbolo central — align-self: center via CSS Grid */}
-        <div className="calculo-op-divider">
-          {/* Operador visual removido entre operandos conforme solicitado */}
-        </div>
+        <div className="calculo-op-divider" />
 
         {renderOperandSection("op2", "Operando 2")}
       </div>
 
-      {/* ── Prévia da expressão ──────────────────────────────────────────── */}
       {expressaoCompleta && (
         <div className="calculo-preview-expr">
           <i className="fi fi-rr-function" />
