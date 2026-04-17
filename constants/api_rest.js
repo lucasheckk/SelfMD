@@ -47,8 +47,17 @@ export const COLUNA_CRUD_ROUTES = {
   EXCLUIR:   (colunaId) => `/colunas/excluir/${colunaId}`,
 };
 
-export const DADOS_CRUD_ROUTES = {}
+export const DADOS_CRUD_ROUTES = {
+  ADICIONAR: (tabelaId) => `/dados/adicionar/tabela/${tabelaId}`,
+  ATUALIZAR: (tabelaId, registroId) => `/dados/tabela/${tabelaId}/registro/${registroId}`,
+  LISTAR: (tabelaId) => `/dados/listar/${tabelaId}`,
+  REMOVER: (tabelaId, registroId) => `/dados/tabela/${tabelaId}/registro/${registroId}`,
+};
 
-export const REL_CRUD_ROUTES = {}
+export const REL_CRUD_ROUTES = {
+  CRIAR: `/relacionamentos/criar`,
+  LISTAR: (tabelaId) => `/relacionamentos/retornar/${tabelaId}`,
+  EXCLUIR: (relId) => `/relacionamentos/excluir/${relId}`,
+}
 
 export const AUT_CRUD_ROUTES = {}
