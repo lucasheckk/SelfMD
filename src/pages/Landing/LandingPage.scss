@@ -34,6 +34,28 @@
   color: #1a1a1a;
   background: #fafafa;
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11, 205, 95, 0.45) transparent;
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(11, 205, 95, 0.45);
+    border-radius: 999px;
+    transition: v.$transicao-rapida;
+
+    &:hover {
+      background: v.$cor-primaria;
+    }
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 
   * {
     box-sizing: border-box;
@@ -1517,9 +1539,10 @@
 .lp-tech-track {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 0;            
   width: max-content;
   animation: tech-marquee 50s linear infinite;
+  will-change: transform;
 }
 
 .lp-tech-item {
@@ -1528,6 +1551,7 @@
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  margin-right: 40px;
   opacity: 0.4;
   transition: v.$transicao-rapida;
 

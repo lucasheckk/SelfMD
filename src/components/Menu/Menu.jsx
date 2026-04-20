@@ -55,6 +55,13 @@ export function Menu({ children }) {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioId");
+    localStorage.removeItem("planoAtual");
+    navigate("/");
+  };
+
   return (
     <nav>
       <div className="menu-superior">
@@ -106,6 +113,11 @@ export function Menu({ children }) {
             <li>
               <a href="#configuracoes">
                 <i className="fi fi-sr-settings"></i>Configurações
+              </a>
+            </li>
+            <li>
+              <a onClick={handleLogout}>
+                <i class="fi fi-rr-arrow-left-from-line"></i>Sair
               </a>
             </li>
           </ul>
