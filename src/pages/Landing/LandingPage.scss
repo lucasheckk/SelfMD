@@ -31,14 +31,15 @@
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: #c7c7c7;
+  scrollbar-color: #c7c7c7 transparent;
   background-color: transparent;
+  height: 100vh;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  height: 100vh; 
+  height: 100%; 
   overflow: hidden;
 }
 
@@ -49,22 +50,22 @@ html, body {
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  padding-top: 70px;
+  padding-top: 70px;´
+
+  // ── Scrollbar customizada ─────────────────────────────────────────────────
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
   }
 
   ::-webkit-scrollbar-track {
     background: transparent;
-    margin-top: 70px;
   }
 
   ::-webkit-scrollbar-thumb {
     background-color: #c7c7c7;
     border-radius: 999px;
-    transition: 0.2s;
+    transition: background 0.2s;
 
     &:hover {
       background: #0bcd5f;

@@ -8,6 +8,7 @@ import MagicRings from "../../ReactBitsCodes/MagicRings/MagicRings.jsx";
 import StarBorder from "../../ReactBitsCodes/StarBorder/StarBorder.jsx";
 import BorderGlow from "../../ReactBitsCodes/BorderGlow/BorderGlow.jsx";
 import CardSwap, { Card } from "../../ReactBitsCodes/CardSwap/CardSwap.jsx";
+import { useScrollToTop } from "../../hooks/useScrollToTop";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── Dados fictícios para a Demo da tabela ao vivo
@@ -756,9 +757,7 @@ function LiveTableDemo() {
 export function LandingPage() {
   const [activeStep, setActiveStep] = useState(0);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }, []);
+  useScrollToTop();
 
   useEffect(() => {
     const lenis = new Lenis();
