@@ -32,15 +32,17 @@
 html {
   scrollbar-width: thin;
   scrollbar-color: #c7c7c7 transparent;
-  background-color: transparent;
+  background-color: #fafafa;
   height: 100vh;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  height: 100%; 
+  height: 100%;
   overflow: hidden;
+  background-color: #fafafa;
 }
 
 .lp-root {
@@ -50,7 +52,8 @@ html, body {
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  padding-top: 70px;´
+  padding-top: 70px;
+  scrollbar-gutter: stable;
 
   // ── Scrollbar customizada ─────────────────────────────────────────────────
 
@@ -87,6 +90,12 @@ html, body {
   button {
     font-family: v.$jakarta;
   }
+}
+
+.lp-page-inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 // ════════════════════════════════════════════════════════════════════════════

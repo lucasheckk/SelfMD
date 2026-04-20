@@ -760,13 +760,24 @@ export function LandingPage() {
   useScrollToTop();
 
   useEffect(() => {
-    const lenis = new Lenis();
+    const wrapper = document.querySelector(".lp-root");
+    const content = document.querySelector(".lp-page-inner");
+    if (!wrapper || !content) return;
+
+    const lenis = new Lenis({
+      wrapper, 
+      content, 
+      lerp: 0.1, 
+      smoothWheel: true,
+    });
+
     let rafId;
     const raf = (t) => {
       lenis.raf(t);
       rafId = requestAnimationFrame(raf);
     };
     rafId = requestAnimationFrame(raf);
+
     return () => {
       lenis.destroy();
       cancelAnimationFrame(rafId);
@@ -775,337 +786,341 @@ export function LandingPage() {
 
   return (
     <main className="lp-root">
+      <div className="lp-page-inner">
+        {/* ── NAVBAR ──────────────────────────────────────────────────────── */}
 
-      {/* ── NAVBAR ──────────────────────────────────────────────────────── */}
-
-      <nav className="lp-nav">
-        <span className="lp-nav-brand">
-          <img
-            src="/Self_md-logo-removebg-preview.png"
-            alt="Logo da Self MD"
-          />{" "}
-          Self MD
-        </span>
-        <div className="lp-nav-links">
-          <a href="#sobre">Sobre</a>
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#demo">Demonstração</a>
-          <Link to="/login" className="lp-nav-cta">
-            Entrar
-          </Link>
-        </div>
-      </nav>
-
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── SEÇÃO 1: HERO ─────────────────────────────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <section className="lp-hero" id="hero">
-        <div className="lp-hero-rings">
-          <MagicRings
-            color="#0bcd5f"
-            colorTwo="#0bcd5f"
-            speed={0.8}
-            ringCount={5}
-            attenuation={8}
-            baseRadius={0.3}
-            radiusStep={0.12}
-            opacity={1}
-            followMouse
-            mouseInfluence={0.04}
-            parallax={0.04}
-          />
-        </div>
-
-        <div className="lp-hero-inner">
-          <motion.span
-            className="lp-hero-badge"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <i className="fi fi-sr-bolt" /> Sistema No-Code
-          </motion.span>
-
-          <SplitText
-            text="Self Management Database"
-            className="lp-hero-title"
-            tag="h1"
-            delay={18}
-            duration={0.9}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 50, filter: "blur(4px)" }}
-            to={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            threshold={0.1}
-            textAlign="center"
-          />
-
-          <motion.p
-            className="lp-hero-sub"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.0 }}
-          >
-            Uma plataforma visual que transforma necessidade em realidade, com
-            apenas alguns cliques, voce cria e gerencia sua propria base de
-            dados, sem utilizar SQL.
-          </motion.p>
-
-          <motion.div
-            className="lp-hero-actions"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.2 }}
-          >
-            <Link to="/login" className="lp-btn lp-btn--primary">
-              Criar meu banco agora
+        <nav className="lp-nav">
+          <span className="lp-nav-brand">
+            <img
+              src="/Self_md-logo-removebg-preview.png"
+              alt="Logo da Self MD"
+            />{" "}
+            Self MD
+          </span>
+          <div className="lp-nav-links">
+            <a href="#sobre">Sobre</a>
+            <a href="#como-funciona">Como funciona</a>
+            <a href="#demo">Demonstração</a>
+            <Link to="/login" className="lp-nav-cta">
+              Entrar
             </Link>
-            <a href="#demo" className="lp-btn lp-btn--ghost">
-              Ver demonstração
-            </a>
-          </motion.div>
+          </div>
+        </nav>
 
-          <motion.div
-            className="lp-hero-stats"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-          >
-            {[
-              { val: "Segurança", label: "Blindado contra ameaças" },
-              { val: "Interface", label: "Moderna e responsiva" },
-              { val: "Integração", label: "com APIs" },
-            ].map((s) => (
-              <div className="lp-hero-stat" key={s.label}>
-                <strong>{s.val}</strong>
-                <span>{s.label}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* ── SEÇÃO 1: HERO ─────────────────────────────────────────────── */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        <section className="lp-hero" id="hero">
+          <div className="lp-hero-rings">
+            <MagicRings
+              color="#0bcd5f"
+              colorTwo="#0bcd5f"
+              speed={0.8}
+              ringCount={5}
+              attenuation={8}
+              baseRadius={0.3}
+              radiusStep={0.12}
+              opacity={1}
+              followMouse
+              mouseInfluence={0.04}
+              parallax={0.04}
+            />
+          </div>
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* ── SEÇÃO 2: O QUE É SELF MD ────────────────────────────────────── */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      <section className="lp-sobre" id="sobre">
-        <div className="lp-sobre-inner">
-          <div className="lp-sobre-text">
-            <motion.div
-              className="lp-section-label lp-section-label--left"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+          <div className="lp-hero-inner">
+            <motion.span
+              className="lp-hero-badge"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              O que é a Self MD?
-            </motion.div>
+              <i className="fi fi-sr-bolt" /> Sistema No-Code
+            </motion.span>
 
-            <motion.h2
-              className="lp-section-title lp-section-title--left"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Sistema No-Code para gerenciamento de banco de dados
-            </motion.h2>
+            <SplitText
+              text="Self Management Database"
+              className="lp-hero-title"
+              tag="h1"
+              delay={18}
+              duration={0.9}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 50, filter: "blur(4px)" }}
+              to={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              threshold={0.1}
+              textAlign="center"
+            />
 
             <motion.p
-              className="lp-sobre-desc lp-sobre-desc--left"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ delay: 0.2 }}
-            >
-              Todas as funcionalidades presentes no MySQL você encontra
-              aqui. Você cria a sua própria database, suas tabelas e colunas, insere dados,
-              gerencia tudo o que voce criou, através de uma interface visual intuitiva, tudo o que for
-              construído é gerado dentro do MySQL.
-            </motion.p>
-          </div>
-
-          <motion.div
-            className="lp-sobre-swap"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-          >
-            <CardSwap
-              width={340}
-              height={240}
-              cardDistance={50}
-              verticalDistance={65}
-              delay={4000}
-              easing="elastic"
-              pauseOnHover
-            >
-              {SOBRE_FEATURES.map((item, i) => (
-                <Card key={i} customClass="lp-sobre-swap-card">
-                  <i className={`fi ${item.icon} lp-sobre-swap-icon`} />
-                  <h3>{item.title}</h3>
-                  <p>{item.desc}</p>
-                </Card>
-              ))}
-            </CardSwap>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── SEÇÃO 3: COMO FUNCIONA ─────────────────────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <section className="lp-steps" id="como-funciona">
-        <div className="lp-steps-inner">
-          <div className="lp-steps-left">
-            <motion.div
-              className="lp-section-label lp-section-label--left"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              Como funciona
-            </motion.div>
-            <motion.h2
-              className="lp-section-title lp-section-title--left"
+              className="lp-hero-sub"
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 1.0 }}
             >
-              D zero ao banco em três passos
-            </motion.h2>
+              Uma plataforma visual que transforma necessidade em realidade, com
+              apenas alguns cliques, voce cria e gerencia sua propria base de
+              dados, sem utilizar SQL.
+            </motion.p>
 
-            <div className="lp-steps-list">
-              {STEPS.map((step, i) => (
-                <motion.div
-                  key={step.num}
-                  className={`lp-step-item-outer ${activeStep === i ? "active" : ""}`}
-                  onClick={() => setActiveStep(i)}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
-                >
-                  <BorderGlow
-                    backgroundColor={activeStep === i ? "#ffffff" : "#f9f9f9"}
-                    glowColor="130 75 47"
-                    colors={["#0bcd5f", "#c8f5dd", "#07a34c"]}
-                    borderRadius={14}
-                    glowRadius={22}
-                    glowIntensity={1}
-                    fillOpacity={0.22}
-                  >
-                    <div className="lp-step-item-inner">
-                      <div className="lp-step-num">{step.num}</div>
-                      <div className="lp-step-text">
-                        <h3>{step.title}</h3>
-                        <p>{step.desc}</p>
-                      </div>
-                    </div>
-                  </BorderGlow>
-                </motion.div>
+            <motion.div
+              className="lp-hero-actions"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 1.2 }}
+            >
+              <Link to="/login" className="lp-btn lp-btn--primary">
+                Criar meu banco agora
+              </Link>
+              <a href="#demo" className="lp-btn lp-btn--ghost">
+                Ver demonstração
+              </a>
+            </motion.div>
+
+            <motion.div
+              className="lp-hero-stats"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1.4 }}
+            >
+              {[
+                { val: "Segurança", label: "Blindado contra ameaças" },
+                { val: "Interface", label: "Moderna e responsiva" },
+                { val: "Integração", label: "com APIs" },
+              ].map((s) => (
+                <div className="lp-hero-stat" key={s.label}>
+                  <strong>{s.val}</strong>
+                  <span>{s.label}</span>
+                </div>
               ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        {/* ── SEÇÃO 2: O QUE É SELF MD ────────────────────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <section className="lp-sobre" id="sobre">
+          <div className="lp-sobre-inner">
+            <div className="lp-sobre-text">
+              <motion.div
+                className="lp-section-label lp-section-label--left"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                O que é a Self MD?
+              </motion.div>
+
+              <motion.h2
+                className="lp-section-title lp-section-title--left"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Sistema No-Code para gerenciamento de banco de dados
+              </motion.h2>
+
+              <motion.p
+                className="lp-sobre-desc lp-sobre-desc--left"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: 0.2 }}
+              >
+                Todas as funcionalidades presentes no MySQL você encontra aqui.
+                Você cria a sua própria database, suas tabelas e colunas, insere
+                dados, gerencia tudo o que voce criou, através de uma interface
+                visual intuitiva, tudo o que for construído é gerado dentro do
+                MySQL.
+              </motion.p>
+            </div>
+
+            <motion.div
+              className="lp-sobre-swap"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+            >
+              <CardSwap
+                width={340}
+                height={240}
+                cardDistance={50}
+                verticalDistance={65}
+                delay={4000}
+                easing="elastic"
+                pauseOnHover
+              >
+                {SOBRE_FEATURES.map((item, i) => (
+                  <Card key={i} customClass="lp-sobre-swap-card">
+                    <i className={`fi ${item.icon} lp-sobre-swap-icon`} />
+                    <h3>{item.title}</h3>
+                    <p>{item.desc}</p>
+                  </Card>
+                ))}
+              </CardSwap>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* ── SEÇÃO 3: COMO FUNCIONA ─────────────────────────────────────── */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        <section className="lp-steps" id="como-funciona">
+          <div className="lp-steps-inner">
+            <div className="lp-steps-left">
+              <motion.div
+                className="lp-section-label lp-section-label--left"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+              >
+                Como funciona
+              </motion.div>
+              <motion.h2
+                className="lp-section-title lp-section-title--left"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6 }}
+              >
+                D zero ao banco em três passos
+              </motion.h2>
+
+              <div className="lp-steps-list">
+                {STEPS.map((step, i) => (
+                  <motion.div
+                    key={step.num}
+                    className={`lp-step-item-outer ${activeStep === i ? "active" : ""}`}
+                    onClick={() => setActiveStep(i)}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
+                  >
+                    <BorderGlow
+                      backgroundColor={activeStep === i ? "#ffffff" : "#f9f9f9"}
+                      glowColor="130 75 47"
+                      colors={["#0bcd5f", "#c8f5dd", "#07a34c"]}
+                      borderRadius={14}
+                      glowRadius={22}
+                      glowIntensity={1}
+                      fillOpacity={0.22}
+                    >
+                      <div className="lp-step-item-inner">
+                        <div className="lp-step-num">{step.num}</div>
+                        <div className="lp-step-text">
+                          <h3>{step.title}</h3>
+                          <p>{step.desc}</p>
+                        </div>
+                      </div>
+                    </BorderGlow>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lp-steps-right">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  className="lp-step-preview-card"
+                  initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -16, scale: 0.97 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  <div className="lp-step-card-header">
+                    <div className="lp-window-dots">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <span className="lp-step-card-title">
+                      <i className={`fi ${STEPS[activeStep].icon}`} />
+                      {STEPS[activeStep].title}
+                    </span>
+                  </div>
+                  <div className="lp-step-card-body">
+                    {STEPS[activeStep].preview}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
+        </section>
 
-          <div className="lp-steps-right">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeStep}
-                className="lp-step-preview-card"
-                initial={{ opacity: 0, y: 24, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -16, scale: 0.97 }}
-                transition={{ duration: 0.35 }}
-              >
-                <div className="lp-step-card-header">
-                  <div className="lp-window-dots">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <span className="lp-step-card-title">
-                    <i className={`fi ${STEPS[activeStep].icon}`} />
-                    {STEPS[activeStep].title}
-                  </span>
-                </div>
-                <div className="lp-step-card-body">
-                  {STEPS[activeStep].preview}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── SEÇÃO 4: DEMO INTERATIVA (Test Drive) ──────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <section className="lp-demo-section" id="demo">
-        <motion.div
-          className="lp-section-label"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          Demonstração
-        </motion.div>
-        <motion.h2
-          className="lp-section-title"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          Experimente antes de criar sua conta
-        </motion.h2>
-        <motion.p
-          className="lp-demo-sub"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-        >
-          Crie uma tabela, adicione uma coluna e insira alguns dados, não é necessário cadastro. Se divirta!
-        </motion.p>
-
-        {/* DemoSandbox já tem o StarBorder interno envolvendo o card inteiro */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <DemoSandbox />
-        </motion.div>
-
-        {/* Showcase da tabela ao vivo */}
-        <div className="lp-demo-showcase-header" id="sistema-real">
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* ── SEÇÃO 4: DEMO INTERATIVA (Test Drive) ──────────────────────── */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        <section className="lp-demo-section" id="demo">
           <motion.div
             className="lp-section-label"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.2 }}
           >
-            Sistema Real
+            Demonstração
           </motion.div>
-          <motion.h3
-            className="lp-demo-showcase-title"
-            initial={{ opacity: 0, y: 16 }}
+          <motion.h2
+            className="lp-section-title"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            É exatamente assim que voce visualiza suas tabelas dentro do Self MD
-          </motion.h3>
-        </div>
-        <LiveTableDemo />
-      </section>
+            Experimente antes de criar sua conta
+          </motion.h2>
+          <motion.p
+            className="lp-demo-sub"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            Crie uma tabela, adicione uma coluna e insira alguns dados, não é
+            necessário cadastro. Se divirta!
+          </motion.p>
 
-      {/* ── TECH STACK como FOOTER — final da página ──────────────────── */}
-      <TechStack />
+          {/* DemoSandbox já tem o StarBorder interno envolvendo o card inteiro */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <DemoSandbox />
+          </motion.div>
+
+          {/* Showcase da tabela ao vivo */}
+          <div className="lp-demo-showcase-header" id="sistema-real">
+            <motion.div
+              className="lp-section-label"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Sistema Real
+            </motion.div>
+            <motion.h3
+              className="lp-demo-showcase-title"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
+              É exatamente assim que voce visualiza suas tabelas dentro do Self
+              MD
+            </motion.h3>
+          </div>
+          <LiveTableDemo />
+        </section>
+
+        {/* ── TECH STACK como FOOTER — final da página ──────────────────── */}
+        <TechStack />
+      </div>
     </main>
   );
 }
