@@ -31,34 +31,51 @@
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(11, 205, 95, 0.45) transparent;
+  scrollbar-color: #c7c7c7;
+  background-color: transparent;
 }
 
-// Chrome, Edge, Safari
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(11, 205, 95, 0.45);
-  border-radius: 999px;
-  transition: 0.2s; 
-
-  &:hover {
-    background: #0bcd5f; 
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; 
+  overflow: hidden;
 }
 
 .lp-root {
   font-family: v.$jakarta;
-  color: #1a1a1a;
+  color: #333;
   background: #fafafa;
+  height: 100vh;
   overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 70px;
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 70px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #c7c7c7;
+    border-radius: 999px;
+    transition: 0.2s;
+
+    &:hover {
+      background: #0bcd5f;
+    }
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 
   * {
     box-sizing: border-box;
@@ -166,6 +183,7 @@ html {
   top: 0;
   left: 0;
   right: 0;
+  height: 70px;
   z-index: 500;
   display: flex;
   align-items: center;
