@@ -776,11 +776,13 @@ export function LandingPage() {
 
   return (
     <main className="lp-root">
+
       {/* ── NAVBAR ──────────────────────────────────────────────────────── */}
+
       <nav className="lp-nav">
         <span className="lp-nav-brand">
           <img
-            src="../../../public/Self_md-logo-removebg-preview.png"
+            src="/Self_md-logo-removebg-preview.png"
             alt="Logo da Self MD"
           />{" "}
           Self MD
