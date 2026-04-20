@@ -2,7 +2,7 @@
 
 -- O que é?
 Sistema No-Code que muda a maneira como o usuário gerencia sua base de dados, com uma interface responsiva e intuitiva, permitindo
-que nunca precise utilizar de querrys em qualquer ação, seja criar uma tabela, inserir ou excluir um dado e na visualização dos dados.
+que nunca precise utilizar querrys em qualquer ação, seja criar uma tabela, inserir ou excluir um dado e na visualização dos dados.
 
 -- Qual a finalidade?
 Facilitar a criação, visualização e gerenciamento de dados, para qualquer usuário que possua ou não conhecimento teórico ou prático
@@ -18,7 +18,6 @@ Front-end
 * React bits
 * Framer Motion
 * Flaticon
-* Icons8
 
 Back-end
 * Java
