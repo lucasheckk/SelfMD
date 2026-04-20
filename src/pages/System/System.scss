@@ -3458,42 +3458,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // ─── MELHORIA: INPUT DE NOME NO MODAL CONFIGURAR COLUNA
-  // ═══════════════════════════════════════════════════════════════════════════════
-
-  // Envolve o input de nome com um visual mais premium
-  .config-nome-field {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    .config-nome-icon {
-      position: absolute;
-      left: 12px;
-      font-size: 13px;
-      color: #bbb;
-      line-height: 0;
-      pointer-events: none;
-      transition: v.$transicao-rapida;
-    }
-
-    // Override do col-nome-input dentro do modal de config para ter padding esquerdo
-    .col-nome-input {
-      padding-left: 36px;
-      padding-right: 52px; // espaço para o counter
-
-      &:focus ~ .config-nome-icon,
-      &:focus + .config-nome-icon {
-        color: v.$cor-primaria;
-      }
-    }
-
-    &:focus-within .config-nome-icon {
-      color: v.$cor-primaria;
-    }
-  }
-
   // ─── BOTÕES BOLEANOS NO MODAL (INSERÇÃO) ─────────────────────────────────────
 
   .insert-bool-group {
@@ -3539,5 +3503,41 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
         cursor: not-allowed;
       }
     }
+  }
+}
+
+.config-nome-field {
+  display: flex;
+  align-items: center;
+  flex-direction: space-between;
+  width: 250px;
+  height: 30px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: v.$transicao-rapida
+
+  i {
+    color: #ddd;
+  }
+
+  input {
+    margin-left: 10px;
+    background-color: transparent;
+    border: none;
+    color: #bbb;
+
+    &:focus {
+      outline:none;
+    }
+
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+
+  span {
+    color: #ccc;
+    margin-left: 40px;
   }
 }

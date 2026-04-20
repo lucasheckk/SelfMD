@@ -65,7 +65,6 @@ export function Menu({ children }) {
           <p>{tituloPagina}</p>
         </div>
         <div className="menu-direita">
-          {/* ↓ ALTERADO: navigate para /upgrade em vez de href estático */}
           <button
             className="upgrade-button"
             onClick={() => navigate("/upgrade")}
@@ -94,7 +93,6 @@ export function Menu({ children }) {
                 <i className="fi fi-sr-user-headset"></i>Suporte
               </a>
             </li>
-            {/* ↓ ALTERADO: navigate para /upgrade */}
             <li>
               <a onClick={() => navigate("/upgrade")}>
                 <i className="fi fi-sr-usd-circle"></i>Planos

@@ -76,14 +76,14 @@ const STEPS = [
     num: "02",
     icon: "fi-sr-table-pivot",
     title: "Defina suas Tabelas",
-    desc: "Use o wizard visual para criar colunas, definir tipos, PKs e FKs — sem escrever SQL.",
+    desc: "Use uma interface visual para criar colunas, definir tipos, configurações e até criar relacionamentos entre tabelas, sem utilizar SQL.",
     preview: <StepPreviewWizard />,
   },
   {
     num: "03",
     icon: "fi-sr-magic-wand",
     title: "Gerencie seus Dados",
-    desc: "Insira, edite, filtre e exporte registros. Importe planilhas .xlsx, .csv ou .json.",
+    desc: "Insira, edite, filtre, exporte e importe seus registros.",
     preview: <StepPreviewTable />,
   },
 ];
@@ -260,15 +260,11 @@ const TECH_ICONS = [
   },
   {
     src: "https://cdn.brandfetch.io/idDJv1mfrb/w/1080/h/1080/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1753779057992",
-    label: "Framer Motion",
+    label: "Motion",
   },
   {
     src: "https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/96/external-flaticon-social-media-tanah-basah-glyph-tanah-basah.png",
     label: "Flaticon",
-  },
-  {
-    src: "https://img.icons8.com/color/96/icons8-new-logo.png",
-    label: "Icons8",
   },
 ];
 
@@ -793,7 +789,6 @@ export function LandingPage() {
           <a href="#sobre">Sobre</a>
           <a href="#como-funciona">Como funciona</a>
           <a href="#demo">Demonstração</a>
-          <a href="#sistema-real">Sistema real</a>
           <Link to="/login" className="lp-nav-cta">
             Entrar
           </Link>
@@ -808,7 +803,7 @@ export function LandingPage() {
           <MagicRings
             color="#0bcd5f"
             colorTwo="#0bcd5f"
-            speed={0.6}
+            speed={0.8}
             ringCount={5}
             attenuation={8}
             baseRadius={0.3}
@@ -900,6 +895,7 @@ export function LandingPage() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
               O que é a Self MD?
             </motion.div>
@@ -909,9 +905,9 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Sistema de gerenciamento de banco de dados
+              Sistema No-Code para gerenciamento de banco de dados
             </motion.h2>
 
             <motion.p
@@ -921,11 +917,10 @@ export function LandingPage() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: 0.2 }}
             >
-              O <strong>Self MD</strong> (Self Management Database) é um sistema
-              No-Code, todas as funcionalidades presentes no MySQL você encontra
-              aqui. Você cria a sua database, tabelas, colunas, insere dados,
-              gerencia, tudo através de uma interface visual intuitiva, tudo é
-              gerado dentro do MySQL.
+              Todas as funcionalidades presentes no MySQL você encontra
+              aqui. Você cria a sua própria database, suas tabelas e colunas, insere dados,
+              gerencia tudo o que voce criou, através de uma interface visual intuitiva, tudo o que for
+              construído é gerado dentro do MySQL.
             </motion.p>
           </div>
 
@@ -978,7 +973,7 @@ export function LandingPage() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6 }}
             >
-              De zero ao banco em três passos
+              D zero ao banco em três passos
             </motion.h2>
 
             <div className="lp-steps-list">
@@ -998,7 +993,7 @@ export function LandingPage() {
                     colors={["#0bcd5f", "#c8f5dd", "#07a34c"]}
                     borderRadius={14}
                     glowRadius={22}
-                    glowIntensity={0.75}
+                    glowIntensity={1}
                     fillOpacity={0.22}
                   >
                     <div className="lp-step-item-inner">
@@ -1054,7 +1049,7 @@ export function LandingPage() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.2 }}
         >
-          Test Drive
+          Demonstração
         </motion.div>
         <motion.h2
           className="lp-section-title"
@@ -1072,8 +1067,7 @@ export function LandingPage() {
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          Crie uma tabela, adicione uma coluna e insira dados — tudo aqui mesmo.
-          Nenhum cadastro necessário.
+          Crie uma tabela, adicione uma coluna e insira alguns dados, não é necessário cadastro. Se divirta!
         </motion.p>
 
         {/* DemoSandbox já tem o StarBorder interno envolvendo o card inteiro */}
@@ -1103,93 +1097,10 @@ export function LandingPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            É exatamente assim que parece dentro do Self MD
+            É exatamente assim que voce visualiza suas tabelas dentro do Self MD
           </motion.h3>
         </div>
         <LiveTableDemo />
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* ── SEÇÃO 5: CTA FINAL — redesenhado ─────────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <section className="lp-cta">
-        {/* Orbs decorativos (CSS puro, sem JS) */}
-        <div className="lp-cta-orb lp-cta-orb--1" aria-hidden="true" />
-        <div className="lp-cta-orb lp-cta-orb--2" aria-hidden="true" />
-        <div className="lp-cta-orb lp-cta-orb--3" aria-hidden="true" />
-
-        <motion.div
-          className="lp-cta-card"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.65 }}
-        >
-          <motion.div
-            className="lp-cta-badge"
-            initial={{ opacity: 0, scale: 0.85 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-          >
-            <i className="fi fi-sr-rocket-lunch" />
-            Pronto para começar?
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15, duration: 0.6 }}
-          >
-            Assuma o controle dos seus dados{" "}
-            <span className="lp-cta-heading-accent"> agora!</span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.25 }}
-          >
-            Chega de planilhas espalhadas, JSON perdido ou SQL que ninguém
-            entende. O Self MD organiza tudo com a interface que você viu acima,
-            gerando um banco MySQL real a cada clique.
-          </motion.p>
-
-          <motion.div
-            className="lp-cta-btn-group"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.32 }}
-          >
-            <Link to="/login" className="lp-cta-btn lp-cta-btn--primary">
-              <i className="fi fi-sr-database" />
-              Comece gratuitamente
-              <i className="fi fi-rr-arrow-right" />
-            </Link>
-          </motion.div>
-
-          <motion.div
-            className="lp-cta-features"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.42 }}
-          >
-            {[
-              "Sem gastar 1 centavo",
-              "Estrutura MySQL real",
-              "Começa em 60 segundos",
-            ].map((f) => (
-              <span key={f} className="lp-cta-feature-item">
-                <i className="fi fi-sr-check-circle" />
-                {f}
-              </span>
-            ))}
-          </motion.div>
-        </motion.div>
       </section>
 
       {/* ── TECH STACK como FOOTER — final da página ──────────────────── */}

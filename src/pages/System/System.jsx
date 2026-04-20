@@ -3282,10 +3282,10 @@ export function System() {
                     <i className="fi fi-rr-id-badge" /> Nome da coluna
                   </span>
                   <div className="col-nome-input-wrapper config-nome-field">
-                    <i className="fi fi-rr-pencil config-nome-icon" />
                     <input
                       type="text"
                       className="col-nome-input"
+                      id={"input-edicao-nome-col"}
                       value={configEdicao.nome}
                       maxLength={NOME_MAX}
                       onChange={(e) =>

@@ -328,6 +328,8 @@
   padding: 100px 48px;
   max-width: 1200px;
   margin: 0 auto;
+  margin-bottom: 200px;
+  margin-top: 100px;
 
   @media (max-width: 768px) {
     padding: 60px 20px;
@@ -369,7 +371,7 @@
   overflow: visible;
 
   .card-swap-container {
-    bottom: 50% !important;
+    bottom: 30% !important;
     right: 50% !important;
     transform: translate(50%, 50%) !important;
   }
@@ -427,7 +429,7 @@
   border-radius: 16px;
   padding: 28px 22px;
   text-align: left;
-  transition: all 0.22s ease;
+  transition: v.$transicao-rapida;
 
   &:hover {
     border-color: rgba(v.$cor-primaria, 0.4);
@@ -490,21 +492,13 @@
 }
 
 // ════════════════════════════════════════════════════════════════════
-// ─── Steps com BorderGlow
+// ─── Steps
 // ════════════════════════════════════════════════════════════════════
 
 .lp-step-item-outer {
   cursor: pointer;
   border-radius: 14px;
   transition: transform 0.18s ease;
-
-  .border-glow-card {
-    border-color: #e8e8e8 !important;
-  }
-
-  .border-glow-inner {
-    overflow: visible !important;
-  }
 
   &.active {
     .lp-step-num {
@@ -569,6 +563,7 @@
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   min-height: 320px;
+  margin-top: 80px;
 }
 
 .lp-step-card-header {
@@ -801,10 +796,6 @@
   max-width: 1100px;
   margin: 0 auto;
   text-align: center;
-
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
 }
 
 .lp-demo-sub {
@@ -825,32 +816,24 @@
   max-width: 600px;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// ─── SANDBOX STAR OUTER
-// ─── StarBorder agora envolve o card INTEIRO.
-// ─── O inner-content recebe o estilo visual do card (borda, sombra, raio).
-// ════════════════════════════════════════════════════════════════════════════
-
 .sandbox-star-outer {
   display: block !important;
-  max-width: 780px;
+  max-width: 785px;
   margin: 0 auto;
   border-radius: 18px !important;
 
   .inner-content {
     background: #fff !important;
-    border: 2px solid #e0e0e0 !important;
+    border: 1.5px solid #e0e0e0 !important;
     border-radius: 18px !important;
     padding: 0 !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07) !important;
+    box-shadow: 0 8px 38px rgba(0, 0, 0, 0.08) !important;
     overflow: hidden;
     font-size: inherit !important;
     text-align: left !important;
     color: inherit !important;
   }
 }
-
-// ── O sandbox-card é apenas um container interno (sem borda própria) ───────
 
 .sandbox-card {
   background: transparent;
@@ -1481,240 +1464,19 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── CTA FINAL — redesenhado
-// ─── Layout: gradiente verde profundo + orbs decorativos + grid sutil
-// ─── Botão: âncora simples com fundo branco (sem StarBorder)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-.lp-cta {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    #022c22 0%,
-    #064e3b 30%,
-    #065f46 60%,
-    #047857 80%,
-    #059669 100%
-  );
-  padding: 130px 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  // Grade sutil de fundo
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 56px 56px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  @media (max-width: 768px) {
-    padding: 80px 24px;
-  }
-}
-
-// ── Orbs de luz — CSS puro ────────────────────────────────────────────────
-
-.lp-cta-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-
-  &--1 {
-    width: 700px;
-    height: 700px;
-    background: radial-gradient(
-      circle,
-      rgba(16, 185, 129, 0.22) 0%,
-      transparent 65%
-    );
-    top: -200px;
-    right: -150px;
-  }
-
-  &--2 {
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(
-      circle,
-      rgba(52, 211, 153, 0.18) 0%,
-      transparent 65%
-    );
-    bottom: -150px;
-    left: -80px;
-  }
-
-  &--3 {
-    width: 280px;
-    height: 280px;
-    background: radial-gradient(
-      circle,
-      rgba(110, 231, 183, 0.14) 0%,
-      transparent 70%
-    );
-    top: 35%;
-    left: 18%;
-  }
-}
-
-// ── Conteúdo central ─────────────────────────────────────────────────────
-
-.lp-cta-card {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 660px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 26px;
-
-  h2 {
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
-    font-weight: 900;
-    color: #fff;
-    margin: 0;
-    line-height: 1.1;
-    letter-spacing: -0.025em;
-  }
-
-  p {
-    font-size: 17px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.75;
-    margin: 0;
-    max-width: 500px;
-  }
-}
-
-.lp-cta-heading-accent {
-  // Verde claro para contraste dentro do heading branco
-  color: #6ee7b7;
-}
-
-// ── Badge de status ───────────────────────────────────────────────────────
-
-.lp-cta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 20px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #d1fae5;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(6px);
-
-  i {
-    font-size: 14px;
-    color: #6ee7b7;
-    line-height: 0;
-  }
-}
-
-// ── Grupo de botões ───────────────────────────────────────────────────────
-
-.lp-cta-btn-group {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 6px;
-}
-
-// ── Botão principal — branco com texto escuro, sem StarBorder ─────────────
-
-.lp-cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 17px 40px;
-  border-radius: 14px;
-  font-size: 17px;
-  font-weight: 800;
-  text-decoration: none;
-  transition: all 0.25s ease;
-  letter-spacing: -0.01em;
-
-  i {
-    font-size: 16px;
-    line-height: 0;
-    flex-shrink: 0;
-  }
-
-  &--primary {
-    background: #fff;
-    color: #065f46;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.25),
-      0 0 0 0 rgba(255, 255, 255, 0.2);
-
-    &:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow:
-        0 20px 52px rgba(0, 0, 0, 0.32),
-        0 0 0 4px rgba(255, 255, 255, 0.12);
-      background: #f0fdf4;
-    }
-  }
-}
-
-// ── Features abaixo do botão ──────────────────────────────────────────────
-
-.lp-cta-features {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding-top: 4px;
-
-  @media (max-width: 480px) {
-    gap: 16px;
-    flex-direction: column;
-  }
-}
-
-.lp-cta-feature-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.58);
-  font-weight: 500;
-
-  i {
-    font-size: 12px;
-    color: #6ee7b7;
-    line-height: 0;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // ─── TECH STACK — agora é o FOOTER da página
 // ─── Fundo escuro, marquee de ícones + linha de copyright embaixo.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .lp-tech-stack {
-  background: #022c22;
-  padding-top: 52px;
+  background: none;
+  padding-top: 60px;
   overflow: hidden;
 }
 
 .lp-tech-footer-top {
   text-align: center;
-  padding-bottom: 44px;
+  padding-bottom: 34px;
 }
 
 .lp-tech-label {
@@ -1722,8 +1484,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #777;
-  margin-bottom: 28px;
+  color: #333;
+  margin-bottom: 50px;
 }
 
 // ── Faixa com máscara de fade nas bordas ─────────────────────────────────
@@ -1744,11 +1506,11 @@
   }
   &::before {
     left: 0;
-    background: linear-gradient(to right, #022c22, transparent);
+    background: linear-gradient(to right, #fafafa, transparent);
   }
   &::after {
     right: 0;
-    background: linear-gradient(to left, #022c22, transparent);
+    background: linear-gradient(to left, #fafafa, transparent);
   }
 }
 
@@ -1757,7 +1519,7 @@
   align-items: center;
   gap: 40px;
   width: max-content;
-  animation: tech-marquee 28s linear infinite;
+  animation: tech-marquee 50s linear infinite;
 }
 
 .lp-tech-item {
@@ -1767,10 +1529,11 @@
   gap: 8px;
   flex-shrink: 0;
   opacity: 0.4;
-  transition: opacity 0.2s;
+  transition: v.$transicao-rapida;
 
   &:hover {
-    opacity: 0.9;
+    opacity: 1;
+    transition: v.$transicao-rapida;
   }
 }
 
@@ -1778,18 +1541,17 @@
   width: 38px;
   height: 38px;
   object-fit: contain;
-  filter: grayscale(30%) brightness(0.85);
   transition: filter 0.2s;
 
   .lp-tech-item:hover & {
-    filter: grayscale(0%) brightness(1);
+    filter: brightness(1);
   }
 }
 
 .lp-tech-name {
   font-size: 10px;
   font-weight: 600;
-  color: #444;
+  color: black;
   letter-spacing: 0.04em;
 }
 
