@@ -29,33 +29,36 @@
 // ─── Reset / Base
 // ════════════════════════════════════════════════════════════════════════════
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11, 205, 95, 0.45) transparent;
+}
+
+// Chrome, Edge, Safari
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(11, 205, 95, 0.45);
+  border-radius: 999px;
+  transition: 0.2s; 
+
+  &:hover {
+    background: #0bcd5f; 
+  }
+}
+
 .lp-root {
   font-family: v.$jakarta;
   color: #1a1a1a;
   background: #fafafa;
   overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(11, 205, 95, 0.45) transparent;
-
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(11, 205, 95, 0.45);
-    border-radius: 999px;
-    transition: v.$transicao-rapida;
-
-    &:hover {
-      background: v.$cor-primaria;
-    }
-  }
-  ::-webkit-scrollbar-corner {
-    background: transparent;
-  }
 
   * {
     box-sizing: border-box;
@@ -1539,7 +1542,7 @@
 .lp-tech-track {
   display: flex;
   align-items: center;
-  gap: 0;            
+  gap: 0;
   width: max-content;
   animation: tech-marquee 50s linear infinite;
   will-change: transform;

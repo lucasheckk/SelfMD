@@ -117,7 +117,7 @@ export function Menu({ children }) {
             </li>
             <li>
               <a onClick={handleLogout}>
-                <i class="fi fi-rr-arrow-left-from-line"></i>Sair
+                <i class="fi fi-sr-power"></i>Sair
               </a>
             </li>
           </ul>
