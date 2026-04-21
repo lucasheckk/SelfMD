@@ -760,14 +760,24 @@ export function LandingPage() {
   useScrollToTop();
 
   useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  useEffect(() => {
     const wrapper = document.querySelector(".lp-root");
     const content = document.querySelector(".lp-page-inner");
     if (!wrapper || !content) return;
 
     const lenis = new Lenis({
-      wrapper, 
-      content, 
-      lerp: 0.1, 
+      wrapper,
+      content,
+      lerp: 0.1,
       smoothWheel: true,
     });
 

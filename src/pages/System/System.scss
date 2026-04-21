@@ -558,7 +558,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           }
           .sticky-id {
             left: $checkbox-width;
-            background-color: inherit;
+            background-color: $bg-normal;
           }
           thead th.sticky-id {
             background-color: #eee;

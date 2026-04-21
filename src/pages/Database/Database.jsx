@@ -28,6 +28,8 @@ export function Database() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(true);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   // Estados de Controle de Interface
   const [isCriando, setIsCriando] = useState(false);
@@ -97,6 +99,17 @@ export function Database() {
     }
     carregarDadosDaAPI();
   }, [navigate, carregarDadosDaAPI]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMinTimeElapsed(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && minTimeElapsed) {
+      setShowLoading(false);
+    }
+  }, [isLoading, minTimeElapsed]);
 
   // Envia os dados para criar uma nova database no servidor
   const handleSalvar = async () => {
@@ -179,6 +192,8 @@ export function Database() {
 
   return (
     <div className="body">
+      {showLoading && <LoadingAnimation />}{" "}
+      {/* ← fora do Menu, cobre tela toda */}
       <AnimatePresence mode="wait">
         <Notificacao
           notifications={notifications}
@@ -187,9 +202,7 @@ export function Database() {
       </AnimatePresence>
       <Menu>
         <div className="container-principal">
-          {isLoading ? (
-            <LoadingAnimation />
-          ) : (
+          {!showLoading && (
             <>
               <AnimatePresence mode="wait">
                 {/* MODAL DE EXCLUSÃO */}
@@ -370,7 +383,7 @@ export function Database() {
                               ? "not-allowed"
                               : "pointer",
                             opacity: isLimiteAtingido ? 0.5 : 1,
-                            display: "flex", 
+                            display: "flex",
                           }}
                         >
                           <i className="fi fi-sr-layer-plus"></i>
