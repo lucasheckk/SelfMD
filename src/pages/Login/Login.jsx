@@ -33,7 +33,7 @@ export function Login() {
 
         setTimeout(() => {
           navigate("/database");
-        }, 5000);
+        }, 2500);
       } else {
         setIsLoading(false);
         alert(mensagem || "Falha na autenticação!");
