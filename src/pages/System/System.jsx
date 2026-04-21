@@ -147,7 +147,6 @@ const mapConfigParaApi = (configForm, tipoDado) => {
     configFinal.max_length = configForm.alcanceMaximo;
 
   if (tipoDado === "calculo") {
-    
     configFinal.operador = configForm.operador || "+";
 
     const nomeCol1 = configForm.op1?.coluna;
@@ -519,6 +518,13 @@ export function System() {
       }
     }
   }, [activeTab, tabs]);
+
+  useEffect(() => {
+    if (!localStorage.getItem(TOUR_SEEN_KEY)) {
+      const t = setTimeout(() => setTourActive(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   // ── Seleção ───────────────────────────────────────────────────────────────
   const toggleSelectAll = () => {
@@ -1892,7 +1898,10 @@ export function System() {
                           </button>
                         </th>
                         {(activeTabData?.cols || []).map((col) => (
-                          <th key={col.nome} className="resizable-col">
+                          <th
+                            key={col.nome}
+                            className={`resizable-col${col.identificacao === "pk" ? " sticky-col sticky-id" : ""}`}
+                          >
                             <div className="cell-content">
                               <div className="col-label-group">
                                 <span className="col-label">
@@ -1979,11 +1988,19 @@ export function System() {
                                 />
                               </button>
                             </td>
-                            {resizableCols.map((col) => (
-                              <td key={col} className="data-cell">
-                                {row[col]}
-                              </td>
-                            ))}
+                            {resizableCols.map((col) => {
+                              const isPK =
+                                activeTabData?.cols?.find((c) => c.nome === col)
+                                  ?.identificacao === "pk";
+                              return (
+                                <td
+                                  key={col}
+                                  className={`data-cell${isPK ? " sticky-col sticky-id" : ""}`}
+                                >
+                                  {row[col]}
+                                </td>
+                              );
+                            })}
                             <td className="actions-cell sticky-col sticky-actions">
                               <div className="actions-container" />
                             </td>

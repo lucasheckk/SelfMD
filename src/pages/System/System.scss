@@ -556,6 +556,13 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               }
             }
           }
+          .sticky-id {
+            left: $checkbox-width;
+            background-color: inherit;
+          }
+          thead th.sticky-id {
+            background-color: #eee;
+          }
         }
       }
     }
@@ -3515,9 +3522,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
   border: 1.5px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
-  transition: v.$transicao-rapida
-
-  i {
+  transition: v.$transicao-rapida i {
     color: #ddd;
   }
 
@@ -3528,7 +3533,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
     color: #bbb;
 
     &:focus {
-      outline:none;
+      outline: none;
     }
 
     &::placeholder {
