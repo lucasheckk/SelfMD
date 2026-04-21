@@ -322,8 +322,13 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
 
         .custom-table {
           table-layout: fixed;
-          border-collapse: collapse;
+          border-collapse: collapse !important;
           border-spacing: 0;
+
+          th,
+          td {
+            border: 1px solid black; 
+          }
 
           .sticky-col {
             position: sticky;
@@ -365,7 +370,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
             white-space: nowrap;
             overflow: hidden;
             &.sticky-col {
-              z-index: 30;
+              z-index: 35;
               background-color: #eee;
             }
           }
