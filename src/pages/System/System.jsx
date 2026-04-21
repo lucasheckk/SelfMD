@@ -5,6 +5,7 @@ import "./System.scss";
 import { SegundoMenu } from "../../components/SegundoMenu/SegundoMenu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import { TourGuide } from "../../components/TourGuide/TourGuide";
+import { LoadingAnimation } from "../../components/Animation/LoadingAnimation.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   API,
@@ -319,6 +320,7 @@ export function System() {
   const [colunas, setColunas] = useState([PRIMEIRA_COLUNA_PK()]);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const [tabelaParaExcluir, setTabelaParaExcluir] = useState(null);
   const [confirmacaoExclusaoTabela, setConfirmacaoExclusaoTabela] =
@@ -430,7 +432,10 @@ export function System() {
   // ── Carregar tabelas ─────────────────────────
   const carregarDados = useCallback(async () => {
     const idDb = idDoDatabaseAtual || localStorage.getItem("lastDbId");
-    if (!idDb) return;
+    if (!idDb) {
+      setInitialLoading(false); // sem DB configurado, não fica travado
+      return;
+    }
 
     try {
       const response = await API.get(TABELA_CRUD_ROUTES.LISTAR(idDb));
@@ -467,6 +472,8 @@ export function System() {
         "Erro",
         err.response?.data?.message || "Falha ao sincronizar.",
       );
+    } finally {
+      setInitialLoading(false); // ← NOVO: libera o loading independente de erro ou sucesso
     }
   }, [idDoDatabaseAtual, pushNotification]);
 
@@ -520,11 +527,12 @@ export function System() {
   }, [activeTab, tabs]);
 
   useEffect(() => {
+    if (initialLoading) return; // aguarda dados carregarem
     if (!localStorage.getItem(TOUR_SEEN_KEY)) {
-      const t = setTimeout(() => setTourActive(true), 600);
+      const t = setTimeout(() => setTourActive(true), 400);
       return () => clearTimeout(t);
     }
-  }, []);
+  }, [initialLoading]);
 
   // ── Seleção ───────────────────────────────────────────────────────────────
   const toggleSelectAll = () => {
@@ -1751,6 +1759,7 @@ export function System() {
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="system-container">
+      {initialLoading && <LoadingAnimation />}
       <SegundoMenu />
       <Notificacao
         notifications={notifications}

@@ -36,15 +36,6 @@ html {
   height: 100vh;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  background-color: #fafafa;
-}
-
 .lp-root {
   font-family: v.$jakarta;
   color: #333;
@@ -1524,6 +1515,7 @@ body {
 .lp-tech-stack {
   background: none;
   padding-top: 60px;
+  padding-bottom: 60px;
 }
 
 .lp-tech-footer-top {
