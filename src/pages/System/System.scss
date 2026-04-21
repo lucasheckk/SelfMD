@@ -325,17 +325,14 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           border-collapse: collapse !important;
           border-spacing: 0;
 
-          th,
-          td {
-            border: 1px solid black; 
-          }
-
           .sticky-col {
             position: sticky;
             z-index: 20;
           }
           .sticky-checkbox {
             left: $sticky-checkbox-left;
+            background-color: inherit;
+            z-index: 32;
           }
           .sticky-actions {
             right: 0;
@@ -564,7 +561,7 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
           }
           .sticky-id {
             left: $checkbox-width;
-            background-color: $bg-normal;
+            z-index: 31;
           }
           thead th.sticky-id {
             background-color: #eee;
