@@ -559,13 +559,6 @@ $bg-selected: rgba(v.$cor-primaria, 0.2);
               }
             }
           }
-          .sticky-id {
-            left: $checkbox-width;
-            z-index: 31;
-          }
-          thead th.sticky-id {
-            background-color: #eee;
-          }
         }
       }
     }
