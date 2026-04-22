@@ -15,25 +15,45 @@ const DEMO_COLUNAS = [
     nome: "nome",
     primaryKey: false,
     tipoDado: "Texto",
-    config: { naoNulo: false, unico: false, indexado: false, autoIncrem: false },
+    config: {
+      naoNulo: false,
+      unico: false,
+      indexado: false,
+      autoIncrem: false,
+    },
   },
   {
     nome: "cpf",
     primaryKey: false,
     tipoDado: "Número",
-    config: { naoNulo: false, unico: false, indexado: false, autoIncrem: false },
+    config: {
+      naoNulo: false,
+      unico: false,
+      indexado: false,
+      autoIncrem: false,
+    },
   },
   {
     nome: "data_nascimento",
     primaryKey: false,
     tipoDado: "Data",
-    config: { naoNulo: false, unico: false, indexado: false, autoIncrem: false },
+    config: {
+      naoNulo: false,
+      unico: false,
+      indexado: false,
+      autoIncrem: false,
+    },
   },
   {
     nome: "conta_ativada",
     primaryKey: false,
     tipoDado: "Booleano",
-    config: { naoNulo: false, unico: false, indexado: false, autoIncrem: false },
+    config: {
+      naoNulo: false,
+      unico: false,
+      indexado: false,
+      autoIncrem: false,
+    },
   },
 ];
 
@@ -48,135 +68,97 @@ const TODOS_TIPOS = ["Texto", "Número", "Data", "Booleano", "Lista", "JSON"];
 
 // ─── Dados fictícios para demos de tabela ─────────────────────────────────────
 const DEMO_ROWS = [
-  { id: 1, nome: "Ana Lima", cpf: "123.456.789-00", data_nasc: "1995-03-12", ativo: "Sim" },
-  { id: 2, nome: "Bruno Costa", cpf: "987.654.321-00", data_nasc: "1988-07-25", ativo: "Não" },
-  { id: 3, nome: "Carla Souza", cpf: "456.123.789-00", data_nasc: "2001-11-04", ativo: "Sim" },
+  {
+    id: 1,
+    nome: "Ana Lima",
+    cpf: "123.456.789-00",
+    data_nasc: "1995-03-12",
+    ativo: "Sim",
+  },
+  {
+    id: 2,
+    nome: "Bruno Costa",
+    cpf: "987.654.321-00",
+    data_nasc: "1988-07-25",
+    ativo: "Não",
+  },
+  {
+    id: 3,
+    nome: "Carla Souza",
+    cpf: "456.123.789-00",
+    data_nasc: "2001-11-04",
+    ativo: "Sim",
+  },
 ];
 
-const DEMO_COLS_TABLE = ["id", "nome", "cpf", "data_nasc", "ativo"];
+const DEMO_COLS = ["id", "nome", "cpf", "data_nasc", "ativo"];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── Componentes Demo Reutilizáveis
+// ─── Demo: Abas de tabelas — fiel ao .tab-layout do System
 // ═══════════════════════════════════════════════════════════════════════════════
-
-// Mini tabela base usada pelos demos
-function DemoMiniTable({ highlightCol, highlightCheckbox, highlightActions, highlightHeader, selectedRows = [] }) {
-  return (
-    <div className="demo-table-shell">
-      {/* Header da página */}
-      <div className={`demo-page-header ${highlightHeader ? "demo-highlight-zone" : ""}`}>
-        <div className="demo-page-header-left">
-          <span className="demo-label-sm">Registros</span>
-          <span className="demo-count">{DEMO_ROWS.length}</span>
-        </div>
-        <div className="demo-page-header-right">
-          <span className="demo-action-btn"><i className="fi fi-sr-add-document" /> Inserir</span>
-          <span className="demo-action-btn"><i className="fi fi-sr-pencil" /> Renomear</span>
-        </div>
-      </div>
-
-      {/* Tabela */}
-      <div className="demo-table-wrap">
-        <table className="demo-table">
-          <thead>
-            <tr>
-              <th className={`demo-th demo-th-check ${highlightCheckbox ? "demo-highlight-zone" : ""}`}>
-                <i className="fi fi-rr-square-plus demo-check-icon" />
-              </th>
-              {DEMO_COLS_TABLE.map((col) => (
-                <th
-                  key={col}
-                  className={`demo-th ${highlightCol === col ? "demo-highlight-zone" : ""} ${col === "id" ? "demo-th-id" : ""}`}
-                >
-                  <div className="demo-th-inner">
-                    <span>{col.toUpperCase()}</span>
-                    {highlightCol === col && (
-                      <i className="fi fi-rr-arrows-from-line demo-resize-icon" />
-                    )}
-                    {col !== "id" && highlightCol !== col && (
-                      <i className="fi fi-rr-menu-dots-vertical demo-menu-icon" />
-                    )}
-                  </div>
-                </th>
-              ))}
-              <th className={`demo-th demo-th-actions ${highlightActions ? "demo-highlight-zone" : ""}`}>
-                <i className="fi fi-rr-refresh demo-refresh-icon" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {DEMO_ROWS.map((row) => {
-              const isSelected = selectedRows.includes(row.id);
-              return (
-                <tr key={row.id} className={isSelected ? "demo-row-selected" : ""}>
-                  <td className={`demo-td demo-td-check ${highlightCheckbox ? "demo-highlight-zone" : ""}`}>
-                    <i className={`fi ${isSelected ? "fi-sr-angle-square-right demo-check-active" : "fi-rr-square demo-check-idle"}`} />
-                  </td>
-                  {DEMO_COLS_TABLE.map((col) => (
-                    <td
-                      key={col}
-                      className={`demo-td ${col === "id" ? "demo-td-id" : ""} ${highlightCol === col ? "demo-highlight-zone" : ""}`}
-                    >
-                      {row[col]}
-                    </td>
-                  ))}
-                  <td className={`demo-td demo-td-actions ${highlightActions ? "demo-highlight-zone" : ""}`}>
-                    <i className="fi fi-rr-pencil demo-row-action" />
-                    <i className="fi fi-rr-trash demo-row-action" />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ─── Demo: Abas de tabelas ────────────────────────────────────────────────────
 function DemoTabs() {
   const [active, setActive] = useState(0);
+  const [indicatorStyle, setIndicatorStyle] = useState({
+    left: "12px",
+    width: "80px",
+  });
+  const tabRefs = useRef({});
   const tabs = ["usuarios", "produtos", "pedidos"];
 
+  useEffect(() => {
+    const el = tabRefs.current[active];
+    if (el) {
+      setIndicatorStyle({
+        left: `${el.offsetLeft}px`,
+        width: `${el.offsetWidth}px`,
+      });
+    }
+  }, [active]);
+
   return (
-    <div className="demo-feature-card">
-      <div className="demo-tabs-bar">
+    <div className="demo-feature-card demo-feature-card--system">
+      {/* Replica o .tab-layout */}
+      <div className="demo-system-tabs">
         {tabs.map((t, i) => (
           <button
             key={t}
-            className={`demo-tab ${active === i ? "demo-tab--active" : ""}`}
+            ref={(el) => (tabRefs.current[i] = el)}
+            className={`demo-system-tab-item ${active === i ? "active" : ""}`}
             onClick={() => setActive(i)}
           >
             {t}
           </button>
         ))}
-        <div className="demo-tab-indicator" style={{ left: `${active * 90 + 12}px`, width: "72px" }} />
-        <button className="demo-new-tab-btn">
+        <div className="demo-system-tab-indicator" style={indicatorStyle} />
+        <button className="demo-system-new-tab-btn" title="Nova tabela">
           <i className="fi fi-rr-plus" />
         </button>
       </div>
-      <div className="demo-tab-content">
-        <div className="demo-tab-table-preview">
-          <span className="demo-label-sm" style={{ color: "#aaa" }}>
-            Exibindo tabela: <strong style={{ color: "#555" }}>{tabs[active]}</strong>
-          </span>
-          <div className="demo-mini-rows">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="demo-mini-row">
-                <span className="demo-mini-cell demo-mini-cell--id">{n}</span>
-                <span className="demo-mini-cell" style={{ flex: 2 }} />
-                <span className="demo-mini-cell" />
-              </div>
-            ))}
-          </div>
+
+      {/* Mini prévia do conteúdo */}
+      <div className="demo-system-tab-content">
+        <span className="demo-system-tab-hint">
+          Tabela ativa: <strong>{tabs[active]}</strong>
+        </span>
+        <div className="demo-system-mini-rows">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="demo-system-mini-row">
+              <span className="demo-system-mini-cell demo-system-mini-cell--id">
+                {n}
+              </span>
+              <span className="demo-system-mini-cell" style={{ flex: 2 }} />
+              <span className="demo-system-mini-cell" />
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Demo: Contador de registros ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Cabeçalho da tabela — fiel ao .table-header do System
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoRecordCount() {
   const [count, setCount] = useState(0);
 
@@ -193,95 +175,254 @@ function DemoRecordCount() {
   }, []);
 
   return (
-    <div className="demo-feature-card">
-      <div className="demo-record-header">
-        <div className="demo-record-count-group">
-          <span className="demo-record-label">Registros</span>
-          <span className="demo-record-number">{count}</span>
-        </div>
-        <div className="demo-record-actions">
-          <span className="demo-action-btn"><i className="fi fi-sr-add-document" /> Inserir registro</span>
-          <span className="demo-action-btn"><i className="fi fi-sr-pencil" /> Renomear tabela</span>
-          <span className="demo-action-btn demo-action-btn--danger"><i className="fi fi-sr-remove-folder" /> Excluir tabela</span>
+    <div className="demo-feature-card demo-feature-card--system">
+      {/* Replica o .table-header */}
+      <div className="demo-system-table-header">
+        <span className="demo-system-qtd-reg">Registros</span>
+        <span className="demo-system-row-counter">{count}</span>
+        <div className="demo-system-header-right">
+          <button className="demo-system-action-header-btn">
+            <i className="fi fi-sr-add-document" /> Inserir registro
+          </button>
+          <button className="demo-system-action-header-btn">
+            <i className="fi fi-sr-pencil" /> Renomear tabela
+          </button>
+          <button className="demo-system-apagar-tabela-btn">
+            <i className="fi fi-sr-remove-folder" /> Excluir tabela
+          </button>
         </div>
       </div>
-      <div className="demo-record-hint">
+      <div className="demo-system-record-hint">
         <i className="fi fi-rr-info" />
-        <span>O contador atualiza em tempo real conforme você adiciona ou remove registros.</span>
+        <span>
+          O contador atualiza em tempo real conforme você adiciona ou remove
+          registros.
+        </span>
       </div>
     </div>
   );
 }
 
-// ─── Demo: Barra de seleção ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Barra de seleção — fiel ao .selection-bar do System
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoSelectionBar() {
   const [selected, setSelected] = useState(0);
   const total = 3;
 
   return (
-    <div className="demo-feature-card">
-      <div className="demo-sel-controls">
+    <div className="demo-feature-card demo-feature-card--system">
+      <div className="demo-system-sel-controls">
         <button
           className="demo-sel-btn"
           onClick={() => setSelected((s) => Math.max(0, s - 1))}
           disabled={selected === 0}
-        >−</button>
-        <span className="demo-sel-hint">Simule a seleção</span>
+        >
+          −
+        </button>
+        <span className="demo-system-sel-hint">Simule a seleção de linhas</span>
         <button
           className="demo-sel-btn"
           onClick={() => setSelected((s) => Math.min(total, s + 1))}
           disabled={selected === total}
-        >+</button>
+        >
+          +
+        </button>
       </div>
 
-      <div className={`demo-sel-bar ${selected > 0 ? "demo-sel-bar--active" : ""}`}>
+      {/* Replica exatamente o .selection-bar com as classes reais */}
+      <div
+        className={`demo-system-selection-bar ${selected > 0 ? "demo-system-selection-bar--active" : ""}`}
+      >
         {selected > 0 ? (
           <>
             <span>{selected} item(s) selecionado(s)</span>
-            <div className="demo-sel-actions">
-              <span className={`demo-sel-action ${selected !== 1 ? "demo-sel-action--disabled" : ""}`}>
+            <div className="demo-system-selection-actions">
+              <button
+                className={`demo-system-selection-action-btn demo-system-selection-action-btn--edit ${selected !== 1 ? "demo-system-selection-action-btn--disabled" : ""}`}
+                disabled={selected !== 1}
+              >
                 <i className="fi fi-sr-file-edit" /> Atualizar
-              </span>
-              <span className="demo-sel-divider" />
-              <span className="demo-sel-action">
+              </button>
+              <span className="demo-system-selection-action-divider" />
+              <button className="demo-system-selection-action-btn demo-system-selection-action-btn--delete">
                 <i className="fi fi-sr-trash" /> Excluir
-              </span>
+              </button>
             </div>
           </>
         ) : (
-          <span style={{ color: "#aaa", fontSize: "13px" }}>Nenhum item selecionado</span>
+          <span className="demo-system-empty-selection">
+            Nenhum item selecionado
+          </span>
         )}
       </div>
 
-      <div className="demo-sel-note">
-        <span>Atualizar só fica disponível com <strong>exatamente 1</strong> item selecionado</span>
+      <div className="demo-system-sel-note">
+        "Atualizar" só fica disponível com <strong>exatamente 1</strong> item
+        selecionado
       </div>
     </div>
   );
 }
 
-// ─── Demo: Checkbox de seleção ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Helper: linha da tabela de demo
+// ═══════════════════════════════════════════════════════════════════════════════
+function DemoTableShell({
+  selectedRows = [],
+  onToggle,
+  onToggleAll,
+  highlightCheckbox,
+  highlightSticky,
+  highlightActions,
+}) {
+  const allSelected = selectedRows.length === DEMO_ROWS.length;
+
+  return (
+    <div className="demo-system-table-shell">
+      <div className="demo-system-table-scroll">
+        <table className="demo-system-custom-table">
+          <colgroup>
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "44px" }} /> {/* ID sticky */}
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "80px" }} />
+            <col style={{ width: "60px" }} />
+          </colgroup>
+          <thead>
+            <tr>
+              {/* Checkbox col */}
+              <th
+                className={`demo-system-th demo-system-checkbox-col ${highlightCheckbox ? "demo-system-th--highlight" : ""}`}
+              >
+                <button
+                  className="demo-system-select-all-btn"
+                  onClick={onToggleAll}
+                >
+                  <i
+                    className={`fi ${allSelected && DEMO_ROWS.length > 0 ? "fi-rr-square-minus" : "fi-rr-square-plus"}`}
+                  />
+                </button>
+              </th>
+              {/* ID — sticky */}
+              <th
+                className={`demo-system-th demo-system-th-id ${highlightSticky ? "demo-system-th--highlight" : ""}`}
+              >
+                <div className="demo-system-cell-content">
+                  <span className="demo-system-col-label">ID</span>
+                </div>
+              </th>
+              {/* Demais colunas */}
+              {["NOME", "CPF", "DATA_NASC", "ATIVO"].map((col) => (
+                <th key={col} className="demo-system-th">
+                  <div className="demo-system-cell-content">
+                    <div className="demo-system-col-label-group">
+                      <span className="demo-system-col-label">{col}</span>
+                    </div>
+                    <button className="demo-system-resizer-handle">
+                      <i className="fi-sr-arrows-from-line" />
+                    </button>
+                  </div>
+                </th>
+              ))}
+              {/* Actions */}
+              <th
+                className={`demo-system-th demo-system-actions-header ${highlightActions ? "demo-system-th--highlight" : ""}`}
+              >
+                <div className="demo-system-actions-cell-content">
+                  <button title="Recarregar">
+                    <i className="fi fi-rr-refresh" />
+                  </button>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {DEMO_ROWS.map((row) => {
+              const isSel = selectedRows.includes(row.id);
+              return (
+                <tr
+                  key={row.id}
+                  className={isSel ? "demo-system-row-selected" : ""}
+                >
+                  <td
+                    className={`demo-system-td demo-system-checkbox-col ${highlightCheckbox ? "demo-system-td--highlight" : ""}`}
+                  >
+                    <button
+                      className="demo-system-custom-checkbox"
+                      onClick={() => onToggle(row.id)}
+                    >
+                      <i
+                        className={`fi ${isSel ? "fi-sr-angle-square-right" : "fi-rr-square"}`}
+                      />
+                    </button>
+                  </td>
+                  <td
+                    className={`demo-system-td demo-system-td-id ${highlightSticky ? "demo-system-td--highlight" : ""}`}
+                  >
+                    {row.id}
+                  </td>
+                  <td className="demo-system-td">{row.nome}</td>
+                  <td className="demo-system-td">{row.cpf}</td>
+                  <td className="demo-system-td">{row.data_nasc}</td>
+                  <td className="demo-system-td">{row.ativo}</td>
+                  <td
+                    className={`demo-system-td demo-system-actions-cell ${highlightActions ? "demo-system-td--highlight" : ""}`}
+                  >
+                    <div className="demo-system-actions-container">
+                      <button>
+                        <i className="fi fi-rr-pencil" />
+                      </button>
+                      <button>
+                        <i className="fi fi-rr-trash" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Checkbox de seleção
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoCheckbox() {
   const [selected, setSelected] = useState([]);
   const ids = DEMO_ROWS.map((r) => r.id);
-  const allSelected = selected.length === ids.length;
 
-  const toggleAll = () => setSelected(allSelected ? [] : [...ids]);
+  const toggleAll = () =>
+    setSelected(selected.length === ids.length ? [] : [...ids]);
   const toggleOne = (id) =>
-    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
 
   return (
-    <div className="demo-feature-card">
-      <DemoMiniTable selectedRows={selected} highlightCheckbox />
-      <div className="demo-checkbox-legend">
-        <button className="demo-legend-btn" onClick={toggleAll}>
-          {allSelected ? "Desmarcar todos" : "Selecionar todos"}
+    <div className="demo-feature-card demo-feature-card--system">
+      <DemoTableShell
+        selectedRows={selected}
+        onToggle={toggleOne}
+        onToggleAll={toggleAll}
+        highlightCheckbox
+      />
+      <div className="demo-system-checkbox-legend">
+        <button className="demo-system-legend-btn" onClick={toggleAll}>
+          {selected.length === ids.length
+            ? "Desmarcar todos"
+            : "Selecionar todos"}
         </button>
-        <div className="demo-legend-individual">
+        <div className="demo-system-legend-individual">
           {DEMO_ROWS.map((r) => (
             <button
               key={r.id}
-              className={`demo-legend-btn demo-legend-btn--sm ${selected.includes(r.id) ? "demo-legend-btn--active" : ""}`}
+              className={`demo-system-legend-btn demo-system-legend-btn--sm ${selected.includes(r.id) ? "demo-system-legend-btn--active" : ""}`}
               onClick={() => toggleOne(r.id)}
             >
               #{r.id}
@@ -293,74 +434,153 @@ function DemoCheckbox() {
   );
 }
 
-// ─── Demo: Coluna ID fixa ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Coluna ID sticky
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoStickyID() {
   const [scrolled, setScrolled] = useState(false);
 
   return (
-    <div className="demo-feature-card">
-      <div className="demo-sticky-wrapper">
-        <div className={`demo-sticky-table-scroll ${scrolled ? "demo-sticky-table-scroll--scrolled" : ""}`}>
-          <table className="demo-table demo-table--sticky-demo">
-            <thead>
-              <tr>
-                <th className="demo-th demo-th-check"><i className="fi fi-rr-square-plus demo-check-icon" /></th>
-                <th className="demo-th demo-th-id demo-th-id--sticky demo-highlight-zone">
-                  <span>ID</span>
-                </th>
-                {["nome", "cpf", "email", "telefone", "cidade"].map((c) => (
-                  <th key={c} className="demo-th demo-th-scrollable">
-                    {c.toUpperCase()}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {DEMO_ROWS.map((row) => (
-                <tr key={row.id}>
-                  <td className="demo-td demo-td-check"><i className="fi fi-rr-square demo-check-idle" /></td>
-                  <td className="demo-td demo-td-id demo-td-id--sticky demo-highlight-zone">{row.id}</td>
-                  {["nome", "cpf", "email", "tel", "cidade"].map((c, i) => (
-                    <td key={i} className="demo-td demo-td-scrollable">
-                      <span className="demo-td-placeholder" />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="demo-sticky-scroll-hint">
-          <button
-            className={`demo-scroll-toggle ${scrolled ? "demo-scroll-toggle--active" : ""}`}
-            onClick={() => setScrolled((s) => !s)}
-          >
-            <i className={`fi fi-rr-arrow-${scrolled ? "left" : "right"}`} />
-            {scrolled ? "Ver ID fixado" : "Simular scroll →"}
-          </button>
-        </div>
+    <div className="demo-feature-card demo-feature-card--system">
+      <div
+        className={`demo-system-sticky-wrapper ${scrolled ? "demo-system-sticky-wrapper--scrolled" : ""}`}
+      >
+        <DemoTableShell
+          selectedRows={[]}
+          onToggle={() => {}}
+          onToggleAll={() => {}}
+          highlightSticky
+        />
+      </div>
+      <div className="demo-system-sticky-hint">
+        <button
+          className={`demo-scroll-toggle ${scrolled ? "demo-scroll-toggle--active" : ""}`}
+          onClick={() => setScrolled((s) => !s)}
+        >
+          <i className={`fi fi-rr-arrow-${scrolled ? "left" : "right"}`} />
+          {scrolled ? "← Voltar" : "Simular scroll →"}
+        </button>
+        <span className="demo-system-sticky-note">
+          {scrolled
+            ? "O ID permanece fixo enquanto o restante rola"
+            : "Clique para ver o ID fixado durante o scroll horizontal"}
+        </span>
       </div>
     </div>
   );
 }
 
-// ─── Demo: Colunas redimensionáveis ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Colunas redimensionáveis
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoResizableCols() {
-  const [width, setWidth] = useState(120);
+  const [width, setWidth] = useState(130);
 
   return (
-    <div className="demo-feature-card">
-      <div className="demo-resize-demo">
-        <div className="demo-resize-col" style={{ width }}>
-          <span className="demo-resize-label">NOME</span>
-          <i className="fi fi-sr-arrows-from-line demo-resize-handle-icon" />
-        </div>
-        <div className="demo-resize-col demo-resize-col--rest">
-          <span className="demo-resize-label">CPF</span>
+    <div className="demo-feature-card demo-feature-card--system">
+      {/* Header da tabela com a coluna redimensionável destacada */}
+      <div className="demo-system-table-shell">
+        <div className="demo-system-table-scroll">
+          <table className="demo-system-custom-table">
+            <colgroup>
+              <col style={{ width: "50px" }} />
+              <col style={{ width: "44px" }} />
+              <col style={{ width: `${width}px` }} />
+              <col style={{ width: "130px" }} />
+              <col style={{ width: "100px" }} />
+              <col style={{ width: "60px" }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <th className="demo-system-th demo-system-checkbox-col">
+                  <button className="demo-system-select-all-btn">
+                    <i className="fi fi-rr-square-plus" />
+                  </button>
+                </th>
+                <th className="demo-system-th demo-system-th-id">
+                  <div className="demo-system-cell-content">
+                    <span className="demo-system-col-label">ID</span>
+                  </div>
+                </th>
+                {/* Coluna NOME destacada — com handle visível */}
+                <th className="demo-system-th demo-system-th--highlight">
+                  <div className="demo-system-cell-content">
+                    <div className="demo-system-col-label-group">
+                      <span className="demo-system-col-label">NOME</span>
+                    </div>
+                    <button className="demo-system-resizer-handle demo-system-resizer-handle--active">
+                      <i className="fi-sr-arrows-from-line" />
+                    </button>
+                  </div>
+                </th>
+                <th className="demo-system-th">
+                  <div className="demo-system-cell-content">
+                    <span className="demo-system-col-label">CPF</span>
+                    <button className="demo-system-resizer-handle">
+                      <i className="fi-sr-arrows-from-line" />
+                    </button>
+                  </div>
+                </th>
+                <th className="demo-system-th">
+                  <div className="demo-system-cell-content">
+                    <span className="demo-system-col-label">ATIVO</span>
+                    <button className="demo-system-resizer-handle">
+                      <i className="fi-sr-arrows-from-line" />
+                    </button>
+                  </div>
+                </th>
+                <th className="demo-system-th demo-system-actions-header">
+                  <div className="demo-system-actions-cell-content">
+                    <button>
+                      <i className="fi fi-rr-refresh" />
+                    </button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {DEMO_ROWS.map((row) => (
+                <tr key={row.id}>
+                  <td className="demo-system-td demo-system-checkbox-col">
+                    <button className="demo-system-custom-checkbox">
+                      <i className="fi fi-rr-square" />
+                    </button>
+                  </td>
+                  <td className="demo-system-td demo-system-td-id">{row.id}</td>
+                  <td
+                    className="demo-system-td demo-system-td--highlight"
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {row.nome}
+                  </td>
+                  <td className="demo-system-td">{row.cpf}</td>
+                  <td className="demo-system-td">{row.ativo}</td>
+                  <td className="demo-system-td demo-system-actions-cell">
+                    <div className="demo-system-actions-container">
+                      <button>
+                        <i className="fi fi-rr-pencil" />
+                      </button>
+                      <button>
+                        <i className="fi fi-rr-trash" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-      <div className="demo-resize-slider-group">
-        <span className="demo-label-sm">Arraste para redimensionar:</span>
+
+      {/* Controle do slider */}
+      <div className="demo-system-resize-controls">
+        <span className="demo-system-resize-label">
+          <i className="fi-sr-arrows-from-line" /> Largura da coluna NOME:
+        </span>
         <input
           type="range"
           min={60}
@@ -369,74 +589,121 @@ function DemoResizableCols() {
           onChange={(e) => setWidth(Number(e.target.value))}
           className="demo-resize-slider"
         />
-        <span className="demo-resize-value">{width}px</span>
-      </div>
-      <div className="demo-resize-rows-preview">
-        {DEMO_ROWS.map((r) => (
-          <div key={r.id} className="demo-resize-row">
-            <div className="demo-resize-cell" style={{ width, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {r.nome}
-            </div>
-            <div className="demo-resize-cell demo-resize-cell--rest">{r.cpf}</div>
-          </div>
-        ))}
+        <span className="demo-system-resize-value">{width}px</span>
       </div>
     </div>
   );
 }
 
-// ─── Demo: Ações do cabeçalho ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Demo: Ações do cabeçalho — dropdown fiel ao .col-header-dropdown
+// ═══════════════════════════════════════════════════════════════════════════════
 function DemoHeaderActions() {
   const [menuOpen, setMenuOpen] = useState(null);
 
   return (
-    <div className="demo-feature-card">
-      <div className="demo-table-shell">
-        <div className="demo-table-wrap">
-          <table className="demo-table">
+    <div className="demo-feature-card demo-feature-card--system">
+      <div className="demo-system-table-shell">
+        <div className="demo-system-table-scroll">
+          <table className="demo-system-custom-table">
+            <colgroup>
+              <col style={{ width: "50px" }} />
+              <col style={{ width: "44px" }} />
+              <col style={{ width: "130px" }} />
+              <col style={{ width: "130px" }} />
+              <col style={{ width: "100px" }} />
+              <col style={{ width: "60px" }} />
+            </colgroup>
             <thead>
               <tr>
-                <th className="demo-th demo-th-check"><i className="fi fi-rr-square-plus demo-check-icon" /></th>
-                {DEMO_COLS_TABLE.filter((c) => c !== "id").slice(0, 3).map((col) => (
-                  <th key={col} className="demo-th">
-                    <div className="demo-th-inner">
-                      <span>{col.toUpperCase()}</span>
-                      <div className="demo-col-menu-wrap">
-                        <button
-                          className={`demo-col-menu-btn ${menuOpen === col ? "demo-col-menu-btn--active" : ""}`}
-                          onClick={() => setMenuOpen(menuOpen === col ? null : col)}
+                <th className="demo-system-th demo-system-checkbox-col">
+                  <button className="demo-system-select-all-btn">
+                    <i className="fi fi-rr-square-plus" />
+                  </button>
+                </th>
+                <th className="demo-system-th demo-system-th-id">
+                  <div className="demo-system-cell-content">
+                    <span className="demo-system-col-label">ID</span>
+                  </div>
+                </th>
+                {["NOME", "CPF", "ATIVO"].map((col) => (
+                  <th
+                    key={col}
+                    className="demo-system-th"
+                    style={{ overflow: "visible" }}
+                  >
+                    <div className="demo-system-cell-content">
+                      <div className="demo-system-col-label-group">
+                        <span className="demo-system-col-label">{col}</span>
+                        {/* Menu de coluna — replica .col-header-menu */}
+                        <div
+                          className="demo-system-col-header-menu"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <i className="fi fi-rr-menu-dots-vertical" />
-                        </button>
-                        {menuOpen === col && (
-                          <div className="demo-col-dropdown">
-                            <div className="demo-col-dropdown-item">
-                              <i className="fi fi-sr-settings" /> Configurar
+                          <button
+                            className={`demo-system-col-header-menu-btn ${menuOpen === col ? "demo-system-col-header-menu-btn--active" : ""}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMenuOpen(menuOpen === col ? null : col);
+                            }}
+                          >
+                            <i className="fi fi-rr-menu-dots-vertical" />
+                          </button>
+                          {/* Dropdown — replica .col-header-dropdown */}
+                          {menuOpen === col && (
+                            <div className="demo-system-col-dropdown">
+                              <button
+                                className="demo-system-col-dropdown-item"
+                                onClick={() => setMenuOpen(null)}
+                              >
+                                <i className="fi fi-sr-settings" /> Configurar
+                              </button>
+                              <button
+                                className="demo-system-col-dropdown-item demo-system-col-dropdown-item--danger"
+                                onClick={() => setMenuOpen(null)}
+                              >
+                                <i className="fi fi-sr-trash" /> Excluir
+                              </button>
                             </div>
-                            <div className="demo-col-dropdown-item demo-col-dropdown-item--danger">
-                              <i className="fi fi-sr-trash" /> Excluir
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
+                      <button className="demo-system-resizer-handle">
+                        <i className="fi-sr-arrows-from-line" />
+                      </button>
                     </div>
                   </th>
                 ))}
-                <th className="demo-th demo-th-actions demo-highlight-zone">
-                  <i className="fi fi-rr-refresh demo-refresh-icon" />
+                <th className="demo-system-th demo-system-actions-header demo-system-th--highlight">
+                  <div className="demo-system-actions-cell-content">
+                    <button>
+                      <i className="fi fi-rr-refresh" />
+                    </button>
+                  </div>
                 </th>
               </tr>
             </thead>
             <tbody>
               {DEMO_ROWS.map((row) => (
                 <tr key={row.id}>
-                  <td className="demo-td demo-td-check"><i className="fi fi-rr-square demo-check-idle" /></td>
-                  {DEMO_COLS_TABLE.filter((c) => c !== "id").slice(0, 3).map((col) => (
-                    <td key={col} className="demo-td">{row[col]}</td>
-                  ))}
-                  <td className="demo-td demo-td-actions demo-highlight-zone">
-                    <i className="fi fi-rr-pencil demo-row-action" />
-                    <i className="fi fi-rr-trash demo-row-action" />
+                  <td className="demo-system-td demo-system-checkbox-col">
+                    <button className="demo-system-custom-checkbox">
+                      <i className="fi fi-rr-square" />
+                    </button>
+                  </td>
+                  <td className="demo-system-td demo-system-td-id">{row.id}</td>
+                  <td className="demo-system-td">{row.nome}</td>
+                  <td className="demo-system-td">{row.cpf}</td>
+                  <td className="demo-system-td">{row.ativo}</td>
+                  <td className="demo-system-td demo-system-actions-cell demo-system-td--highlight">
+                    <div className="demo-system-actions-container">
+                      <button>
+                        <i className="fi fi-rr-pencil" />
+                      </button>
+                      <button>
+                        <i className="fi fi-rr-trash" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -444,7 +711,10 @@ function DemoHeaderActions() {
           </table>
         </div>
       </div>
-      <p className="demo-caption">Clique no <strong>⋮</strong> de qualquer coluna para configurar ou excluir. O <strong>↺</strong> recarrega os dados do servidor.</p>
+      <p className="demo-system-caption">
+        Clique no <strong>⋮</strong> de qualquer coluna para configurar ou
+        excluir. O <strong>↺</strong> recarrega os dados do servidor.
+      </p>
     </div>
   );
 }
@@ -487,7 +757,6 @@ const TOUR_STEPS = [
       "Cada aba representa uma tabela do seu banco de dados. Clique em uma aba para visualizar seus registros.",
   },
   {
-    // Passo 5 — spotlight no botão "+", seta à esquerda do tooltip
     type: "spotlight",
     selector: ".new-tab-btn",
     placement: "bottom-left",
@@ -495,7 +764,6 @@ const TOUR_STEPS = [
     description:
       'Clique neste "+" para abrir o assistente de criação. Você define o nome e as colunas em poucos passos.',
   },
-  // ── A partir daqui: demos visuais, sem depender de DOM real ───────────────
   {
     type: "demo-tabs",
     selector: null,
@@ -508,9 +776,9 @@ const TOUR_STEPS = [
     type: "demo-record-count",
     selector: null,
     placement: "center",
-    title: "Contagem de registros",
+    title: "Cabeçalho da tabela",
     description:
-      "O cabeçalho da tabela mostra quantos registros existem e os botões para inserir, renomear ou excluir a tabela.",
+      "O cabeçalho mostra quantos registros existem e os botões para inserir, renomear ou excluir a tabela.",
   },
   {
     type: "demo-selection-bar",
@@ -550,7 +818,7 @@ const TOUR_STEPS = [
     placement: "center",
     title: "Ações por coluna e por linha",
     description:
-      "O menu ⋮ no cabeçalho de cada coluna permite configurar ou excluir. Cada linha também tem ações de edição e exclusão fixadas à direita.",
+      "O menu ⋮ no cabeçalho de cada coluna permite configurar ou excluir. Cada linha também tem ações de edição e exclusão.",
   },
   {
     type: "center",
@@ -577,7 +845,10 @@ function DemoStep1() {
     const iv = setInterval(() => {
       i++;
       setTyped(target.slice(0, i));
-      if (i >= target.length) { clearInterval(iv); setDone(true); }
+      if (i >= target.length) {
+        clearInterval(iv);
+        setDone(true);
+      }
     }, 100);
     return () => clearInterval(iv);
   }, []);
@@ -601,16 +872,29 @@ function DemoStep1() {
         <p className="demo-field-label">Nome da tabela</p>
         <div className={`demo-input-field ${done ? "demo-input-done" : ""}`}>
           <span className="demo-typed">{typed}</span>
-          <span className={`demo-cursor ${blink ? "demo-cursor-on" : ""}`}>|</span>
+          <span className={`demo-cursor ${blink ? "demo-cursor-on" : ""}`}>
+            |
+          </span>
         </div>
         <div className="demo-char-track">
-          <div className="demo-char-fill" style={{ width: `${Math.min((typed.length / charMax) * 100, 100)}%` }} />
+          <div
+            className="demo-char-fill"
+            style={{
+              width: `${Math.min((typed.length / charMax) * 100, 100)}%`,
+            }}
+          />
         </div>
-        <span className="demo-char-hint">{typed.length} / {charMax} caracteres</span>
+        <span className="demo-char-hint">
+          {typed.length} / {charMax} caracteres
+        </span>
       </div>
       <div className="demo-wizard-footer">
         <span className="demo-btn-fake demo-btn-fake--ghost">Cancelar</span>
-        <span className={`demo-btn-fake demo-btn-fake--primary ${done ? "demo-btn-pulse" : ""}`}>Próximo →</span>
+        <span
+          className={`demo-btn-fake demo-btn-fake--primary ${done ? "demo-btn-pulse" : ""}`}
+        >
+          Próximo →
+        </span>
       </div>
     </div>
   );
@@ -638,7 +922,9 @@ function DemoStep2() {
           <span className="demo-step-line demo-step-line--done" />
           <span className="demo-step-dot demo-step-done">2</span>
         </div>
-        <span className="demo-badge">Prévia · tabela: <strong>usuarios</strong></span>
+        <span className="demo-badge">
+          Prévia · tabela: <strong>usuarios</strong>
+        </span>
       </div>
       <div className="demo-cols-scroll">
         <div className="demo-cols-grid demo-cols-head">
@@ -654,18 +940,32 @@ function DemoStep2() {
           >
             <span className="demo-col-name">{col.nome}</span>
             <div className="txt-center">
-              <span className={`demo-pk-icon ${col.primaryKey ? "demo-pk-icon--on" : ""}`}>
-                <i className={`fi ${col.primaryKey ? "fi-sr-key" : "fi-rr-key"}`} />
+              <span
+                className={`demo-pk-icon ${col.primaryKey ? "demo-pk-icon--on" : ""}`}
+              >
+                <i
+                  className={`fi ${col.primaryKey ? "fi-sr-key" : "fi-rr-key"}`}
+                />
               </span>
             </div>
             <div className="demo-pills-wrap">
               {TODOS_TIPOS.map((t) => (
-                <span key={t} className={`demo-pill ${col.tipoDado === t ? "demo-pill--on" : ""}`}>{t}</span>
+                <span
+                  key={t}
+                  className={`demo-pill ${col.tipoDado === t ? "demo-pill--on" : ""}`}
+                >
+                  {t}
+                </span>
               ))}
             </div>
             <div className="demo-pills-wrap">
               {Object.entries(col.config).map(([key, val]) => (
-                <span key={key} className={`demo-pill ${val ? "demo-pill--on" : ""}`}>{CONFIG_LABELS[key]}</span>
+                <span
+                  key={key}
+                  className={`demo-pill ${val ? "demo-pill--on" : ""}`}
+                >
+                  {CONFIG_LABELS[key]}
+                </span>
               ))}
             </div>
           </div>
@@ -695,18 +995,29 @@ export function TourGuide({ onFinish }) {
   const isFirst = step === 0;
   const isLast = step === TOUR_STEPS.length - 1;
 
-  // Tipos que são demos visuais (não dependem de DOM real)
   const isDemoType = [
-    "demo-step1", "demo-step2", "demo-tabs", "demo-record-count",
-    "demo-selection-bar", "demo-checkbox", "demo-sticky-id",
-    "demo-resize", "demo-header-actions",
+    "demo-step1",
+    "demo-step2",
+    "demo-tabs",
+    "demo-record-count",
+    "demo-selection-bar",
+    "demo-checkbox",
+    "demo-sticky-id",
+    "demo-resize",
+    "demo-header-actions",
   ].includes(current.type);
 
-  const isWide = ["demo-step2", "demo-tabs", "demo-record-count",
-    "demo-selection-bar", "demo-checkbox", "demo-sticky-id",
-    "demo-resize", "demo-header-actions"].includes(current.type);
+  const isWide = [
+    "demo-step2",
+    "demo-tabs",
+    "demo-record-count",
+    "demo-selection-bar",
+    "demo-checkbox",
+    "demo-sticky-id",
+    "demo-resize",
+    "demo-header-actions",
+  ].includes(current.type);
 
-  // ── Medir alvo ───────────────────────────────────────────────────────────
   const measureTarget = useCallback((s) => {
     const ts = TOUR_STEPS[s];
     if (ts.type !== "spotlight" || !ts.selector) {
@@ -714,7 +1025,10 @@ export function TourGuide({ onFinish }) {
       return;
     }
     const el = document.querySelector(ts.selector);
-    if (!el) { setRect(null); return; }
+    if (!el) {
+      setRect(null);
+      return;
+    }
     const r = el.getBoundingClientRect();
     setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
   }, []);
@@ -730,13 +1044,11 @@ export function TourGuide({ onFinish }) {
     };
   }, [step, measureTarget]);
 
-  // ── Posicionar tooltip ───────────────────────────────────────────────────
   useEffect(() => {
     if (!tooltipRef.current) return;
     const tip = tooltipRef.current.getBoundingClientRect();
     const pad = 16;
 
-    // Demos e passos centralizados
     if (!rect || current.placement === "center" || isDemoType) {
       setTooltipPos({
         top: window.innerHeight / 2 - tip.height / 2,
@@ -745,7 +1057,8 @@ export function TourGuide({ onFinish }) {
       return;
     }
 
-    let top = 0, left = 0;
+    let top = 0,
+      left = 0;
     const placement = current.placement;
 
     switch (placement) {
@@ -754,9 +1067,8 @@ export function TourGuide({ onFinish }) {
         left = rect.left + rect.width / 2 - tip.width / 2;
         break;
       case "bottom-left":
-        // Tooltip fica embaixo e alinhado à esquerda do elemento alvo
         top = rect.top + rect.height + pad;
-        left = rect.left; // alinha pela esquerda do botão
+        left = rect.left;
         break;
       case "top":
         top = rect.top - tip.height - pad;
@@ -779,16 +1091,25 @@ export function TourGuide({ onFinish }) {
     setTooltipPos({ top, left });
   }, [rect, visible, step, current.placement, isDemoType]);
 
-  // ── Navegação ────────────────────────────────────────────────────────────
-  const goNext = () => { if (isLast) { onFinish(); return; } setStep((s) => s + 1); };
-  const goPrev = () => { if (!isFirst) setStep((s) => s - 1); };
+  const goNext = () => {
+    if (isLast) {
+      onFinish();
+      return;
+    }
+    setStep((s) => s + 1);
+  };
+  const goPrev = () => {
+    if (!isFirst) setStep((s) => s - 1);
+  };
 
-  // ── Spotlight SVG ─────────────────────────────────────────────────────────
-  const R = 10, P = 8;
+  const R = 10,
+    P = 8;
   const buildClip = () => {
     if (!rect) return null;
-    const x = rect.left - P, y = rect.top - P;
-    const w = rect.width + P * 2, h = rect.height + P * 2;
+    const x = rect.left - P,
+      y = rect.top - P;
+    const w = rect.width + P * 2,
+      h = rect.height + P * 2;
     return (
       `M ${x + R} ${y} H ${x + w - R} Q ${x + w} ${y} ${x + w} ${y + R} ` +
       `V ${y + h - R} Q ${x + w} ${y + h} ${x + w - R} ${y + h} ` +
@@ -798,16 +1119,15 @@ export function TourGuide({ onFinish }) {
   };
   const clip = buildClip();
 
-  // Determina a classe da seta
   const getArrowClass = () => {
     if (isDemoType || current.placement === "center") return "";
-    if (current.placement === "bottom-left") return "tooltip-arrow tooltip-arrow--bottom-left";
+    if (current.placement === "bottom-left")
+      return "tooltip-arrow tooltip-arrow--bottom-left";
     return `tooltip-arrow tooltip-arrow--${current.placement}`;
   };
 
   return (
     <div className="tour-backdrop">
-      {/* Overlay */}
       <svg
         className="tour-svg"
         width={window.innerWidth}
@@ -837,7 +1157,6 @@ export function TourGuide({ onFinish }) {
         )}
       </svg>
 
-      {/* Tooltip */}
       <div
         ref={tooltipRef}
         className={[
@@ -846,10 +1165,11 @@ export function TourGuide({ onFinish }) {
           getArrowClass(),
           isDemoType ? "tour-tooltip--demo" : "",
           isWide ? "tour-tooltip--wide" : "",
-        ].filter(Boolean).join(" ")}
+        ]
+          .filter(Boolean)
+          .join(" ")}
         style={{ top: tooltipPos.top, left: tooltipPos.left }}
       >
-        {/* Progresso */}
         <div className="tour-progress">
           {TOUR_STEPS.map((_, i) => (
             <span
@@ -859,32 +1179,55 @@ export function TourGuide({ onFinish }) {
           ))}
         </div>
 
-        {/* Texto */}
         <div className="tour-text-block">
           <h3 className="tour-title">{current.title}</h3>
           <p className="tour-desc">{current.description}</p>
         </div>
 
-        {/* Componentes demo */}
-        {current.type === "demo-step1"         && <DemoStep1          key={`demo1-${step}`} />}
-        {current.type === "demo-step2"         && <DemoStep2          key={`demo2-${step}`} />}
-        {current.type === "demo-tabs"          && <DemoTabs           key={`dtabs-${step}`} />}
-        {current.type === "demo-record-count"  && <DemoRecordCount    key={`drec-${step}`} />}
-        {current.type === "demo-selection-bar" && <DemoSelectionBar   key={`dsel-${step}`} />}
-        {current.type === "demo-checkbox"      && <DemoCheckbox       key={`dchk-${step}`} />}
-        {current.type === "demo-sticky-id"     && <DemoStickyID       key={`dstk-${step}`} />}
-        {current.type === "demo-resize"        && <DemoResizableCols  key={`drsz-${step}`} />}
-        {current.type === "demo-header-actions"&& <DemoHeaderActions  key={`dhdr-${step}`} />}
+        {current.type === "demo-step1" && <DemoStep1 key={`demo1-${step}`} />}
+        {current.type === "demo-step2" && <DemoStep2 key={`demo2-${step}`} />}
+        {current.type === "demo-tabs" && <DemoTabs key={`dtabs-${step}`} />}
+        {current.type === "demo-record-count" && (
+          <DemoRecordCount key={`drec-${step}`} />
+        )}
+        {current.type === "demo-selection-bar" && (
+          <DemoSelectionBar key={`dsel-${step}`} />
+        )}
+        {current.type === "demo-checkbox" && (
+          <DemoCheckbox key={`dchk-${step}`} />
+        )}
+        {current.type === "demo-sticky-id" && (
+          <DemoStickyID key={`dstk-${step}`} />
+        )}
+        {current.type === "demo-resize" && (
+          <DemoResizableCols key={`drsz-${step}`} />
+        )}
+        {current.type === "demo-header-actions" && (
+          <DemoHeaderActions key={`dhdr-${step}`} />
+        )}
 
-        {/* Rodapé */}
         <div className="tour-footer">
-          <button className="tour-btn-cancel" onClick={onFinish}>Pular tour</button>
+          <button className="tour-btn-cancel" onClick={onFinish}>
+            Pular tour
+          </button>
           <div className="tour-nav">
-            <button className="tour-btn-nav tour-btn-prev" onClick={goPrev} disabled={isFirst}>
+            <button
+              className="tour-btn-nav tour-btn-prev"
+              onClick={goPrev}
+              disabled={isFirst}
+            >
               <i className="fi fi-rr-arrow-left" /> Voltar
             </button>
             <button className="tour-btn-nav tour-btn-next" onClick={goNext}>
-              {isLast ? <><i className="fi fi-rr-check" /> Começar</> : <>Avançar <i className="fi fi-rr-arrow-right" /></>}
+              {isLast ? (
+                <>
+                  <i className="fi fi-rr-check" /> Começar
+                </>
+              ) : (
+                <>
+                  Avançar <i className="fi fi-rr-arrow-right" />
+                </>
+              )}
             </button>
           </div>
         </div>

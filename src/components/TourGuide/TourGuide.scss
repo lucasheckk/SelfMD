@@ -91,10 +91,9 @@
   border-right: none;
 }
 
-// Seta alinhada à esquerda (passo 5: botão "+")
 .tooltip-arrow--bottom-left::before {
   top: -7px;
-  left: 22px; // fica sobre o botão "+" que está à esquerda
+  left: 22px;
   transform: rotate(45deg);
   border-bottom: none;
   border-right: none;
@@ -246,7 +245,7 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO WIZARD (passos 1 e 2)
+// ─── DEMO WIZARD (passos 1 e 2) — mantidos sem alteração
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .demo-wizard {
@@ -590,288 +589,99 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-}
 
-// ─── Highlight zone (zona em destaque na tabela demo) ─────────────────────────
-.demo-highlight-zone {
-  background: rgba(v.$cor-primaria, 0.07) !important;
-  outline: 2px solid rgba(v.$cor-primaria, 0.25);
-  outline-offset: -2px;
-  position: relative;
+  // Variante que simula o visual real do sistema
+  &.demo-feature-card--system {
+    background: #fff;
+    border-color: #c7c7c7;
+    border-width: 2px;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── MINI TABELA DEMO
+// ─── DEMO SYSTEM — Abas (.tab-layout)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-table-shell {
-  display: flex;
-  flex-direction: column;
-}
-
-.demo-page-header {
+.demo-system-tabs {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: #fff;
-  border-bottom: 1.5px solid #ececec;
-  flex-shrink: 0;
-
-  .demo-page-header-left {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-  }
-
-  .demo-page-header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-}
-
-.demo-label-sm {
-  font-size: 13px;
-  font-weight: 300;
-  color: #999;
-  font-family: v.$jakarta;
-}
-
-.demo-count {
-  font-size: 16px;
-  font-weight: 300;
-  color: #c7c7c7;
-  font-family: v.$jakarta;
-}
-
-.demo-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #888;
-  font-family: v.$jakarta;
-  cursor: default;
-  white-space: nowrap;
-
-  i {
-    font-size: 13px;
-    padding-top: 1px;
-  }
-
-  &.demo-action-btn--danger {
-    color: #e74c3c;
-  }
-}
-
-.demo-table-wrap {
-  overflow-x: auto;
-  max-height: 180px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #ddd;
-    border-radius: 6px;
-  }
-}
-
-.demo-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: v.$jakarta;
-  table-layout: fixed;
-
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-}
-
-// Células de cabeçalho
-.demo-th {
-  background: #f2f2f2;
-  padding: 8px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #555;
-  text-align: left;
-  border-bottom: 2px solid #e0e0e0;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.demo-th-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.demo-th-check {
-  width: 36px;
-  text-align: center;
-}
-.demo-th-id {
-  width: 44px;
-}
-.demo-th-actions {
-  width: 52px;
-  text-align: center;
-}
-.demo-th-scrollable {
-  min-width: 100px;
-}
-
-.demo-check-icon {
-  font-size: 14px;
-  color: #bbb;
-}
-.demo-resize-icon {
-  font-size: 12px;
-  color: v.$cor-primaria;
-  transform: rotate(90deg);
-}
-.demo-menu-icon {
-  font-size: 11px;
-  color: #ccc;
-}
-.demo-refresh-icon {
-  font-size: 13px;
-  color: #888;
-}
-
-// Células de dados
-.demo-td {
-  padding: 8px 10px;
-  font-size: 12px;
-  color: #444;
-  border-bottom: 1.5px solid #efefef;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: #fff;
-}
-
-.demo-td-check {
-  text-align: center;
-  width: 36px;
-}
-.demo-td-id {
-  width: 44px;
-  font-weight: 600;
-  color: #888;
-}
-.demo-td-actions {
-  width: 52px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-bottom: solid 2px #c7c7c7;
+  padding-left: 12px;
   gap: 6px;
-  padding: 8px 6px;
-}
-
-.demo-check-icon {
-  font-size: 14px;
-  color: #bbb;
-}
-.demo-check-idle {
-  font-size: 14px;
-  color: #ccc;
-}
-.demo-check-active {
-  font-size: 14px;
-  color: v.$cor-primaria;
-}
-
-.demo-row-action {
-  font-size: 12px;
-  color: #ccc;
-  cursor: default;
-}
-
-.demo-row-selected td {
-  background: rgba(v.$cor-primaria, 0.1) !important;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO TABS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-.demo-tabs-bar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 12px;
-  border-bottom: 2px solid #e0e0e0;
-  background: #fff;
   position: relative;
   flex-shrink: 0;
+  background: #fff;
+  min-height: 44px;
 }
 
-.demo-tab {
+.demo-system-tab-item {
   background: transparent;
   border: none;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-family: v.$jakarta;
-  color: #999;
   cursor: pointer;
+  color: #999;
   position: relative;
-  transition: color 0.2s;
+  padding: 10px 6px;
+  font-size: 15px;
+  font-family: v.$jakarta;
   white-space: nowrap;
+  transition: color 0.2s;
 
-  &.demo-tab--active {
+  &.active {
     color: v.$cor-secundaria;
     font-weight: 400;
   }
 }
 
-.demo-tab-indicator {
+.demo-system-tab-indicator {
   position: absolute;
   bottom: -2px;
   height: 3px;
-  background: v.$cor-primaria;
+  background-color: v.$cor-primaria;
   border-radius: 5px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.demo-new-tab-btn {
+.demo-system-new-tab-btn {
   background: transparent;
   border: none;
-  padding: 10px 12px;
+  padding: 8px 12px;
   cursor: pointer;
-  color: #aaa;
-  font-size: 13px;
   display: flex;
   align-items: center;
+  color: #333;
+  font-size: 13px;
+  i {
+    padding-top: 2px;
+  }
 }
 
-.demo-tab-content {
-  padding: 12px;
+.demo-system-tab-content {
+  padding: 12px 14px;
   background: #fafafa;
-}
-
-.demo-tab-table-preview {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.demo-mini-rows {
+.demo-system-tab-hint {
+  font-size: 12px;
+  color: #aaa;
+  font-family: v.$jakarta;
+  font-weight: 300;
+
+  strong {
+    color: #555;
+    font-weight: 600;
+  }
+}
+
+.demo-system-mini-rows {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.demo-mini-row {
+.demo-system-mini-row {
   display: flex;
   gap: 6px;
   align-items: center;
@@ -881,65 +691,97 @@
   border-radius: 7px;
 }
 
-.demo-mini-cell {
+.demo-system-mini-cell {
   height: 10px;
   border-radius: 4px;
   background: #efefef;
   flex: 1;
 
-  &.demo-mini-cell--id {
-    width: 24px;
-    flex: 0 0 24px;
+  &.demo-system-mini-cell--id {
+    width: 20px;
+    flex: 0 0 20px;
     background: #e0e0e0;
     border-radius: 3px;
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO RECORD COUNT
+// ─── DEMO SYSTEM — Table header (.table-header)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-record-header {
+.demo-system-table-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: #fff;
-  border-bottom: 1.5px solid #ececec;
-  flex-wrap: wrap;
   gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 2px solid #c7c7c7;
+  background: #fff;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
-.demo-record-count-group {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.demo-record-label {
-  font-size: 18px;
+.demo-system-qtd-reg {
+  font-size: 20px;
   font-weight: 300;
-  color: #555;
+  color: #333;
   font-family: v.$jakarta;
 }
 
-.demo-record-number {
-  font-size: 22px;
+.demo-system-row-counter {
+  font-size: 17px;
   font-weight: 300;
   color: v.$cor-primaria;
   font-family: v.$jakarta;
-  min-width: 40px;
+  padding-left: 4px;
+  min-width: 36px;
   transition: color 0.1s;
 }
 
-.demo-record-actions {
+.demo-system-header-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.demo-record-hint {
+.demo-system-action-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: v.$jakarta;
+  color: #555;
+  cursor: default;
+  white-space: nowrap;
+  i {
+    font-size: 14px;
+    padding-top: 2px;
+  }
+}
+
+.demo-system-apagar-tabela-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: v.$jakarta;
+  color: #e74c3c;
+  cursor: default;
+  white-space: nowrap;
+  i {
+    font-size: 14px;
+    padding-top: 2px;
+  }
+}
+
+.demo-system-record-hint {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -961,10 +803,10 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO SELECTION BAR
+// ─── DEMO SYSTEM — Selection bar (.selection-bar)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-sel-controls {
+.demo-system-sel-controls {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -974,6 +816,7 @@
   border-bottom: 1.5px solid #ececec;
 }
 
+// Botões +/- do simulador (mantidos do original)
 .demo-sel-btn {
   width: 32px;
   height: 32px;
@@ -999,45 +842,56 @@
   }
 }
 
-.demo-sel-hint {
+.demo-system-sel-hint {
   font-size: 12px;
   color: #aaa;
   font-family: v.$jakarta;
 }
 
-.demo-sel-bar {
+// Réplica fiel do .selection-bar
+.demo-system-selection-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  height: 40px;
   margin: 12px 14px;
-  transition: all 0.25s;
-  min-height: 44px;
+  padding: 0 12px;
+  border: solid 2px v.$cor-primaria;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s;
 
   span {
-    font-size: 13px;
-    color: #555;
+    font-size: 16px;
+    font-weight: 300;
+    color: #333;
     font-family: v.$jakarta;
   }
 
-  &.demo-sel-bar--active {
-    background: v.$cor-secundaria;
+  &.demo-system-selection-bar--active {
+    background-color: v.$cor-secundaria;
     border-color: v.$cor-secundaria;
+
     span {
       color: #fff;
     }
   }
 }
 
-.demo-sel-actions {
+.demo-system-empty-selection {
+  font-size: 14px;
+  color: #aaa !important;
+  font-family: v.$jakarta;
+}
+
+.demo-system-selection-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.demo-sel-divider {
+.demo-system-selection-action-divider {
+  display: block;
   width: 1.5px;
   height: 18px;
   background: rgba(255, 255, 255, 0.3);
@@ -1045,55 +899,302 @@
   margin: 0 4px;
 }
 
-.demo-sel-action {
+.demo-system-selection-action-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  background: transparent;
+  border: none;
   font-size: 13px;
   font-weight: 500;
-  color: #fff;
   font-family: v.$jakarta;
+  color: #fff;
+  cursor: default;
   padding: 4px 8px;
   border-radius: 6px;
-  cursor: default;
 
   i {
     font-size: 13px;
+    padding-top: 2px;
   }
 
-  &.demo-sel-action--disabled {
+  &.demo-system-selection-action-btn--disabled {
     opacity: 0.4;
   }
 }
 
-.demo-sel-note {
+.demo-system-sel-note {
   padding: 0 14px 12px;
-  span {
-    font-size: 11.5px;
-    color: #aaa;
-    font-family: v.$jakarta;
-    line-height: 1.5;
-    strong {
-      color: #777;
-    }
+  font-size: 11.5px;
+  color: #aaa;
+  font-family: v.$jakarta;
+  line-height: 1.5;
+
+  strong {
+    color: #777;
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO CHECKBOX
+// ─── DEMO SYSTEM — Tabela genérica (usada por Checkbox, StickyID, Resize, etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-checkbox-legend {
+.demo-system-table-shell {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.demo-system-table-scroll {
+  overflow-x: auto;
+  max-height: 180px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 6px;
+  }
+}
+
+.demo-system-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: v.$jakarta;
+
+  // Cabeçalho sticky
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+}
+
+// ── Th genérico — espelha o .custom-table thead th do System ──────────────────
+.demo-system-th {
+  background-color: #eee;
+  border-bottom: 2px solid #c7c7c7;
+  color: #333;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: v.$jakarta;
+
+  &.demo-system-th--highlight {
+    background: rgba(v.$cor-primaria, 0.08) !important;
+    outline: 2px solid rgba(v.$cor-primaria, 0.3);
+    outline-offset: -2px;
+  }
+}
+
+// ── Colunas especiais (espelham .checkbox-col, sticky-id, actions-header)
+.demo-system-checkbox-col {
+  width: 50px;
+  min-width: 50px;
+  text-align: center;
+  padding: 0;
+}
+
+.demo-system-th-id {
+  width: 44px;
+  min-width: 44px;
+  background-color: #eee;
+}
+
+.demo-system-actions-header {
+  width: 60px;
+  min-width: 60px;
+  text-align: center;
+}
+
+// ── Cell content (espelha o .cell-content dentro de .resizable-col)
+.demo-system-cell-content {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+  gap: 4px;
+}
+
+.demo-system-col-label-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  gap: 4px;
+  position: relative; // para o dropdown ficar posicionado corretamente
+}
+
+.demo-system-col-label {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+// ── Resizer handle (espelha .resizer-handle)
+.demo-system-resizer-handle {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: default;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+
+  i {
+    font-size: 13px;
+    color: #c7c7c7;
+    transform: rotate(90deg);
+  }
+
+  &.demo-system-resizer-handle--active i {
+    color: v.$cor-primaria;
+  }
+}
+
+// ── Actions cell content (espelha .actions-cell-content)
+.demo-system-actions-cell-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  button {
+    border: none;
+    background: none;
+    cursor: default;
+    font-size: 15px;
+    color: #555;
+    line-height: 0;
+    padding: 0;
+  }
+}
+
+// ── Select all button (espelha .select-all-btn)
+.demo-system-select-all-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #c7c7c7;
+  padding: 8px;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #333;
+  }
+}
+
+// ── Custom checkbox (espelha .custom-checkbox)
+.demo-system-custom-checkbox {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 8px;
+  line-height: 0;
+
+  i {
+    font-size: 15px;
+    transition: color 0.15s;
+
+    &.fi-sr-angle-square-right {
+      color: v.$cor-secundaria;
+    }
+    &.fi-rr-square {
+      color: #c7c7c7;
+    }
+  }
+}
+
+// ── Td genérico (espelha o tbody td do System)
+.demo-system-td {
+  background-color: #fff;
+  padding: 8px 8px;
+  font-size: 12px;
+  color: #333;
+  border-bottom: 2px solid #c7c7c7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: v.$jakarta;
+
+  &.demo-system-td--highlight {
+    background: rgba(v.$cor-primaria, 0.06) !important;
+    outline: 2px solid rgba(v.$cor-primaria, 0.25);
+    outline-offset: -2px;
+  }
+}
+
+.demo-system-td-id {
+  font-weight: 600;
+  color: #888;
+  width: 44px;
+}
+
+.demo-system-actions-cell {
+  width: 60px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.demo-system-actions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 6px 0;
+
+  button {
+    border: none;
+    background: none;
+    cursor: default;
+    font-size: 13px;
+    color: #ccc;
+    line-height: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+}
+
+// ── Row selecionada (espelha .row-selected)
+.demo-system-row-selected {
+  td {
+    background-color: rgba(v.$cor-primaria, 0.15) !important;
+  }
+}
+
+// ── Legend de seleção (controles abaixo da tabela)
+.demo-system-checkbox-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 12px;
   background: #fff;
   border-top: 1.5px solid #ececec;
   flex-wrap: wrap;
 }
 
-.demo-legend-btn {
+.demo-system-legend-btn {
   background: #fff;
   border: 1.5px solid #e0e0e0;
   border-radius: 7px;
@@ -1110,84 +1211,76 @@
     color: v.$cor-primaria;
   }
 
-  &--active {
-    background: rgba(v.$cor-primaria, 0.1);
+  &.demo-system-legend-btn--active {
+    background: rgba(v.$cor-primaria, 0.08);
     border-color: v.$cor-primaria;
     color: v.$cor-primaria;
   }
 
-  &--sm {
+  &.demo-system-legend-btn--sm {
     padding: 4px 10px;
   }
 }
 
-.demo-legend-individual {
+.demo-system-legend-individual {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO STICKY ID
+// ─── DEMO SYSTEM — Sticky ID
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-sticky-wrapper {
-  display: flex;
-  flex-direction: column;
-}
+// Quando scrollado, aplica translateX nas colunas não-fixas para simular scroll
+.demo-system-sticky-wrapper {
+  &.demo-system-sticky-wrapper--scrolled {
+    .demo-system-table-scroll {
+      // As colunas não-ID saem da área visível
+      th:not(.demo-system-th-id):not(.demo-system-checkbox-col):not(
+          .demo-system-actions-header
+        ),
+      td:not(.demo-system-td-id):not(.demo-system-checkbox-col):not(
+          .demo-system-actions-cell
+        ) {
+        transform: translateX(-90px);
+        transition: transform 0.4s ease;
+        opacity: 0.4;
+      }
 
-.demo-sticky-table-scroll {
-  overflow-x: hidden;
-  transition: all 0.4s ease;
-
-  &.demo-sticky-table-scroll--scrolled {
-    // Simula o scroll deslocando a tabela
-    .demo-th-scrollable,
-    .demo-td-scrollable {
-      transform: translateX(-80px);
-      transition: transform 0.4s ease;
-    }
-    .demo-th-id--sticky,
-    .demo-td-id--sticky {
-      position: sticky;
-      left: 36px;
-      z-index: 3;
+      // ID e checkbox ficam parados (sticky simulado)
+      .demo-system-th-id,
+      .demo-system-td-id {
+        transition: none;
+        transform: none;
+        opacity: 1;
+        outline: 2px solid rgba(v.$cor-primaria, 0.35);
+        outline-offset: -2px;
+        background: rgba(v.$cor-primaria, 0.05) !important;
+      }
     }
   }
 }
 
-.demo-th-id--sticky,
-.demo-td-id--sticky {
-  background: #f2f2f2;
-  transition: all 0.4s ease;
-}
-
-.demo-td-id--sticky {
-  background: #fff !important;
-}
-
-.demo-th-scrollable,
-.demo-td-scrollable {
-  min-width: 100px;
-  transition: transform 0.4s ease;
-}
-
-.demo-td-placeholder {
-  display: block;
-  height: 10px;
-  border-radius: 4px;
-  background: #efefef;
-  width: 80%;
-}
-
-.demo-sticky-scroll-hint {
+.demo-system-sticky-hint {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 12px;
   padding: 10px 14px;
   background: #fff;
   border-top: 1.5px solid #ececec;
+  flex-wrap: wrap;
 }
 
+.demo-system-sticky-note {
+  font-size: 11.5px;
+  color: #aaa;
+  font-family: v.$jakarta;
+  flex: 1;
+  line-height: 1.5;
+}
+
+// Botão toggle scroll (mantido do original)
 .demo-scroll-toggle {
   display: flex;
   align-items: center;
@@ -1202,6 +1295,7 @@
   color: #555;
   cursor: pointer;
   transition: all 0.18s;
+  flex-shrink: 0;
 
   i {
     font-size: 11px;
@@ -1212,7 +1306,7 @@
     color: v.$cor-primaria;
   }
 
-  &--active {
+  &.demo-scroll-toggle--active {
     background: rgba(v.$cor-primaria, 0.08);
     border-color: v.$cor-primaria;
     color: v.$cor-primaria;
@@ -1220,108 +1314,66 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO RESIZE
+// ─── DEMO SYSTEM — Resize controls
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-resize-demo {
-  display: flex;
-  background: #f2f2f2;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.demo-resize-col {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-right: 1.5px solid #e0e0e0;
-  overflow: hidden;
-  flex-shrink: 0;
-  min-width: 60px;
-  transition: width 0.05s;
-
-  &.demo-resize-col--rest {
-    flex: 1;
-  }
-}
-
-.demo-resize-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #555;
-  font-family: v.$jakarta;
-}
-
-.demo-resize-handle-icon {
-  font-size: 13px;
-  color: v.$cor-primaria;
-  transform: rotate(90deg);
-  flex-shrink: 0;
-}
-
-.demo-resize-slider-group {
+.demo-system-resize-controls {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
   background: #fff;
-  border-bottom: 1.5px solid #ececec;
+  border-top: 1.5px solid #ececec;
   flex-wrap: wrap;
+}
+
+.demo-system-resize-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #777;
+  font-family: v.$jakarta;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  i {
+    font-size: 12px;
+    color: v.$cor-primaria;
+    transform: rotate(90deg);
+  }
 }
 
 .demo-resize-slider {
   flex: 1;
+  min-width: 80px;
   accent-color: v.$cor-primaria;
-  min-width: 100px;
 }
 
-.demo-resize-value {
+.demo-system-resize-value {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: v.$cor-primaria;
   font-family: v.$jakarta;
-  min-width: 40px;
-}
-
-.demo-resize-rows-preview {
-  display: flex;
-  flex-direction: column;
-}
-
-.demo-resize-row {
-  display: flex;
-  border-bottom: 1.5px solid #efefef;
-  background: #fff;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.demo-resize-cell {
-  padding: 8px 10px;
-  font-size: 12px;
-  color: #444;
-  font-family: v.$jakarta;
-  overflow: hidden;
-  border-right: 1.5px solid #efefef;
-  flex-shrink: 0;
-  transition: width 0.05s;
-
-  &.demo-resize-cell--rest {
-    flex: 1;
-  }
+  min-width: 44px;
+  text-align: right;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── DEMO HEADER ACTIONS — dropdown de coluna
+// ─── DEMO SYSTEM — Header actions (dropdown de coluna)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.demo-col-menu-wrap {
+// Menu de coluna (espelha .col-header-menu)
+.demo-system-col-header-menu {
   position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.demo-col-menu-btn {
+// Botão ⋮ (espelha .col-header-menu-btn)
+.demo-system-col-header-menu-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -1335,13 +1387,14 @@
   transition: all 0.15s;
 
   &:hover,
-  &.demo-col-menu-btn--active {
+  &.demo-system-col-header-menu-btn--active {
     color: #555;
     background: #f0f0f0;
   }
 }
 
-.demo-col-dropdown {
+// Dropdown (espelha .col-header-dropdown)
+.demo-system-col-dropdown {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -1349,54 +1402,63 @@
   border: 1.5px solid #e8e8e8;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  min-width: 140px;
+  z-index: 50;
+  min-width: 150px;
   overflow: hidden;
-  animation: fadeIn 0.15s ease;
+  animation: demoDropdownIn 0.15s ease;
+
+  @keyframes demoDropdownIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.demo-col-dropdown-item {
+// Item do dropdown (espelha .col-dropdown-item)
+.demo-system-col-dropdown-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 12px;
-  font-size: 12px;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
   font-family: v.$jakarta;
   font-weight: 500;
   color: #444;
-  cursor: default;
+  text-align: left;
   transition: background 0.1s;
 
   i {
-    font-size: 12px;
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
+    line-height: 0;
   }
 
   &:hover {
     background: #f7f7f7;
   }
 
-  &.demo-col-dropdown-item--danger {
+  &.demo-system-col-dropdown-item--danger {
     border-top: 1.5px solid #f5f5f5;
     color: #e74c3c;
+
     &:hover {
       background: #fff5f5;
     }
   }
 }
 
-.demo-caption {
-  padding: 8px 12px 10px;
+.demo-system-caption {
+  padding: 8px 14px 10px;
   font-size: 11.5px;
   color: #888;
   font-family: v.$jakarta;
