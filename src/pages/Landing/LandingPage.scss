@@ -43,7 +43,6 @@ html {
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  padding-top: 70px;
   scrollbar-gutter: stable;
 
   // ── Scrollbar customizada ─────────────────────────────────────────────────
@@ -231,15 +230,19 @@ html {
   }
 
   .lp-nav-cta {
-    background: v.$cor-primaria;
-    color: #fff;
-    padding: 8px 18px;
+    background: transparent;
+    color: v.$cor-primaria;
+    padding: 6px 18px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
-
+    border: solid 1.5px v.$cor-primaria;
+    transition: v.$transicao-rapida;
+    
     &:hover {
-      filter: brightness(0.93);
+      background-color: v.$cor-primaria;
+      transition: v.$transicao-rapida;
+      color: #fff;
     }
   }
 }
@@ -313,6 +316,7 @@ html {
   line-height: 1.1 !important;
   color: #333 !important;
   margin: 0 !important;
+  height: 80px;
 
   .split-char {
     display: inline-block;
@@ -1513,6 +1517,9 @@ html {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .lp-tech-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   padding-top: 60px;
   padding-bottom: 60px;
@@ -1535,8 +1542,12 @@ html {
 // ── Faixa com máscara de fade nas bordas ─────────────────────────────────
 
 .lp-tech-track-wrapper {
+  display: flex;
+  align-items: center;
   position: relative;
   overflow: hidden;
+  width: 900px;
+  height: 70px;
 
   &::before,
   &::after {
@@ -1580,6 +1591,7 @@ html {
   &:hover {
     opacity: 1;
     transition: v.$transicao-rapida;
+    transform: translateY(-2px);
   }
 }
 
@@ -1595,6 +1607,7 @@ html {
 }
 
 .lp-tech-name {
+  font-family: v.$jakarta;
   font-size: 10px;
   font-weight: 600;
   color: black;

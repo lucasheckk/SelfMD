@@ -2646,7 +2646,7 @@ export function System() {
                       <span className="btn-spinner" />
                     ) : (
                       <>
-                        Gerar tabela <i className="fi fi-sr-rocket-lunch" />
+                        Gerar tabela <i className="fi fi-sr-sparkles" />
                       </>
                     )}
                   </button>

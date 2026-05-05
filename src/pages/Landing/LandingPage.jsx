@@ -231,7 +231,7 @@ const TECH_ICONS = [
   },
   {
     src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/nodejs/nodejs-original.svg",
-    label: "Node.js",
+    label: "Node",
   },
   {
     src: "https://img.icons8.com/external-tal-revivo-color-tal-revivo/96/external-java-is-a-general-purpose-programming-language-that-is-class-based-logo-color-tal-revivo.png",
@@ -248,7 +248,7 @@ const TECH_ICONS = [
   { src: "https://img.icons8.com/fluency/96/docker.png", label: "Docker" },
   {
     src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/sass/sass-original.svg",
-    label: "SASS",
+    label: "Sass",
   },
   {
     src: "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/spring/spring-original.svg",
@@ -823,17 +823,16 @@ export function LandingPage() {
         <section className="lp-hero" id="hero">
           <div className="lp-hero-rings">
             <MagicRings
-              color="#0bcd5f"
+              color="#08af50"
               colorTwo="#0bcd5f"
               speed={0.8}
               ringCount={5}
+              hoverScale={1}
               attenuation={8}
               baseRadius={0.3}
               radiusStep={0.12}
+              blur={1}
               opacity={1}
-              followMouse
-              mouseInfluence={0.04}
-              parallax={0.04}
             />
           </div>
 
